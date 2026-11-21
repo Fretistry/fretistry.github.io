@@ -1,0 +1,19 @@
+{
+  "name": "Fretistry — guitar scales, chords & positions",
+  "short_name": "Fretistry",
+  "description": "Explore guitar scales across all 24 frets, see the chords in every key, learn box shapes and CAGED positions — with the theory explained. Free in your browser.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#121318",
+  "theme_color": "#121318",
+  "categories": ["music", "education"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

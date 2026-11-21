@@ -1,0 +1,212 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  /* Note colour system — used by the fretboard, legend and theory panel */
+  --color-note-root: var(--note-root);
+  --color-note-root-foreground: var(--note-root-foreground);
+  --color-note-scale: var(--note-scale);
+  --color-note-scale-foreground: var(--note-scale-foreground);
+  --color-note-outside: var(--note-outside);
+  --color-surface: var(--surface);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* Light theme */
+:root {
+  --background: oklch(0.975 0.003 265);
+  --foreground: oklch(0.18 0.01 265);
+  --surface: oklch(0.955 0.004 265);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.01 265);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.01 265);
+  --primary: oklch(0.66 0.16 58);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.95 0.004 265);
+  --secondary-foreground: oklch(0.22 0.01 265);
+  --muted: oklch(0.95 0.004 265);
+  --muted-foreground: oklch(0.48 0.012 265);
+  --accent: oklch(0.94 0.006 265);
+  --accent-foreground: oklch(0.2 0.01 265);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.9 0.005 265);
+  --input: oklch(0.88 0.006 265);
+  --ring: oklch(0.66 0.16 58 / 55%);
+  --radius: 0.75rem;
+
+  --note-root: oklch(0.8 0.16 68);
+  --note-root-foreground: oklch(0.22 0.05 55);
+  --note-scale: oklch(0.74 0.12 188);
+  --note-scale-foreground: oklch(0.2 0.04 200);
+  --note-outside: oklch(0.62 0.01 265);
+}
+
+/* Dark theme (default) */
+.dark {
+  --background: oklch(0.135 0.006 265);
+  --foreground: oklch(0.96 0.004 265);
+  --surface: oklch(0.165 0.007 265);
+  --card: oklch(0.18 0.008 265);
+  --card-foreground: oklch(0.96 0.004 265);
+  --popover: oklch(0.2 0.009 265);
+  --popover-foreground: oklch(0.96 0.004 265);
+  --primary: oklch(0.82 0.15 72);
+  --primary-foreground: oklch(0.2 0.04 60);
+  --secondary: oklch(0.24 0.009 265);
+  --secondary-foreground: oklch(0.96 0.004 265);
+  --muted: oklch(0.23 0.009 265);
+  --muted-foreground: oklch(0.68 0.012 265);
+  --accent: oklch(0.26 0.01 265);
+  --accent-foreground: oklch(0.96 0.004 265);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 9%);
+  --input: oklch(1 0 0 / 13%);
+  --ring: oklch(0.82 0.15 72 / 55%);
+
+  --note-root: oklch(0.82 0.16 70);
+  --note-root-foreground: oklch(0.22 0.05 55);
+  --note-scale: oklch(0.76 0.12 188);
+  --note-scale-foreground: oklch(0.19 0.04 200);
+  --note-outside: oklch(0.7 0.01 265);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  html {
+    @apply font-sans;
+    /* Phones: no font inflation in landscape, no double-tap zoom delay, no grey tap flash */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* ── Fretboard ──────────────────────────────────────────────────────────── */
+
+.fret-marker {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    opacity 220ms ease,
+    transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.fret-marker[data-visible="false"] {
+  opacity: 0;
+  transform: scale(0.4);
+  pointer-events: none;
+}
+
+.fret-marker circle,
+.fret-marker text {
+  transition:
+    fill 220ms ease,
+    stroke 220ms ease,
+    r 220ms ease,
+    opacity 220ms ease;
+}
+
+.fret-marker:focus-visible {
+  outline: none;
+}
+
+.fret-marker:focus-visible .marker-focus {
+  opacity: 1;
+}
+
+.marker-pulse {
+  animation: marker-pulse 1.6s ease-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes marker-pulse {
+  0% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}
+
+/* Metronome beat light in the header */
+.animate-beat-flash {
+  animation: beat-flash 0.35s ease-out;
+}
+
+@keyframes beat-flash {
+  0% {
+    opacity: 1;
+    transform: scale(1.6);
+  }
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-beat-flash {
+    animation: none;
+  }
+
+  .fret-marker,
+  .fret-marker circle,
+  .fret-marker text {
+    transition: none;
+  }
+  .marker-pulse {
+    animation: none;
+  }
+}
+
+/* Subtle scrollbar for the horizontally scrolling fretboard */
+.fretboard-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(0.5 0.01 265 / 40%) transparent;
+}
