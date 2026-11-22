@@ -35,7 +35,10 @@ export interface ScalePosition {
 
 const MAJOR_PENTATONIC = [0, 2, 4, 7, 9];
 const MINOR_PENTATONIC = [0, 3, 5, 7, 10];
+/** The CAGED letter of each box as computed (box 1 starts on the root on the 6th string = E shape). */
 const CAGED_ORDER = ["E", "D", "C", "A", "G"];
+/** The order guitarists learn and name the shapes in. */
+export const CAGED_SEQUENCE = ["C", "A", "G", "E", "D"] as const;
 const MAX_STRETCH = 2;
 
 export function positionSystemsFor(spelled: SpelledScale): PositionSystem[] {
@@ -208,7 +211,7 @@ export function scalePositions(
 
   const anchor = thirdQuality(spelled.scale) === "major" ? MAJOR_PENTATONIC : MINOR_PENTATONIC;
   const isAnchorItself = intervals.length === anchor.length && intervals.every((v, i) => v === anchor[i]);
-  return anchor.map((startSemitones, index) => {
+  const boxes: ScalePosition[] = anchor.map((startSemitones, index) => {
     const start = boxStart(openMidis, extra ?? 0, rootPc, mod12(rootPc + startSemitones), anchor);
     const anchors = notesPerString(openMidis, start, rootPc, anchor, 2);
     const base = isAnchorItself ? anchors : fillBox(anchors, openMidis, rootPc, intervals);
@@ -220,6 +223,14 @@ export function scalePositions(
       occurrences: occurrencesOnNeck(base, fretCount),
     };
   });
+  if (extra === null) return boxes;
+  // CAGED tunings: present the shapes as guitarists know them — C, A, G, E, D.
+  return CAGED_SEQUENCE.map((letter, index) => ({ ...boxes.find((b) => b.cagedShape === letter)!, index }));
+}
+
+/** True when the box shapes carry CAGED names (standard-type tunings, including 7-string). */
+export function hasCagedShapes(tuning: Tuning): boolean {
+  return extraLowStrings(tuning) !== null;
 }
 
 /** Lowest fret used by the first occurrence — handy for labels like "5th fret". */

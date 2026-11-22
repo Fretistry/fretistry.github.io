@@ -10,7 +10,7 @@ import {
   scalePositions,
   spellScale,
 } from "@/lib/theory";
-import { MAX_TAPER, TRUE_TAPER, computeGeometry, fitTaper, minimumLength, positionOutline } from "./geometry";
+import { MAX_TAPER, TRUE_TAPER, computeGeometry, fitTaper, minimumLength, positionArea } from "./geometry";
 import { computeMarker, type ChordDisplay, type MarkerOptions } from "./marker-model";
 
 const standard = getTuningPreset("standard")!;
@@ -58,7 +58,7 @@ describe("marker model — explore mode", () => {
   });
 
   it("dims notes outside the selected scale position", () => {
-    const box1 = scalePositions(aMinorPent, standard, "boxes")[0];
+    const box1 = scalePositions(aMinorPent, standard, "boxes").find((p) => p.cagedShape === "E")!; // the 5th-fret box
     const keys = new Set(box1.occurrences.flat().map((n) => positionKey(n.stringIndex, n.fret)));
     const opts = { ...base, positionKeys: keys };
     expect(computeMarker(A5, opts).dimmed).toBe(false); // 5th fret is inside box 1
@@ -170,13 +170,17 @@ describe("fretboard geometry", () => {
     expect(lefty.noteXY(0, 5).x).toBeGreaterThan(lefty.noteXY(5, 5).x);
   });
 
-  it("outlines a scale position around its outermost notes", () => {
+  it("shades a scale position on the fret grid: edges on fret wires, steps where the shape shifts", () => {
     const g = computeGeometry(input);
-    const box1 = scalePositions(aMinorPent, standard, "boxes")[0].occurrences[0];
-    const outline = positionOutline(g, box1);
-    expect(outline).toHaveLength(12); // left and right edge for each of the 6 strings
-    const xs = outline.map((p) => p.x);
-    expect(Math.min(...xs)).toBeCloseTo(g.noteXY(0, 5).x, 6);
-    expect(Math.max(...xs)).toBeCloseTo(g.noteXY(0, 8).x, 6);
+    // C major, A shape: "3 5 | 2 3 5 | 2 3 5 | 2 4 5 | 3 5 6 | 3 5" (low E → high E)
+    const aShape = scalePositions(spellScale(parseNote("C"), getScale("major")), standard, "boxes").find((p) => p.cagedShape === "A")!;
+    const area = positionArea(g, aShape.occurrences[0]);
+    expect(area).toHaveLength(24); // 2 corners on each side of each of the 6 strings
+    const xs = area.map((p) => p.x);
+    expect(Math.min(...xs)).toBeCloseTo(g.wireU(1), 6); // the A string starts on fret 2: from the wire after fret 1
+    expect(Math.max(...xs)).toBeCloseTo(g.wireU(6), 6); // the F at fret 6 on the B string: to the wire after fret 6
+    // Every corner lies on a fret wire (or the open-string zone) — never halfway through a fret.
+    const wires = new Set([1, 2, 4, 5, 6].map((f) => g.wireU(f).toFixed(3)));
+    expect(xs.every((x) => wires.has(x.toFixed(3)))).toBe(true);
   });
 });

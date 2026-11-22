@@ -157,6 +157,8 @@ export const fr: UiMessages = {
     threePerString: "3 par corde",
     wholeNeckTitle: "Afficher la gamme partout",
     positionsTitle: "Les 5 formes en boîte (CAGED en accordage standard)",
+    caged: "CAGED",
+    cagedTitle: "Les 5 formes CAGED, dans l’ordre C – A – G – E – D",
     threePerStringTitle: "Motifs à trois notes par corde",
     previous: "Position précédente",
     next: "Position suivante",

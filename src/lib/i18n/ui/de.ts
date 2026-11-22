@@ -155,6 +155,8 @@ export const de: UiMessages = {
     threePerString: "3 pro Saite",
     wholeNeckTitle: "Die Tonleiter überall zeigen",
     positionsTitle: "Die 5 Box-Formen (CAGED in Standardstimmung)",
+    caged: "CAGED",
+    cagedTitle: "Die 5 CAGED-Formen, in der Reihenfolge C – A – G – E – D",
     threePerStringTitle: "Muster mit drei Tönen pro Saite",
     previous: "Vorherige Lage",
     next: "Nächste Lage",

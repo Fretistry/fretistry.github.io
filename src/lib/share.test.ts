@@ -1,6 +1,17 @@
 import { describe, expect, it } from "vitest";
 import { parsePitch } from "@/lib/theory";
 import { imageFileName } from "./file-name";
+import { withSingleSvgNamespace } from "./svg-markup";
+
+describe("saved image markup", () => {
+  const ns = 'xmlns="http://www.w3.org/2000/svg"';
+  it("declares the SVG namespace exactly once (Firefox writes it twice)", () => {
+    const twice = `<svg ${ns} width="10" ${ns}><rect/></svg>`;
+    expect(withSingleSvgNamespace(twice)).toBe(`<svg ${ns} width="10"><rect/></svg>`);
+    expect(withSingleSvgNamespace('<svg width="10"><svg x="1"/></svg>')).toBe(`<svg ${ns} width="10"><svg x="1"/></svg>`);
+    expect(withSingleSvgNamespace(`<svg ${ns}><g/></svg>`)).toBe(`<svg ${ns}><g/></svg>`);
+  });
+});
 import { parseSearchParams, stateToSearchParams, type SharedState } from "./share";
 
 describe("saved image file names", () => {

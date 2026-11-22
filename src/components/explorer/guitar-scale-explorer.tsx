@@ -29,6 +29,7 @@ import {
   mod12,
   pitchClassOf,
   positionKey,
+  hasCagedShapes,
   positionSystemsFor,
   scaleChords,
   scalePositions,
@@ -247,7 +248,9 @@ function ExplorerApp() {
     const rows = explanation.intervalRows;
     const details = [ui.image.tuning(tuningName(tuning), tuning.strings.map((p) => i18n.note(p.note)).join(" "))];
     if (activePosition) {
-      const label = ui.positions.positionAria(positionIndex + 1, activePosition.cagedShape);
+      const label = activePosition.cagedShape
+        ? `CAGED · ${ui.positions.shape(activePosition.cagedShape)}`
+        : ui.positions.positionAria(positionIndex + 1, null);
       details.push(positionSystem === "3nps" ? `${ui.positions.threePerString} · ${label}` : label);
     }
     if (activeChord) details.push(ui.image.chord(activeChord.symbol));
@@ -314,7 +317,7 @@ function ExplorerApp() {
     <div className="flex min-h-screen flex-col bg-background">
       <AppHeader soundEnabled={soundEnabled} onSoundChange={setSoundEnabled} settings={settings} onSettingsChange={update} />
 
-      <main className="mx-auto w-full max-w-[1600px] flex-1 space-y-5 px-[max(1rem,env(safe-area-inset-left))] py-5 sm:px-6 sm:py-6">
+      <main className="mx-auto w-full max-w-[1600px] min-[1760px]:max-w-[112rem] flex-1 space-y-5 px-[max(1rem,env(safe-area-inset-left))] py-5 sm:px-6 sm:py-6">
         {/* Main controls */}
         <section
           aria-label={`${ui.controls.rootNote} · ${ui.controls.scale} · ${ui.controls.tuning}`}
@@ -370,6 +373,7 @@ function ExplorerApp() {
               available={availableSystems}
               positions={positions}
               index={positionIndex}
+              caged={hasCagedShapes(tuning)}
               onChange={update}
             />
             <ChordBar

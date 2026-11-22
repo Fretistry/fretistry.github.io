@@ -157,6 +157,8 @@ export const nl: UiMessages = {
     threePerString: "3 per snaar",
     wholeNeckTitle: "Toon de toonladder overal",
     positionsTitle: "De 5 boxvormen (CAGED in standaardstemming)",
+    caged: "CAGED",
+    cagedTitle: "De 5 CAGED-vormen, in de volgorde C – A – G – E – D",
     threePerStringTitle: "Patronen met drie noten per snaar",
     previous: "Vorige positie",
     next: "Volgende positie",

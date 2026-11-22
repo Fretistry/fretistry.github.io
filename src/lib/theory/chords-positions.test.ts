@@ -4,11 +4,20 @@ import { SCALES, getScale } from "@/lib/data/scales";
 import { TUNING_PRESETS, getTuningPreset, makeCustomTuning } from "@/lib/data/tunings";
 import { describeChordStack, identifyChord, scaleChords } from "./chords";
 import { midiOf, mod12, noteToAscii, parseNote, parsePitch, pitchClassOf } from "./notes";
-import { extraLowStrings, isStandardShape, positionSystemsFor, scalePositions, type PositionNote } from "./positions";
+import {
+  extraLowStrings,
+  hasCagedShapes,
+  isStandardShape,
+  positionSystemsFor,
+  scalePositions,
+  type PositionNote,
+  type ScalePosition,
+} from "./positions";
 import { spellScale } from "./scales";
 
 const spell = (root: string, scaleId: string) => spellScale(parseNote(root), getScale(scaleId));
 const standard = getTuningPreset("standard")!;
+const byShape = (positions: ScalePosition[], letter: string) => positions.find((p) => p.cagedShape === letter)!;
 
 /** Frets per string (low → high) of a position's first occurrence, e.g. "5 8 | 5 7 | …". */
 function shape(notes: PositionNote[], stringCount = 6): string {
@@ -98,33 +107,41 @@ describe("scale positions", () => {
   it("produces the five classic A minor pentatonic boxes", () => {
     const boxes = scalePositions(spell("A", "minor-pentatonic"), standard, "boxes");
     expect(boxes).toHaveLength(5);
-    expect(shape(boxes[0].occurrences[0])).toBe("5 8 | 5 7 | 5 7 | 5 7 | 5 8 | 5 8");
-    expect(shape(boxes[1].occurrences[0])).toBe("8 10 | 7 10 | 7 10 | 7 9 | 8 10 | 8 10");
-    expect(shape(boxes[3].occurrences[0])).toBe("0 3 | 0 3 | 0 2 | 0 2 | 1 3 | 0 3"); // open position
-    expect(shape(boxes[3].occurrences[1])).toBe("12 15 | 12 15 | 12 14 | 12 14 | 13 15 | 12 15"); // repeats at the 12th fret
+    expect(shape(byShape(boxes, "E").occurrences[0])).toBe("5 8 | 5 7 | 5 7 | 5 7 | 5 8 | 5 8"); // "box 1"
+    expect(shape(byShape(boxes, "D").occurrences[0])).toBe("8 10 | 7 10 | 7 10 | 7 9 | 8 10 | 8 10");
+    expect(shape(byShape(boxes, "A").occurrences[0])).toBe("0 3 | 0 3 | 0 2 | 0 2 | 1 3 | 0 3"); // open position
+    expect(shape(byShape(boxes, "A").occurrences[1])).toBe("12 15 | 12 15 | 12 14 | 12 14 | 13 15 | 12 15"); // repeats at the 12th fret
   });
 
-  it("labels boxes with CAGED shapes in standard tuning only", () => {
+  it("names the boxes C-A-G-E-D in standard tuning only, in that order", () => {
     const boxes = scalePositions(spell("C", "major"), standard, "boxes");
-    expect(boxes.map((b) => b.cagedShape)).toEqual(["E", "D", "C", "A", "G"]);
+    expect(boxes.map((b) => b.cagedShape)).toEqual(["C", "A", "G", "E", "D"]);
+    expect(boxes.map((b) => b.index)).toEqual([0, 1, 2, 3, 4]);
     expect(isStandardShape(standard)).toBe(true);
     expect(isStandardShape(getTuningPreset("d-standard")!)).toBe(true);
     expect(isStandardShape(getTuningPreset("drop-d")!)).toBe(false);
+    expect(hasCagedShapes(getTuningPreset("drop-d")!)).toBe(false);
     expect(scalePositions(spell("C", "major"), getTuningPreset("open-g")!, "boxes")[0].cagedShape).toBeNull();
+  });
+
+  it("matches the standard CAGED major-scale diagrams (C major)", () => {
+    const boxes = scalePositions(spell("C", "major"), standard, "boxes");
+    expect(shape(byShape(boxes, "C").occurrences[0])).toBe("0 1 3 | 0 2 3 | 0 2 3 | 0 2 | 0 1 3 | 0 1 3");
+    expect(shape(byShape(boxes, "A").occurrences[0])).toBe("3 5 | 2 3 5 | 2 3 5 | 2 4 5 | 3 5 6 | 3 5");
+    expect(shape(byShape(boxes, "G").occurrences[0])).toBe("5 7 8 | 5 7 8 | 5 7 | 4 5 7 | 5 6 8 | 5 7 8");
+    expect(shape(byShape(boxes, "E").occurrences[0])).toBe("7 8 10 | 7 8 10 | 7 9 10 | 7 9 10 | 8 10 | 7 8 10");
+    expect(shape(byShape(boxes, "D").occurrences[0])).toBe("10 12 13 | 10 12 | 9 10 12 | 9 10 12 | 10 12 13 | 10 12 13");
   });
 
   it("fills 7-note scales into the familiar position shapes", () => {
     // A natural minor, root on the low E string at the 5th fret
     const aMinor = scalePositions(spell("A", "natural-minor"), standard, "boxes");
-    expect(shape(aMinor[0].occurrences[0])).toBe("5 7 8 | 5 7 8 | 5 7 | 4 5 7 | 5 6 8 | 5 7 8");
-    // C major "E shape", root on the low E string at the 8th fret
-    const cMajor = scalePositions(spell("C", "major"), standard, "boxes");
-    expect(shape(cMajor[0].occurrences[0])).toBe("7 8 10 | 7 8 10 | 7 9 10 | 7 9 10 | 8 10 | 7 8 10");
+    expect(shape(byShape(aMinor, "E").occurrences[0])).toBe("5 7 8 | 5 7 8 | 5 7 | 4 5 7 | 5 6 8 | 5 7 8");
   });
 
   it("adds the blue note inside the pentatonic boxes", () => {
     const blues = scalePositions(spell("A", "blues"), standard, "boxes");
-    expect(shape(blues[0].occurrences[0])).toBe("5 8 | 5 6 7 | 5 7 | 5 7 8 | 5 8 | 5 8");
+    expect(shape(byShape(blues, "E").occurrences[0])).toBe("5 8 | 5 6 7 | 5 7 | 5 7 8 | 5 8 | 5 8");
   });
 
   it("produces 3-notes-per-string patterns", () => {
@@ -140,14 +157,14 @@ describe("scale positions", () => {
     const seven = getTuningPreset("seven-standard")!;
     const boxes7 = scalePositions(spell("A", "minor-pentatonic"), seven, "boxes");
     const boxes6 = scalePositions(spell("A", "minor-pentatonic"), standard, "boxes");
-    // Box 1: the low B string adds E and G below the familiar 5th-fret box.
-    expect(shape(boxes7[0].occurrences[0], 7)).toBe("5 8 | 5 8 | 5 7 | 5 7 | 5 7 | 5 8 | 5 8");
+    // E shape ("box 1"): the low B string adds E and G below the familiar 5th-fret box.
+    expect(shape(byShape(boxes7, "E").occurrences[0], 7)).toBe("5 8 | 5 8 | 5 7 | 5 7 | 5 7 | 5 8 | 5 8");
     for (let i = 0; i < 5; i++) {
       const topSix = boxes7[i].occurrences[0].filter((n) => n.stringIndex > 0).map((n) => ({ ...n, stringIndex: n.stringIndex - 1 }));
       expect(shape(topSix), `box ${i + 1}`).toBe(shape(boxes6[i].occurrences[0]));
     }
-    expect(boxes7.map((b) => b.cagedShape)).toEqual(["E", "D", "C", "A", "G"]);
-    expect(scalePositions(spell("C", "major"), getTuningPreset("seven-drop-a")!, "boxes")[0].cagedShape).toBe("E");
+    expect(boxes7.map((b) => b.cagedShape)).toEqual(["C", "A", "G", "E", "D"]);
+    expect(scalePositions(spell("C", "major"), getTuningPreset("seven-drop-a")!, "boxes")[0].cagedShape).toBe("C");
     expect(extraLowStrings(seven)).toBe(1);
     expect(extraLowStrings(standard)).toBe(0);
     expect(extraLowStrings(getTuningPreset("drop-b")!)).toBeNull();

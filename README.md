@@ -46,7 +46,7 @@ Then open <http://localhost:3000>.
   - **teal** = scale note (or chord tone)
   - **grey ring** = not in the scale
   - **small faint dot** = outside the chosen position or chord
-  - **light area** = the chosen position (box)
+  - **light area** = the chosen CAGED shape or box, shaded on the fret grid
   - **white ring** = selected note
 - Labels: note names, intervals (R, ♭3, 5…), note numbers (1, 2, 3… within the scale), or none.
 - Show all notes, scale notes only, or roots only. Choose a fret range: 0–24, 0–12 or 12–24. On phones these three sit behind one **Display** button, so the neck starts on the first screen.
@@ -60,13 +60,15 @@ Then open <http://localhost:3000>.
 - Everything personal in one place: language, note names, left-handed, neck direction (Auto, Across, Down), fret numbers, even fret spacing, and light/dark theme.
 - Settings are remembered on this device and never included in shared links.
 
-**Scale positions ("box shapes")**
+**CAGED shapes and scale positions**
 
-- **Positions:** 5 box shapes per scale. Pentatonic scales give the classic 5 pentatonic boxes, and 7-note scales give the familiar 5 CAGED patterns. In standard tuning (and E♭, D or C standard) each box is labelled with its CAGED shape (E, D, C, A, G).
-- **7-string guitars:** the boxes are the same shapes a 6-string player knows, extended onto the low string, so they keep their CAGED names.
+- **CAGED:** the 5 shapes of each scale, in the order guitarists learn them: **C – A – G – E – D**. They're available in standard tuning (and E♭, D or C standard).
+  - 7-note scales give the standard CAGED scale patterns, and an automated test checks all five C major shapes against the usual diagrams.
+  - Pentatonic scales give the 5 pentatonic boxes, named by the same shapes (the familiar "box 1" at the 5th fret of A minor pentatonic is the E shape).
+- **Shaded like a CAGED diagram:** the chosen shape is shaded on the fret grid. On every string the light area covers exactly the frets that string uses, with edges on the fret wires and a step where the shape shifts (e.g. at the B string). It repeats 12 frets higher where it fits, and the rest of the scale is dimmed.
+- **Other tunings:** the same 5 boxes, numbered 1–5, calculated from the tuning so they are correct in Drop D, open tunings and custom tunings too.
+- **7-string guitars:** the shapes are the ones a 6-string player knows, extended onto the low string, so they keep their CAGED names.
 - **3 per string:** the 3-notes-per-string patterns, one starting on each scale degree.
-- The chosen shape is outlined on the neck, repeats 12 frets higher where it fits, and the rest of the scale is dimmed.
-- Shapes are calculated from the tuning, so they are correct in Drop D, open tunings and custom tunings too.
 
 **Chords in the key**
 
@@ -150,6 +152,7 @@ Then open <http://localhost:3000>.
 **Phones and tablets (iOS and Android)**
 
 - Responsive layout with large touch targets, no accidental zooming, and support for notches and rounded screen corners.
+- **Large monitors:** from about 1760 pixels wide, the whole interface grows a little and uses more of the screen (up to 2240 px wide on a 2560 monitor). The neck grows with it: taller strings, bigger notes and labels.
 - **Installable as an app:** use Android "Install app" or iPhone "Share → Add to Home Screen". It opens full-screen with its own icon.
 - After the first visit, the published site keeps working offline. An offline helper (a "service worker") is installed in production builds only, never during local development.
 
@@ -252,16 +255,17 @@ Add one line to `src/lib/data/tunings.ts`, e.g. `tuning("open-f", "Open F", "C2 
 
 ## Tests
 
-`npm test` runs 440 automated checks, including:
+`npm test` runs 442 automated checks, including:
 
 - **Required cases:** C Major, A Natural Minor, A Minor Pentatonic, E Minor Pentatonic, Drop D, and custom tunings.
 - **Spelling:** every root × every scale for correct pitches and spelling.
 - **Tunings:** the exact pitches of all 15 presets, every preset in a menu group, and adding or removing the 7th string.
-- **Positions:** the classic pentatonic boxes, the CAGED shapes, G major 3-notes-per-string, Drop D boxes, and 7-string boxes that match the 6-string shapes.
+- **Positions:** the classic pentatonic boxes, the five C major CAGED shapes against the standard diagrams, the C-A-G-E-D order, G major 3-notes-per-string, Drop D boxes, and 7-string boxes that match the 6-string shapes.
+  - The shaded area of a shape always ends on fret wires.
   - A sweep over every tuning × root × scale × position checks that each note is valid, in the scale and never duplicated.
 - **Chords:** diatonic triads and 7ths with Roman numerals in major, minor and harmonic minor keys, and every chord identified for every root and scale.
 - **Shareable links:** round-tripping every field (including 7-string tunings), rejecting invalid links, and ignoring old practice-mode links.
-- **Saved pictures:** readable, safe file names in every language.
+- **Saved pictures:** readable, safe file names in every language, and picture markup that Firefox accepts (no duplicate namespace).
 - **Favourites:** adding, removing, saving and reading back, ignoring broken or unknown entries, and the 30-item limit.
 - **Fretboard geometry:** real fret spacing, the softened spacing that fits narrower screens (never softer than needed), no overlapping markers, the left-handed mirror, and the vertical layout.
 - **Chord view:** the scale's root stays marked while a chord is highlighted.

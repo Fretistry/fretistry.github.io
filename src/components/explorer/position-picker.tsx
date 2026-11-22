@@ -14,11 +14,13 @@ interface PositionPickerProps {
   available: PositionSystem[];
   positions: ScalePosition[];
   index: number;
+  /** The tuning gives the 5 boxes CAGED names (standard-type tunings): label them "CAGED", C-A-G-E-D. */
+  caged: boolean;
   onChange: (patch: { positionSystem?: PositionChoice; positionIndex?: number }) => void;
 }
 
-/** Choose between the whole neck, the 5 box positions, or the 3-notes-per-string patterns. */
-export function PositionPicker({ system, available, positions, index, onChange }: PositionPickerProps) {
+/** Choose between the whole neck, the 5 CAGED shapes (or numbered boxes), or the 3-notes-per-string patterns. */
+export function PositionPicker({ system, available, positions, index, caged, onChange }: PositionPickerProps) {
   const t = useI18n().ui.positions;
   const count = positions.length;
   const current = positions[index];
@@ -33,7 +35,9 @@ export function PositionPicker({ system, available, positions, index, onChange }
           onChange={(positionSystem) => onChange({ positionSystem })}
           options={[
             { value: "all", label: t.wholeNeck, title: t.wholeNeckTitle },
-            { value: "boxes", label: t.positions, title: t.positionsTitle },
+            caged
+              ? { value: "boxes" as const, label: t.caged, title: t.cagedTitle }
+              : { value: "boxes" as const, label: t.positions, title: t.positionsTitle },
             ...(available.includes("3nps") ? [{ value: "3nps" as const, label: t.threePerString, title: t.threePerStringTitle }] : []),
           ]}
         />
@@ -53,19 +57,16 @@ export function PositionPicker({ system, available, positions, index, onChange }
                   type="button"
                   role="radio"
                   aria-checked={active}
-                  aria-label={t.positionAria(p.index + 1, p.cagedShape)}
+                  aria-label={p.cagedShape ? t.shape(p.cagedShape) : t.positionAria(p.index + 1, null)}
+                  title={p.cagedShape ? t.shape(p.cagedShape) : undefined}
                   onClick={() => onChange({ positionIndex: p.index })}
                   className={cn(
-                    "flex h-8 min-w-8 items-center justify-center gap-1 rounded-lg px-2 text-sm font-semibold tabular-nums ring-1 transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                    "flex h-8 min-w-8 items-center justify-center rounded-lg px-2 text-sm font-semibold tabular-nums ring-1 transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
                     active ? "bg-foreground text-background ring-foreground" : "bg-card text-foreground/80 ring-border hover:bg-accent",
                   )}
                 >
-                  {p.index + 1}
-                  {p.cagedShape && (
-                    <span className={cn("text-[10px] font-medium", active ? "text-background/70" : "text-muted-foreground")}>
-                      {p.cagedShape}
-                    </span>
-                  )}
+                  {/* CAGED shapes are known by their letter; other boxes are numbered */}
+                  {p.cagedShape ?? p.index + 1}
                 </button>
               );
             })}

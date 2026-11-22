@@ -12,7 +12,7 @@ import {
   fitTaper,
   fretRangeBounds,
   minimumLength,
-  positionOutline,
+  positionArea,
   type FretboardGeometry,
   type NeckOrientation,
   type SpacingMode,
@@ -39,6 +39,9 @@ interface FretboardProps {
 export const LABEL_SIZE = 44;
 /** Smallest fret (px) in the horizontal view, so markers never overlap. */
 const MIN_FRET_SIZE = 24;
+/** Neck width (px) from which the horizontal neck starts growing, and its largest size factor. */
+const WIDE_NECK = 1500;
+const MAX_SCALE = 1.45;
 /** Colour of the highlighted scale-position box (also used for its legend swatch). */
 export const POSITION_TINT = "#f6ead0";
 const VERTICAL_LABEL_HEIGHT = 30;
@@ -83,6 +86,10 @@ export function Fretboard({
   const [firstFret, lastFret] = fretRangeBounds(fretRange, fretCount);
   const stringCount = tuning.strings.length;
   const vertical = orientation === "vertical";
+  // Large monitors: the horizontal neck grows with the space it gets (taller strings, bigger notes
+  // and labels), up to 45% larger than on a normal laptop screen.
+  const scale = vertical ? 1 : Math.min(MAX_SCALE, Math.max(1, containerWidth / WIDE_NECK));
+  const labelSize = Math.round(LABEL_SIZE * scale);
 
   const geometry = useMemo(() => {
     if (vertical) {
@@ -101,21 +108,23 @@ export function Fretboard({
       });
     }
     // Show all frets when possible: soften the narrowing only as much as the screen needs.
-    const available = containerWidth - LABEL_SIZE;
-    const taper = spacing === "realistic" ? fitTaper(firstFret, lastFret, available, MIN_FRET_SIZE) : undefined;
+    const available = containerWidth - labelSize;
+    const minFret = MIN_FRET_SIZE * scale;
+    const taper = spacing === "realistic" ? fitTaper(firstFret, lastFret, available, minFret) : undefined;
     return computeGeometry({
-      length: Math.max(available, minimumLength(firstFret, lastFret, spacing, MIN_FRET_SIZE, taper)),
+      length: Math.max(available, minimumLength(firstFret, lastFret, spacing, minFret, taper)),
       stringCount,
       firstFret,
       lastFret,
       spacing,
       showFretNumbers,
-      stringSpacing: containerWidth < 640 ? 32 : 36,
+      stringSpacing: (containerWidth < 640 ? 32 : 36) * scale,
       orientation: "horizontal",
       leftHanded,
       taper,
+      scale,
     });
-  }, [vertical, containerWidth, firstFret, lastFret, spacing, showFretNumbers, stringCount, leftHanded]);
+  }, [vertical, containerWidth, firstFret, lastFret, spacing, showFretNumbers, stringCount, leftHanded, scale, labelSize]);
 
   // Left-handed horizontal necks start at the right: show the nut end first.
   useLayoutEffect(() => {
@@ -195,26 +204,26 @@ export function Fretboard({
       <div
         aria-hidden="true"
         className={cn(fade, "bg-gradient-to-r", more.left ? "opacity-100" : "opacity-0")}
-        style={{ left: leftHanded ? 0 : LABEL_SIZE }}
+        style={{ left: leftHanded ? 0 : labelSize }}
       />
       <div
         aria-hidden="true"
         className={cn(fade, "bg-gradient-to-l", more.right ? "opacity-100" : "opacity-0")}
-        style={{ right: leftHanded ? LABEL_SIZE : 0 }}
+        style={{ right: leftHanded ? labelSize : 0 }}
       />
       <div ref={scrollRef} className="fretboard-scroll overflow-x-auto overflow-y-hidden overscroll-x-contain">
-        <div className={cn("flex", leftHanded && "flex-row-reverse")} style={{ width: geometry.width + LABEL_SIZE }}>
+        <div className={cn("flex", leftHanded && "flex-row-reverse")} style={{ width: geometry.width + labelSize }}>
           {/* String names — sticky so they stay visible while scrolling sideways */}
           <div
             className={cn(
               "sticky z-10 shrink-0 border-white/5 bg-[#120d0a]/95 backdrop-blur-sm",
               leftHanded ? "right-0 border-l" : "left-0 border-r",
             )}
-            style={{ width: LABEL_SIZE }}
+            style={{ width: labelSize }}
           >
-            <svg width={LABEL_SIZE} height={geometry.height} aria-hidden="true">
+            <svg width={labelSize} height={geometry.height} aria-hidden="true">
               {tuning.strings.map((pitch, i) => (
-                <StringLabel key={i} x={LABEL_SIZE / 2 - 3} y={geometry.stringC(i)} pitch={pitch} />
+                <StringLabel key={i} x={labelSize / 2 - 3 * scale} y={geometry.stringC(i)} pitch={pitch} scale={scale} />
               ))}
             </svg>
           </div>
@@ -225,13 +234,13 @@ export function Fretboard({
   );
 }
 
-function StringLabel({ x, y, pitch }: { x: number; y: number; pitch: Tuning["strings"][number] }) {
+function StringLabel({ x, y, pitch, scale = 1 }: { x: number; y: number; pitch: Tuning["strings"][number]; scale?: number }) {
   const { note } = useI18n();
-  return <StringName x={x} y={y} name={note(pitch.note)} octave={pitch.octave} />;
+  return <StringName x={x} y={y} name={note(pitch.note)} octave={pitch.octave} scale={scale} />;
 }
 
 /** An open-string name with its octave (e.g. "E₂"), drawn in SVG. */
-export function StringName({ x, y, name, octave }: { x: number; y: number; name: string; octave: number }) {
+export function StringName({ x, y, name, octave, scale = 1 }: { x: number; y: number; name: string; octave: number; scale?: number }) {
   return (
     <text
       x={x}
@@ -239,11 +248,11 @@ export function StringName({ x, y, name, octave }: { x: number; y: number; name:
       dy="0.35em"
       textAnchor="middle"
       className="fill-[oklch(0.88_0.02_80)] font-mono"
-      fontSize={name.length > 3 ? 10 : name.length > 2 ? 11 : 13}
+      fontSize={(name.length > 3 ? 10 : name.length > 2 ? 11 : 13) * scale}
       fontWeight={600}
     >
       {name}
-      <tspan fontSize={9} dx={1} dy="0.25em" className="fill-[oklch(0.62_0.02_80)]" fontWeight={500}>
+      <tspan fontSize={9 * scale} dx={1} dy="0.25em" className="fill-[oklch(0.62_0.02_80)]" fontWeight={500}>
         {octave}
       </tspan>
     </text>
@@ -321,37 +330,43 @@ export function FretboardArt({
       {g.frets.map((fret) => {
         if (fret === 0) return null;
         const u = g.noteU(fret);
+        const inlayR = 5.5 * g.scale;
         if (SINGLE_INLAYS.includes(fret)) {
           const p = g.toXY(u, midC);
-          return <circle key={`inlay-${fret}`} cx={p.x} cy={p.y} r={5.5} fill="url(#fb-pearl)" opacity={0.75} />;
+          return <circle key={`inlay-${fret}`} cx={p.x} cy={p.y} r={inlayR} fill="url(#fb-pearl)" opacity={0.75} />;
         }
         if (DOUBLE_INLAYS.includes(fret)) {
           const a = g.toXY(u, midC - g.stringSpacing);
           const b = g.toXY(u, midC + g.stringSpacing);
           return (
             <g key={`inlay-${fret}`} opacity={0.75}>
-              <circle cx={a.x} cy={a.y} r={5.5} fill="url(#fb-pearl)" />
-              <circle cx={b.x} cy={b.y} r={5.5} fill="url(#fb-pearl)" />
+              <circle cx={a.x} cy={a.y} r={inlayR} fill="url(#fb-pearl)" />
+              <circle cx={b.x} cy={b.y} r={inlayR} fill="url(#fb-pearl)" />
             </g>
           );
         }
         return null;
       })}
 
-      {/* Scale position outlines, behind frets and strings */}
+      {/* Scale position (CAGED shape / box) areas, behind frets and strings: on each string exactly
+          the frets the shape uses, edges on the fret wires. A light, neutral highlight — amber is
+          reserved for root notes. */}
       {positionOccurrences?.map((occ, i) => {
         const inRange = occ.filter((n) => visibleFrets.has(n.fret));
-        const points = positionOutline(g, inRange);
+        const points = positionArea(g, inRange);
         if (points.length === 0) return null;
-        const pad = g.stringSpacing * 0.95;
-        const pts = points.map((p) => `${p.x},${p.y}`).join(" ");
         return (
-          <g key={`pos-${i}`} className="pointer-events-none">
-            {/* soft halo + body: a thick round stroke pads the polygon into a rounded "box".
-                A light, neutral highlight — amber is reserved for root notes. */}
-            <polygon points={pts} fill={POSITION_TINT} stroke={POSITION_TINT} opacity={0.05} strokeWidth={pad + 8} strokeLinejoin="round" />
-            <polygon points={pts} fill={POSITION_TINT} stroke={POSITION_TINT} opacity={0.11} strokeWidth={pad} strokeLinejoin="round" />
-          </g>
+          <polygon
+            key={`pos-${i}`}
+            className="pointer-events-none"
+            points={points.map((p) => `${p.x},${p.y}`).join(" ")}
+            fill={POSITION_TINT}
+            fillOpacity={0.13}
+            stroke={POSITION_TINT}
+            strokeOpacity={0.5}
+            strokeWidth={1.5}
+            strokeLinejoin="round"
+          />
         );
       })}
 
@@ -396,7 +411,7 @@ export function FretboardArt({
               y={p.y}
               dy={vertical ? "0.35em" : undefined}
               textAnchor="middle"
-              fontSize={11}
+              fontSize={11 * g.scale}
               fontWeight={marked ? 650 : 450}
               className={marked ? "fill-[oklch(0.86_0.02_80)]" : "fill-[oklch(0.6_0.015_80)]"}
             >

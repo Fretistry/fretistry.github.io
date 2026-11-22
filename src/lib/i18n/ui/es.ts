@@ -155,6 +155,8 @@ export const es: UiMessages = {
     threePerString: "3 por cuerda",
     wholeNeckTitle: "Mostrar la escala en todo el mástil",
     positionsTitle: "Las 5 formas de caja (CAGED en afinación estándar)",
+    caged: "CAGED",
+    cagedTitle: "Las 5 formas CAGED, en el orden C – A – G – E – D",
     threePerStringTitle: "Patrones de tres notas por cuerda",
     previous: "Posición anterior",
     next: "Posición siguiente",

@@ -26,7 +26,7 @@ interface AppHeaderProps {
 export function AppHeader({ soundEnabled, onSoundChange, settings, onSettingsChange }: AppHeaderProps) {
   return (
     <header className="sticky top-0 z-30 border-b border-border/60 bg-background/80 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
-      <div className="mx-auto flex h-14 max-w-[1600px] items-center gap-3 px-[max(1rem,env(safe-area-inset-left))] sm:px-6">
+      <div className="mx-auto flex h-14 max-w-[1600px] min-[1760px]:max-w-[112rem] items-center gap-3 px-[max(1rem,env(safe-area-inset-left))] sm:px-6">
         <div className="flex min-w-0 items-center gap-2.5">
           <FretistryMark className="size-8 drop-shadow-[0_0_14px_rgba(247,169,59,0.35)]" />
           <h1 className="min-w-0 truncate text-[17px]">

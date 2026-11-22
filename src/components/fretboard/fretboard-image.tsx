@@ -3,6 +3,7 @@
 import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
 import { FretistryMark } from "@/components/brand/fretistry-mark";
+import { SVG_NS, withSingleSvgNamespace } from "@/lib/svg-markup";
 import type { FretboardNote, PositionNote, Tuning } from "@/lib/theory";
 import { FretboardArt, LABEL_SIZE, POSITION_TINT, StringName } from "./fretboard";
 import { computeGeometry, fretRangeBounds, minimumLength, type SpacingMode } from "./geometry";
@@ -53,7 +54,6 @@ const PALETTE = {
 
 const PAD = 36;
 const SCALE = 2;
-const SVG_NS = "http://www.w3.org/2000/svg";
 const LINE_GAP = 22;
 
 let measureContext: CanvasRenderingContext2D | null = null;
@@ -110,7 +110,8 @@ function FretboardPicture({ input, background, fontFamily }: { input: FretboardI
   }));
 
   return (
-    <svg xmlns={SVG_NS} width={width} height={height} viewBox={`0 0 ${width} ${height}`} fontFamily={fontFamily}>
+    // No xmlns attribute here: the serializer adds it, and Firefox would otherwise write it twice (invalid SVG).
+    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} fontFamily={fontFamily}>
       <rect width={width} height={height} fill={colors.background} />
 
       {/* Title and details */}
@@ -254,12 +255,20 @@ function embeddedFontCss(families: Set<string>): Promise<string> {
   return cached;
 }
 
+function loadImage(url: string, width: number, height: number): Promise<HTMLImageElement> {
+  // onload/onerror instead of image.decode(): decode() is unreliable for SVG images in Firefox.
+  return new Promise((resolve, reject) => {
+    const image = new Image(width, height);
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("The picture could not be loaded"));
+    image.src = url;
+  });
+}
+
 async function rasterize(markup: string, width: number, height: number): Promise<Blob> {
   const url = URL.createObjectURL(new Blob([markup], { type: "image/svg+xml;charset=utf-8" }));
   try {
-    const image = new Image(width, height);
-    image.src = url;
-    await image.decode();
+    const image = await loadImage(url, width, height);
     // Give embedded fonts a moment to be applied (needed by some Safari versions).
     await new Promise((resolve) => setTimeout(resolve, 60));
     const canvas = document.createElement("canvas");
@@ -291,15 +300,23 @@ export async function renderFretboardImage(input: FretboardImageInput, backgroun
     const svg = container.querySelector("svg");
     if (!svg) throw new Error("Picture did not render");
     const families = inlineComputedStyles(svg);
-    const fontCss = await embeddedFontCss(families);
+    const width = Number(svg.getAttribute("width"));
+    const height = Number(svg.getAttribute("height"));
+    const serialize = () => withSingleSvgNamespace(new XMLSerializer().serializeToString(svg));
+    const plainMarkup = serialize();
+    const fontCss = await embeddedFontCss(families).catch(() => "");
     if (fontCss) {
       const style = document.createElementNS(SVG_NS, "style");
       style.textContent = fontCss;
       svg.insertBefore(style, svg.firstChild);
+      try {
+        return await rasterize(serialize(), width, height);
+      } catch (error) {
+        // Some browsers refuse embedded fonts in pictures: fall back to the system font.
+        console.warn("Fretboard image: retrying without the embedded font", error);
+      }
     }
-    const width = Number(svg.getAttribute("width"));
-    const height = Number(svg.getAttribute("height"));
-    return await rasterize(new XMLSerializer().serializeToString(svg), width, height);
+    return await rasterize(plainMarkup, width, height);
   } finally {
     root.unmount();
     container.remove();

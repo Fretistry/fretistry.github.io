@@ -29,6 +29,8 @@ export interface GeometryInput {
   leftHanded?: boolean;
   /** Realistic spacing only: 12 = true to scale, larger = gentler narrowing (see {@link fitTaper}). */
   taper?: number;
+  /** Size of labels, fret numbers and inlays (1 = normal; larger on big monitors). */
+  scale?: number;
 }
 
 export interface FretWire {
@@ -56,6 +58,8 @@ export interface FretboardGeometry {
   orientation: NeckOrientation;
   leftHanded: boolean;
   stringSpacing: number;
+  /** Size factor for labels, fret numbers and inlays. */
+  scale: number;
   hasOpenStrings: boolean;
   /** Neck-space extents. */
   neckLength: number;
@@ -67,6 +71,8 @@ export interface FretboardGeometry {
   wires: FretWire[];
   frets: number[];
   fretNumberC: number;
+  /** Position of the fret wire *after* fret n along the neck (0 = the nut). */
+  wireU: (fret: number) => number;
   noteU: (fret: number) => number;
   stringC: (stringIndex: number) => number;
   markerRadius: (fret: number) => number;
@@ -131,6 +137,7 @@ export function computeGeometry(input: GeometryInput): FretboardGeometry {
   const leftHanded = input.leftHanded ?? false;
   const stringSpacing = input.stringSpacing ?? 36;
   const taper = input.taper ?? TRUE_TAPER;
+  const scale = input.scale ?? 1;
   const hasOpenStrings = firstFret === 0;
   const startWire = hasOpenStrings ? 0 : firstFret - 1;
   const boardStart = hasOpenStrings ? OPEN_ZONE : START_PADDING_NO_OPEN;
@@ -148,7 +155,7 @@ export function computeGeometry(input: GeometryInput): FretboardGeometry {
   const boardTop = EDGE;
   const firstStringC = boardTop + half;
   const boardBottom = firstStringC + (stringCount - 1) * stringSpacing + half;
-  const neckDepth = boardBottom + (showFretNumbers ? FRET_NUMBER_GUTTER : EDGE);
+  const neckDepth = boardBottom + (showFretNumbers ? FRET_NUMBER_GUTTER * scale : EDGE);
   const neckLength = length;
 
   const noteU = (fret: number) => (fret === 0 ? OPEN_ZONE / 2 - 2 : (wireU(fret - 1) + wireU(fret)) / 2);
@@ -181,6 +188,7 @@ export function computeGeometry(input: GeometryInput): FretboardGeometry {
     orientation,
     leftHanded,
     stringSpacing,
+    scale,
     hasOpenStrings,
     neckLength,
     neckDepth,
@@ -190,7 +198,8 @@ export function computeGeometry(input: GeometryInput): FretboardGeometry {
     boardBottom,
     wires,
     frets,
-    fretNumberC: boardBottom + 19,
+    fretNumberC: boardBottom + 19 * scale,
+    wireU,
     noteU,
     stringC,
     markerRadius,
@@ -207,20 +216,32 @@ export function fretRangeBounds(range: "all" | "low" | "high", fretCount = 24): 
 }
 
 /**
- * Outline of a scale position: a polygon through the outermost notes on each
- * string, in screen coordinates (drawn with a thick round stroke to pad it).
+ * The area of a scale position (box shape), aligned to the fret grid the way
+ * CAGED diagrams shade a shape: on every string it covers exactly the frets
+ * that string uses — from the fret wire before its lowest note to the wire
+ * after its highest — so the edges sit on fret wires and step where the shape
+ * shifts (e.g. at the B string). Returned as a polygon in screen coordinates.
  */
-export function positionOutline(
-  g: FretboardGeometry,
-  notes: readonly { stringIndex: number; fret: number }[],
-): Point[] {
+export function positionArea(g: FretboardGeometry, notes: readonly { stringIndex: number; fret: number }[]): Point[] {
   const byString = new Map<number, number[]>();
   for (const n of notes) byString.set(n.stringIndex, [...(byString.get(n.stringIndex) ?? []), n.fret]);
+  const half = g.stringSpacing / 2;
+  const openStart = 4; // left edge of the open-string zone
   const rows = [...byString.entries()]
-    .map(([s, frets]) => ({ c: g.stringC(s), uMin: g.noteU(Math.min(...frets)), uMax: g.noteU(Math.max(...frets)) }))
-    .sort((a, b) => a.c - b.c);
+    .map(([s, frets]) => {
+      const lo = Math.min(...frets);
+      const hi = Math.max(...frets);
+      const c = g.stringC(s);
+      return {
+        cTop: Math.max(g.boardTop, c - half),
+        cBottom: Math.min(g.boardBottom, c + half),
+        uLeft: lo === 0 ? openStart : g.wireU(lo - 1),
+        uRight: g.wireU(hi),
+      };
+    })
+    .sort((a, b) => a.cTop - b.cTop);
   if (rows.length === 0) return [];
-  const left = rows.map((r) => g.toXY(r.uMin, r.c));
-  const right = [...rows].reverse().map((r) => g.toXY(r.uMax, r.c));
+  const left = rows.flatMap((r) => [g.toXY(r.uLeft, r.cTop), g.toXY(r.uLeft, r.cBottom)]);
+  const right = [...rows].reverse().flatMap((r) => [g.toXY(r.uRight, r.cBottom), g.toXY(r.uRight, r.cTop)]);
   return [...left, ...right];
 }

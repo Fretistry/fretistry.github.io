@@ -160,6 +160,8 @@ export const en = {
     threePerString: "3 per string",
     wholeNeckTitle: "Show the scale everywhere",
     positionsTitle: "The 5 box shapes (CAGED in standard tuning)",
+    caged: "CAGED",
+    cagedTitle: "The 5 CAGED shapes, in the order C – A – G – E – D",
     threePerStringTitle: "Three-notes-per-string patterns",
     previous: "Previous position",
     next: "Next position",
