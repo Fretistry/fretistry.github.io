@@ -14,12 +14,12 @@ import {
   type MarkerText,
 } from "@/components/fretboard/marker-model";
 import { I18nProvider, useI18n } from "@/components/i18n/i18n-provider";
-import { NoteSheet, NoteStrip } from "@/components/inspector/note-summary";
+import { NoteStrip } from "@/components/inspector/note-summary";
 import { MetronomeBar } from "@/components/metronome/metronome-control";
 import { MetronomeProvider, useSharedMetronome } from "@/components/metronome/metronome-provider";
 import { TheoryPanel } from "@/components/theory/theory-panel";
 import { Button } from "@/components/ui/button";
-import { useExplorerState } from "@/hooks/use-explorer-state";
+import { effectiveFretRange, useExplorerState } from "@/hooks/use-explorer-state";
 import { useFavourites } from "@/hooks/use-favourites";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useScalePlayer, type PlayStep } from "@/hooks/use-scale-player";
@@ -130,7 +130,8 @@ function ExplorerApp() {
   const isPhone = useMediaQuery("(max-width: 639px)");
   const orientation = settings.orientation === "auto" ? (isPhone ? "vertical" : "horizontal") : settings.orientation;
   const [neckOverflows, setNeckOverflows] = useState(false);
-  const [firstFret, lastFret] = fretRangeBounds(settings.fretRange);
+  const fretRange = effectiveFretRange(settings.fretRange, isPhone);
+  const [firstFret, lastFret] = fretRangeBounds(fretRange);
 
   // ── Music theory (pure calculations, memoised) ────────────────────────────
   const scale = getScale(settings.scaleId);
@@ -220,7 +221,7 @@ function ExplorerApp() {
 
   // "Play scale": one shape on the neck — the chosen one, or the one nearest the nut — lit up note
   // by note, one note per metronome click, starting on the next beat when the metronome runs.
-  const scalePlayer = useScalePlayer(`${settings.rootName}|${settings.scaleId}|${tuningKey}|${settings.fretRange}|${shapeContext}`);
+  const scalePlayer = useScalePlayer(`${settings.rootName}|${settings.scaleId}|${tuningKey}|${fretRange}|${shapeContext}`);
   const { play: playSequence, stop: stopScale } = scalePlayer;
   const { settings: metronomeSettings, running: metronomeRunning, nextBeatTime } = metronome;
   const playScale = useCallback(() => {
@@ -266,7 +267,7 @@ function ExplorerApp() {
   );
 
   // ── Fretboard trainer ("find every G") ───────────────────────────────────
-  const trainer = useTrainer(`${settings.rootName}|${settings.scaleId}|${tuningKey}|${settings.fretRange}|${shapeContext}`);
+  const trainer = useTrainer(`${settings.rootName}|${settings.scaleId}|${tuningKey}|${fretRange}|${shapeContext}`);
   const training = trainer.state.active;
   const trainerSetup = useMemo(() => {
     if (!training) return null;
@@ -386,8 +387,8 @@ function ExplorerApp() {
     [activePositions, positionAreas, ui],
   );
 
-  // ── Metronome bar: shown by default on larger screens, behind the header button on phones ──
-  const metronomeBarVisible = settings.metronomeBar === "auto" ? !isPhone : settings.metronomeBar === "shown";
+  // ── Metronome & drone bar: shown on every screen until hidden with its × or the header button ──
+  const metronomeBarVisible = settings.metronomeBar !== "hidden";
   const toggleMetronomeBar = useCallback(
     () => update({ metronomeBar: metronomeBarVisible ? "hidden" : "shown" }),
     [update, metronomeBarVisible],
@@ -461,7 +462,7 @@ function ExplorerApp() {
       tuning,
       stringNames: tuning.strings.map((p) => i18n.note(p.note)),
       spacing: settings.spacing,
-      fretRange: settings.fretRange,
+      fretRange,
       showFretNumbers: settings.showFretNumbers,
       leftHanded: settings.leftHanded,
       positionAreas,
@@ -489,7 +490,7 @@ function ExplorerApp() {
     activeChord,
     settings.visibility,
     settings.spacing,
-    settings.fretRange,
+    fretRange,
     settings.showFretNumbers,
     settings.leftHanded,
     board,
@@ -589,7 +590,7 @@ function ExplorerApp() {
             onPlay={playScale}
             onStop={stopScale}
           />
-          <DisplayToolbar settings={settings} onChange={update} />
+          <DisplayToolbar settings={settings} fretRange={fretRange} onChange={update} />
           <div className="space-y-3 border-t border-border/50 pt-3">
             <PositionPicker
               system={positionSystem}
@@ -620,7 +621,13 @@ function ExplorerApp() {
                   "sticky top-[calc(3.5rem+env(safe-area-inset-top))] z-20 -mx-3 bg-background/90 px-3 py-1.5 backdrop-blur-sm sm:-mx-5 sm:px-5",
               )}
             >
-              {metronomeBarVisible && <MetronomeBar onClose={() => update({ metronomeBar: "hidden" })} />}
+              {metronomeBarVisible && (
+                <MetronomeBar
+                  rootPitchClass={pitchClassOf(spelled.root)}
+                  rootName={i18n.note(spelled.root)}
+                  onClose={() => update({ metronomeBar: "hidden" })}
+                />
+              )}
               {trainerSetup && (
                 <TrainerBar
                   state={trainer.state}
@@ -637,7 +644,7 @@ function ExplorerApp() {
             markers={neckMarkers}
             tuning={tuning}
             spacing={settings.spacing}
-            fretRange={settings.fretRange}
+            fretRange={fretRange}
             showFretNumbers={settings.showFretNumbers}
             orientation={orientation}
             leftHanded={settings.leftHanded}
@@ -665,7 +672,7 @@ function ExplorerApp() {
               />
             ) : (
               <p className="text-xs text-muted-foreground">
-                {!training && ui.hints.explore}
+                {!training && (isPhone ? ui.hints.explorePhone : ui.hints.explore)}
                 {neckOverflows && <span> {ui.hints.swipe}</span>}
               </p>
             )}
@@ -690,23 +697,10 @@ function ExplorerApp() {
         />
       </main>
 
-      <footer
-        className={cn(
-          "border-t border-border/60 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] text-center text-xs text-muted-foreground",
-          isPhone && selectedNote && "pb-32", // room for the note panel
-        )}
-      >
+      {/* (On phones a tapped note shows on the neck itself — ring, same-pitch rings and sound — without a panel over the neck.) */}
+      <footer className="border-t border-border/60 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] text-center text-xs text-muted-foreground">
         Fretistry · {ui.footer.madeBy(CREATOR)} · {ui.footer.local}
       </footer>
-
-      {isPhone && selectedNote && (
-        <NoteSheet
-          note={selectedNote}
-          chordRole={chordRole}
-          onPlay={soundEnabled ? () => playNote(selectedNote) : undefined}
-          onClear={() => select(null)}
-        />
-      )}
     </div>
   );
 }

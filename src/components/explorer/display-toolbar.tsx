@@ -7,12 +7,15 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
+import { FRET_RANGES, fretRangeLabel, type FretRange } from "@/components/fretboard/geometry";
 import type { ExplorerSettings } from "@/hooks/use-explorer-state";
 import { InfoTip } from "./info-tip";
 import { SegmentedControl } from "./segmented-control";
 
 interface DisplayToolbarProps {
   settings: ExplorerSettings;
+  /** The fret range actually shown (the setting may be "auto"). */
+  fretRange: FretRange;
   onChange: (patch: Partial<ExplorerSettings>) => void;
 }
 
@@ -47,21 +50,20 @@ export function ToolbarSwitch({
   );
 }
 
-const FRET_RANGE_LABELS = { all: "0–24", low: "0–12", high: "12–24" } as const;
 
 /**
  * What the neck shows: labels, which notes, and which frets. One row on
  * larger screens; on phones a single "Display" button (with the current
  * choices as its caption) so the neck starts higher up the page.
  */
-export function DisplayToolbar({ settings, onChange }: DisplayToolbarProps) {
+export function DisplayToolbar({ settings, fretRange, onChange }: DisplayToolbarProps) {
   const t = useI18n().ui.toolbar;
   const labelNames = { note: t.notes, interval: t.intervals, degree: t.degrees, none: t.none };
   const showNames = { all: t.allNotes, scale: t.scaleOnly, roots: t.rootsOnly };
   return (
     <>
       <div className="hidden sm:block">
-        <DisplayControls settings={settings} onChange={onChange} />
+        <DisplayControls settings={settings} fretRange={fretRange} onChange={onChange} />
       </div>
       <div className="sm:hidden">
         <Popover>
@@ -70,13 +72,13 @@ export function DisplayToolbar({ settings, onChange }: DisplayToolbarProps) {
               <Eye />
               <span className="font-medium">{t.display}</span>
               <span className="truncate text-muted-foreground">
-                {labelNames[settings.labelMode]} · {showNames[settings.visibility]} · {FRET_RANGE_LABELS[settings.fretRange]}
+                {labelNames[settings.labelMode]} · {showNames[settings.visibility]} · {fretRangeLabel(fretRange)}
               </span>
               <ChevronDown className="text-muted-foreground" />
             </Button>
           </PopoverTrigger>
           <PopoverContent align="start" className="w-[min(22rem,calc(100vw-1.5rem))]">
-            <DisplayControls settings={settings} onChange={onChange} stacked />
+            <DisplayControls settings={settings} fretRange={fretRange} onChange={onChange} stacked />
           </PopoverContent>
         </Popover>
       </div>
@@ -84,9 +86,16 @@ export function DisplayToolbar({ settings, onChange }: DisplayToolbarProps) {
   );
 }
 
-function DisplayControls({ settings, onChange, stacked = false }: DisplayToolbarProps & { stacked?: boolean }) {
+function DisplayControls({ settings, fretRange, onChange, stacked = false }: DisplayToolbarProps & { stacked?: boolean }) {
   const { ui } = useI18n();
   const t = ui.toolbar;
+  const fretTitles: Record<FretRange, string> = {
+    low: t.lowTitle,
+    to15: t.to15Title,
+    to22: t.to22Title,
+    all: t.wholeNeckTitle,
+    high: t.highTitle,
+  };
   return (
     <div className={stacked ? "space-y-3" : "flex flex-wrap items-center gap-x-5 gap-y-2.5"}>
       <ToolbarGroup label={t.labels} info={<InfoTip label={ui.info.labelsTitle} paragraphs={[ui.info.labels]} />}>
@@ -117,13 +126,10 @@ function DisplayControls({ settings, onChange, stacked = false }: DisplayToolbar
       <ToolbarGroup label={t.frets}>
         <SegmentedControl
           ariaLabel={t.fretRange}
-          value={settings.fretRange}
-          onChange={(fretRange) => onChange({ fretRange })}
-          options={[
-            { value: "all", label: FRET_RANGE_LABELS.all, title: t.wholeNeckTitle },
-            { value: "low", label: FRET_RANGE_LABELS.low, title: t.lowTitle },
-            { value: "high", label: FRET_RANGE_LABELS.high, title: t.highTitle },
-          ]}
+          value={fretRange}
+          onChange={(range) => onChange({ fretRange: range })}
+          // shortest neck first: 0–12, 0–15, 0–22, 0–24, then the upper octave 12–24
+          options={FRET_RANGES.map((range) => ({ value: range, label: fretRangeLabel(range), title: fretTitles[range] }))}
         />
       </ToolbarGroup>
     </div>

@@ -139,6 +139,8 @@ export const fr: UiMessages = {
     wholeNeckTitle: "Tout le manche",
     lowTitle: "Position ouverte jusqu’à la 12e case",
     highTitle: "À partir de la 12e case",
+    to15Title: "Cases 0–15 : aussi loin que la plupart des guitares acoustiques le permettent confortablement",
+    to22Title: "Cases 0–22 : une guitare électrique à 22 cases",
   },
   view: {
     direction: "Orientation du manche",
@@ -211,6 +213,7 @@ export const fr: UiMessages = {
   hints: {
     explore: "Touchez une note pour les détails.",
     swipe: "Faites glisser pour voir tout le manche.",
+    explorePhone: "Touchez une note pour l’entendre. Les anneaux pointillés montrent la même hauteur ailleurs sur le manche.",
   },
   fretboard: {
     section: "Manche",
@@ -296,11 +299,13 @@ export const fr: UiMessages = {
     accent: "Accentuer le premier temps",
     volume: "Volume du métronome",
     note: "Le métronome continue pendant que vous explorez. L’icône du métronome en haut affiche ou masque sa barre au-dessus du manche, et « Jouer la gamme » suit son tempo. Il a son propre volume, indépendant du son des notes.",
-    showBar: "Afficher le métronome au-dessus du manche",
-    hideBar: "Masquer la barre du métronome",
+    showBar: "Afficher le métronome et le bourdon au-dessus du manche",
+    hideBar: "Masquer la barre du métronome et du bourdon",
     startShort: "Démarrer",
     stopShort: "Arrêter",
-    more: "Plus de réglages du métronome",
+    more: "Réglages du métronome et du bourdon",
+    settings: "Réglages",
+    barTitle: "Métronome et bourdon",
   },
   startHere: {
     title: "Pour commencer",
@@ -333,6 +338,21 @@ export const fr: UiMessages = {
     session: (completed, avgSeconds, mistakes) =>
       `Cette session : ${completed} ${completed <= 1 ? "note" : "notes"} · ${avgSeconds} s en moyenne · ${mistakes} ${mistakes <= 1 ? "erreur" : "erreurs"}`,
     hint: "Touchez les emplacements sur le manche. Seules les notes dans les cases visibles sont demandées — et dans les formes choisies, s’il y en a.",
+  },
+  drone: {
+    title: "Bourdon",
+    label: (note) => `Bourdon · ${note}`,
+    start: "Lancer le bourdon : une note qui continue de sonner sous votre jeu, dans la tonalité actuelle",
+    stop: "Arrêter le bourdon",
+    sound: "Son du bourdon",
+    pad: "Nappe",
+    harmonium: "Harmonium",
+    padTitle: "Nappe chaude : un son de synthé doux qui évolue lentement",
+    harmoniumTitle: "Harmonium : un orgue à anches stable et chantant",
+    fifth: "+ quinte",
+    fifthTitle: "Ajouter la quinte au-dessus de la tonique, pour un son plus plein",
+    volume: "Volume du bourdon",
+    note: "Le bourdon joue la tonique de la tonalité actuelle et suit quand vous changez de tonalité. Jouez par-dessus et écoutez l’effet de chaque note : la ♭3 sonne triste, la 3 joyeuse, et la 7 veut monter vers la tonique.",
   },
   footer: {
     madeBy: (name) => `Créé par ${name}`,

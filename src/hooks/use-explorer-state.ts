@@ -6,10 +6,13 @@ import { DEFAULT_SCALE_ID } from "@/lib/data/scales";
 import { CUSTOM_TUNING_ID, DEFAULT_TUNING_ID, getTuningPreset } from "@/lib/data/tunings";
 import { parseSearchParams, stateToSearchParams, type PositionChoice } from "@/lib/share";
 import { noteToAscii, parsePitch, pitchClassOf, type ChordSize, type Pitch, type SpelledNote } from "@/lib/theory";
+import { FRET_RANGES, type FretRange } from "@/components/fretboard/geometry";
 
 export type LabelMode = "note" | "interval" | "degree" | "none";
 export type Visibility = "all" | "scale" | "roots";
-export type FretRange = "all" | "low" | "high";
+export type { FretRange };
+/** "auto" = frets 0–12 on phones, the whole neck (0–24) on larger screens. */
+export type FretRangeSetting = FretRange | "auto";
 export type Spacing = "realistic" | "even";
 export type Orientation = "auto" | "horizontal" | "vertical";
 
@@ -23,7 +26,7 @@ export interface ExplorerSettings {
   visibility: Visibility;
   showFretNumbers: boolean;
   spacing: Spacing;
-  fretRange: FretRange;
+  fretRange: FretRangeSetting;
   /** Play a plucked-string sound when notes are clicked. */
   soundEnabled: boolean;
   /** "all" = whole neck, otherwise highlight one position of that system. */
@@ -38,7 +41,7 @@ export interface ExplorerSettings {
   orientation: Orientation;
   /** Music theory panel folded away. */
   theoryCollapsed: boolean;
-  /** The metronome bar at the neck: "auto" = shown on larger screens, hidden on phones. */
+  /** The metronome & drone bar at the neck: "auto" (= shown) until hidden with its × or the header button. */
   metronomeBar: MetronomeBarSetting;
 }
 
@@ -57,6 +60,11 @@ export interface ExplorerState {
 export type ExplorerAction = { type: "update"; patch: Partial<ExplorerSettings> } | { type: "select"; selection: Selection | null };
 
 const STORAGE_KEY = "gse-settings-v1";
+/**
+ * Version 2 added the "auto" fret range. Version 1 always saved "all" (its only
+ * default), so a saved "all" without a version is read as "auto".
+ */
+const STORAGE_VERSION = 2;
 
 export const DEFAULT_SETTINGS: ExplorerSettings = {
   rootName: DEFAULT_ROOT,
@@ -67,7 +75,7 @@ export const DEFAULT_SETTINGS: ExplorerSettings = {
   visibility: "scale",
   showFretNumbers: true,
   spacing: "realistic",
-  fretRange: "all",
+  fretRange: "auto",
   soundEnabled: true,
   positionSystem: "all",
   positionIndices: [0],
@@ -108,12 +116,26 @@ function bool(value: unknown, fallback: boolean): boolean {
   return typeof value === "boolean" ? value : fallback;
 }
 
+/** The fret range to draw: "auto" picks 0–12 on phones and the whole neck elsewhere. */
+export function effectiveFretRange(setting: FretRangeSetting, isPhone: boolean): FretRange {
+  return setting === "auto" ? (isPhone ? "low" : "all") : setting;
+}
+
 /** Reads saved preferences defensively — anything invalid falls back to defaults. */
 function loadSavedSettings(): ExplorerSettings {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return DEFAULT_SETTINGS;
-    const data = JSON.parse(raw) as Record<string, unknown>;
+    return settingsFromSaved(JSON.parse(raw) as Record<string, unknown>);
+  } catch {
+    return DEFAULT_SETTINGS;
+  }
+}
+
+/** Turns saved preferences back into settings (exported for the tests). */
+export function settingsFromSaved(data: Record<string, unknown>): ExplorerSettings {
+  try {
+    const fretRange = oneOf(data.fretRange, ["auto", ...FRET_RANGES], DEFAULT_SETTINGS.fretRange);
     let customTuning = DEFAULT_SETTINGS.customTuning;
     if (Array.isArray(data.customTuning) && data.customTuning.length >= 4 && data.customTuning.length <= 8) {
       customTuning = data.customTuning.map((p) => parsePitch(String(p)));
@@ -130,7 +152,7 @@ function loadSavedSettings(): ExplorerSettings {
       visibility: oneOf(data.visibility, ["all", "scale", "roots"], DEFAULT_SETTINGS.visibility),
       showFretNumbers: bool(data.showFretNumbers, true),
       spacing: oneOf(data.spacing, ["realistic", "even"], DEFAULT_SETTINGS.spacing),
-      fretRange: oneOf(data.fretRange, ["all", "low", "high"], DEFAULT_SETTINGS.fretRange),
+      fretRange: data.version !== STORAGE_VERSION && fretRange === "all" ? "auto" : fretRange,
       soundEnabled: bool(data.soundEnabled, true),
       chordSize: oneOf(data.chordSize, ["triad", "seventh"], DEFAULT_SETTINGS.chordSize),
       leftHanded: bool(data.leftHanded, false),
@@ -155,6 +177,7 @@ function saveSettings(settings: ExplorerSettings): void {
     const preferences: Record<string, unknown> = {};
     for (const key of PREFERENCE_KEYS) preferences[key] = settings[key];
     preferences.customTuning = settings.customTuning.map((p) => `${noteToAscii(p.note)}${p.octave}`);
+    preferences.version = STORAGE_VERSION;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences));
   } catch {
     // Storage unavailable — settings simply aren't remembered.

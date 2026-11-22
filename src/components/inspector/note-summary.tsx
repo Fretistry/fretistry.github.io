@@ -7,9 +7,8 @@ import { intervalDisplayLabel, type FretboardNote } from "@/lib/theory";
 import { cn } from "@/lib/utils";
 
 /**
- * The essentials of the tapped note, shown right where you are looking:
- * a strip under the neck on larger screens, a panel sliding up from the
- * bottom on phones. (The full "Selected note" card has the rest.)
+ * The essentials of the tapped note in one line under the neck (tablets and
+ * computers). Phones show the tapped note on the neck itself only.
  */
 
 interface NoteSummaryProps {
@@ -91,42 +90,6 @@ export function NoteStrip({ note, chordRole, onPlay, onClear }: NoteSummaryProps
       {facts.chord && <span className="text-muted-foreground">{facts.chord}</span>}
       <span className="text-muted-foreground">{facts.where}</span>
       <SummaryButtons onPlay={onPlay} onClear={onClear} size="icon-sm" />
-    </div>
-  );
-}
-
-/** A panel that slides up from the bottom of the screen (phones). */
-export function NoteSheet({ note, chordRole, onPlay, onClear }: NoteSummaryProps) {
-  const { ui } = useI18n();
-  const facts = useNoteFacts(note, chordRole);
-  return (
-    <div
-      role="region"
-      aria-label={ui.inspector.title}
-      aria-live="polite"
-      className="fixed inset-x-0 bottom-0 z-40 animate-in border-t border-border/70 bg-popover/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-12px_32px_-12px_rgba(0,0,0,0.5)] backdrop-blur-xl duration-200 slide-in-from-bottom"
-    >
-      <div className="mx-auto flex max-w-lg items-center gap-3">
-        <NoteBadge note={note} name={facts.name} className={cn("size-11", facts.name.length > 2 ? "text-sm" : "text-lg")} />
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-base font-semibold">
-            {facts.name}
-            <sub className="ml-0.5 text-xs font-medium text-muted-foreground">{note.octave}</sub>
-            <span className="ml-2 text-sm font-normal text-muted-foreground">{facts.role}</span>
-          </p>
-          {!note.isRoot && (
-            <p className="truncate text-sm">
-              <span className="font-mono">{facts.intervalLabel}</span>
-              <span className="text-muted-foreground"> · {facts.intervalName}</span>
-            </p>
-          )}
-          <p className="truncate text-xs text-muted-foreground">
-            {facts.where}
-            {facts.chord ? ` · ${facts.chord}` : ""}
-          </p>
-        </div>
-        <SummaryButtons onPlay={onPlay} onClear={onClear} size="icon" />
-      </div>
     </div>
   );
 }

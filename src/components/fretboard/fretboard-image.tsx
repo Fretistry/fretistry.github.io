@@ -6,7 +6,7 @@ import { FretistryMark } from "@/components/brand/fretistry-mark";
 import { SVG_NS, withSingleSvgNamespace } from "@/lib/svg-markup";
 import type { FretboardNote, Tuning } from "@/lib/theory";
 import { FretboardArt, LABEL_SIZE, POSITION_TINT, StringName, type PositionArea } from "./fretboard";
-import { computeGeometry, fretRangeBounds, minimumLength, type SpacingMode } from "./geometry";
+import { computeGeometry, fretRangeBounds, minimumLength, type FretRange, type SpacingMode } from "./geometry";
 import type { MarkerModel, MarkerVariant } from "./marker-model";
 import { MarkerSwatch, NoteMarker } from "./note-marker";
 
@@ -37,7 +37,7 @@ export interface FretboardImageInput {
   /** Open-string names in the chosen note naming, lowest string first. */
   stringNames: readonly string[];
   spacing: SpacingMode;
-  fretRange: "all" | "low" | "high";
+  fretRange: FretRange;
   showFretNumbers: boolean;
   leftHanded: boolean;
   positionAreas: PositionArea[] | null;
@@ -73,7 +73,8 @@ export function pictureLayout(
   const fretCount = input.notes[0]?.length ? input.notes[0].length - 1 : 24;
   const [firstFret, lastFret] = fretRangeBounds(input.fretRange, fretCount);
   const geometry = computeGeometry({
-    length: Math.max(input.fretRange === "all" ? 1480 : 1000, minimumLength(firstFret, lastFret, input.spacing, 26)),
+    // 24 frets get 1480 px, shorter necks proportionally less (never below 1000 px)
+    length: Math.max(1000, Math.round((1480 * (lastFret - firstFret)) / 24), minimumLength(firstFret, lastFret, input.spacing, 26)),
     stringCount: input.tuning.strings.length,
     firstFret,
     lastFret,

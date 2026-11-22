@@ -217,10 +217,34 @@ export function computeGeometry(input: GeometryInput): FretboardGeometry {
   };
 }
 
-export function fretRangeBounds(range: "all" | "low" | "high", fretCount = 24): [number, number] {
-  if (range === "low") return [0, 12];
-  if (range === "high") return [12, fretCount];
-  return [0, fretCount];
+/**
+ * Which frets the neck shows: up to the 12th, 15th (where most acoustics stop
+ * being comfortable), 22nd (many electrics) or 24th fret, or the upper octave.
+ */
+export type FretRange = "low" | "to15" | "to22" | "all" | "high";
+
+/** In the order they appear in the picker: from the shortest neck to the longest, then the upper octave. */
+export const FRET_RANGES: readonly FretRange[] = ["low", "to15", "to22", "all", "high"];
+
+export function fretRangeBounds(range: FretRange, fretCount = 24): [number, number] {
+  switch (range) {
+    case "low":
+      return [0, Math.min(12, fretCount)];
+    case "to15":
+      return [0, Math.min(15, fretCount)];
+    case "to22":
+      return [0, Math.min(22, fretCount)];
+    case "high":
+      return [12, fretCount];
+    case "all":
+      return [0, fretCount];
+  }
+}
+
+/** "0–15" etc. */
+export function fretRangeLabel(range: FretRange, fretCount = 24): string {
+  const [first, last] = fretRangeBounds(range, fretCount);
+  return `${first}–${last}`;
 }
 
 /**

@@ -137,6 +137,8 @@ export const de: UiMessages = {
     wholeNeckTitle: "Ganzer Hals",
     lowTitle: "Offene Lage bis zum 12. Bund",
     highTitle: "Ab dem 12. Bund",
+    to15Title: "Bund 0–15: so weit, wie die meisten Akustikgitarren bequem reichen",
+    to22Title: "Bund 0–22: eine E-Gitarre mit 22 Bünden",
   },
   view: {
     direction: "Ausrichtung des Halses",
@@ -209,6 +211,7 @@ export const de: UiMessages = {
   hints: {
     explore: "Tippe auf einen Ton für Details.",
     swipe: "Zur Seite wischen, um den ganzen Hals zu sehen.",
+    explorePhone: "Tippe auf einen Ton, um ihn zu hören. Gestrichelte Ringe zeigen dieselbe Tonhöhe an anderen Stellen.",
   },
   fretboard: {
     section: "Griffbrett",
@@ -294,11 +297,13 @@ export const de: UiMessages = {
     accent: "Ersten Schlag betonen",
     volume: "Lautstärke des Metronoms",
     note: "Das Metronom läuft weiter, während du die App nutzt. Mit dem Metronom-Symbol oben blendest du seine Leiste über dem Griffbrett ein oder aus, und „Tonleiter abspielen“ folgt seinem Tempo. Es hat eine eigene Lautstärke, unabhängig vom Notenklang.",
-    showBar: "Metronom über dem Griffbrett zeigen",
-    hideBar: "Metronomleiste ausblenden",
+    showBar: "Metronom und Bordun über dem Griffbrett zeigen",
+    hideBar: "Leiste mit Metronom und Bordun ausblenden",
     startShort: "Start",
     stopShort: "Stopp",
-    more: "Weitere Metronom-Einstellungen",
+    more: "Einstellungen für Metronom und Bordun",
+    settings: "Einstellungen",
+    barTitle: "Metronom und Bordun",
   },
   startHere: {
     title: "Hier anfangen",
@@ -331,6 +336,21 @@ export const de: UiMessages = {
     session: (completed, avgSeconds, mistakes) =>
       `Diese Sitzung: ${completed} ${completed === 1 ? "Ton" : "Töne"} · im Schnitt ${avgSeconds} s · ${mistakes} Fehler`,
     hint: "Tippe die Stellen auf dem Griffbrett an. Gefragt werden nur Töne innerhalb der sichtbaren Bünde — und innerhalb der gewählten Formen, falls welche angezeigt werden.",
+  },
+  drone: {
+    title: "Bordun",
+    label: (note) => `Bordun · ${note}`,
+    start: "Bordun starten: ein Ton, der unter deinem Spiel weiterklingt, in der aktuellen Tonart",
+    stop: "Bordun stoppen",
+    sound: "Klang des Borduns",
+    pad: "Pad",
+    harmonium: "Harmonium",
+    padTitle: "Warmes Pad: ein weicher, sich langsam bewegender Synthesizerklang",
+    harmoniumTitle: "Harmonium: eine ruhig singende Zungenorgel",
+    fifth: "+ Quinte",
+    fifthTitle: "Die Quinte über dem Grundton hinzufügen, für einen volleren Klang",
+    volume: "Lautstärke des Borduns",
+    note: "Der Bordun spielt den Grundton der aktuellen Tonart und folgt, wenn du die Tonart wechselst. Spiel darüber und hör, wie jeder Ton wirkt: die ♭3 klingt traurig, die 3 fröhlich, und die 7 will hinauf zum Grundton.",
   },
   footer: {
     madeBy: (name) => `Erstellt von ${name}`,

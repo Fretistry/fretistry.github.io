@@ -142,6 +142,8 @@ export const en = {
     wholeNeckTitle: "Whole neck",
     lowTitle: "Open position to the 12th fret",
     highTitle: "12th fret and up",
+    to15Title: "Frets 0–15: as far as most acoustic guitars comfortably go",
+    to22Title: "Frets 0–22: a 22-fret electric guitar",
   },
   view: {
     direction: "Neck direction",
@@ -214,6 +216,7 @@ export const en = {
   hints: {
     explore: "Tap any note for details.",
     swipe: "Swipe sideways to see the whole neck.",
+    explorePhone: "Tap a note to hear it. Dashed rings show the same pitch elsewhere on the neck.",
   },
   fretboard: {
     section: "Fretboard",
@@ -299,11 +302,13 @@ export const en = {
     accent: "Accent the first beat",
     volume: "Metronome volume",
     note: "The metronome keeps going while you explore. The metronome icon in the header shows or hides its bar above the neck, and “Play scale” follows its tempo. It has its own volume, separate from the note sounds.",
-    showBar: "Show the metronome above the neck",
-    hideBar: "Hide the metronome bar",
+    showBar: "Show the metronome and drone above the neck",
+    hideBar: "Hide the metronome and drone bar",
     startShort: "Start",
     stopShort: "Stop",
-    more: "More metronome settings",
+    more: "Metronome and drone settings",
+    settings: "Settings",
+    barTitle: "Metronome and drone",
   },
   startHere: {
     title: "Start here",
@@ -336,6 +341,21 @@ export const en = {
     session: (completed: number, avgSeconds: string, mistakes: number) =>
       `This session: ${completed} ${completed === 1 ? "note" : "notes"} · ${avgSeconds} s on average · ${mistakes} ${mistakes === 1 ? "mistake" : "mistakes"}`,
     hint: "Tap the spots on the neck. It only asks for notes within the visible frets — and within the chosen shapes, if any are shown.",
+  },
+  drone: {
+    title: "Drone",
+    label: (note: string) => `Drone · ${note}`,
+    start: "Start the drone: a note that keeps sounding under your playing, in the current key",
+    stop: "Stop the drone",
+    sound: "Drone sound",
+    pad: "Pad",
+    harmonium: "Harmonium",
+    padTitle: "Warm pad: a soft, slowly moving synth sound",
+    harmoniumTitle: "Harmonium: a steady, singing reed organ",
+    fifth: "+5th",
+    fifthTitle: "Add the fifth above the root, for a fuller sound",
+    volume: "Drone volume",
+    note: "The drone plays the root of the current key and follows along when you change key. Play over it and listen to how each note feels: the ♭3 sounds sad, the 3 happy, and the 7 wants to move up to the root.",
   },
   footer: {
     madeBy: (name: string) => `Made by ${name}`,

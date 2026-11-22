@@ -14,6 +14,7 @@ import {
   minimumLength,
   positionArea,
   type FretboardGeometry,
+  type FretRange,
   type NeckOrientation,
   type SpacingMode,
 } from "./geometry";
@@ -25,7 +26,7 @@ interface FretboardProps {
   markers: Map<string, MarkerModel>;
   tuning: Tuning;
   spacing: SpacingMode;
-  fretRange: "all" | "low" | "high";
+  fretRange: FretRange;
   showFretNumbers: boolean;
   orientation: NeckOrientation;
   leftHanded: boolean;

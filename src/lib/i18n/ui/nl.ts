@@ -139,6 +139,8 @@ export const nl: UiMessages = {
     wholeNeckTitle: "Hele hals",
     lowTitle: "Open posities tot de 12e fret",
     highTitle: "Vanaf de 12e fret",
+    to15Title: "Fret 0–15: zo ver als de meeste akoestische gitaren comfortabel gaan",
+    to22Title: "Fret 0–22: een elektrische gitaar met 22 frets",
   },
   view: {
     direction: "Richting van de hals",
@@ -211,6 +213,7 @@ export const nl: UiMessages = {
   hints: {
     explore: "Tik op een noot voor details.",
     swipe: "Veeg opzij om de hele hals te zien.",
+    explorePhone: "Tik op een noot om hem te horen. Gestippelde ringen tonen dezelfde toonhoogte elders op de hals.",
   },
   fretboard: {
     section: "Gitaarhals",
@@ -296,11 +299,13 @@ export const nl: UiMessages = {
     accent: "Accent op de eerste tel",
     volume: "Volume van de metronoom",
     note: "De metronoom blijft lopen terwijl je verder verkent. Met het metronoomicoon bovenaan toon of verberg je de balk boven de hals, en ‘Speel toonladder’ volgt zijn tempo. Hij heeft een eigen volume, los van het notengeluid.",
-    showBar: "Metronoom boven de hals tonen",
-    hideBar: "Metronoombalk verbergen",
+    showBar: "Metronoom en drone boven de hals tonen",
+    hideBar: "Balk met metronoom en drone verbergen",
     startShort: "Start",
     stopShort: "Stop",
-    more: "Meer metronoominstellingen",
+    more: "Instellingen voor metronoom en drone",
+    settings: "Instellingen",
+    barTitle: "Metronoom en drone",
   },
   startHere: {
     title: "Begin hier",
@@ -333,6 +338,21 @@ export const nl: UiMessages = {
     session: (completed, avgSeconds, mistakes) =>
       `Deze sessie: ${completed} ${completed === 1 ? "noot" : "noten"} · gemiddeld ${avgSeconds} s · ${mistakes} ${mistakes === 1 ? "fout" : "fouten"}`,
     hint: "Tik de plekken aan op de hals. Er worden alleen noten gevraagd binnen de zichtbare frets — en binnen de gekozen vormen, als die getoond worden.",
+  },
+  drone: {
+    title: "Drone",
+    label: (note) => `Drone · ${note}`,
+    start: "Drone starten: een noot die onder je spel blijft klinken, in de huidige toonsoort",
+    stop: "Drone stoppen",
+    sound: "Klank van de drone",
+    pad: "Pad",
+    harmonium: "Harmonium",
+    padTitle: "Warme pad: een zachte, langzaam bewegende synthesizerklank",
+    harmoniumTitle: "Harmonium: een rustig zingend rietorgel",
+    fifth: "+ kwint",
+    fifthTitle: "Voeg de kwint boven de grondtoon toe, voor een vollere klank",
+    volume: "Volume van de drone",
+    note: "De drone speelt de grondtoon van de huidige toonsoort en volgt mee als je van toonsoort wisselt. Speel erover en luister hoe elke noot klinkt: de ♭3 klinkt droevig, de 3 vrolijk, en de 7 wil omhoog naar de grondtoon.",
   },
   footer: {
     madeBy: (name) => `Gemaakt door ${name}`,

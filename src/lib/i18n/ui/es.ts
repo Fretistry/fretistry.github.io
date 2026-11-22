@@ -137,6 +137,8 @@ export const es: UiMessages = {
     wholeNeckTitle: "Todo el mástil",
     lowTitle: "Posición abierta hasta el traste 12",
     highTitle: "Desde el traste 12",
+    to15Title: "Trastes 0–15: hasta donde llegan cómodamente la mayoría de las guitarras acústicas",
+    to22Title: "Trastes 0–22: una guitarra eléctrica de 22 trastes",
   },
   view: {
     direction: "Orientación del mástil",
@@ -209,6 +211,7 @@ export const es: UiMessages = {
   hints: {
     explore: "Toca una nota para ver los detalles.",
     swipe: "Desliza para ver todo el mástil.",
+    explorePhone: "Toca una nota para oírla. Los anillos discontinuos muestran la misma altura en otros lugares del mástil.",
   },
   fretboard: {
     section: "Mástil",
@@ -294,11 +297,13 @@ export const es: UiMessages = {
     accent: "Acentuar el primer pulso",
     volume: "Volumen del metrónomo",
     note: "El metrónomo sigue sonando mientras exploras. El icono del metrónomo de arriba muestra u oculta su barra sobre el mástil, y «Tocar la escala» sigue su tempo. Tiene su propio volumen, independiente del sonido de las notas.",
-    showBar: "Mostrar el metrónomo sobre el mástil",
-    hideBar: "Ocultar la barra del metrónomo",
+    showBar: "Mostrar el metrónomo y el bordón sobre el mástil",
+    hideBar: "Ocultar la barra del metrónomo y el bordón",
     startShort: "Iniciar",
     stopShort: "Parar",
-    more: "Más ajustes del metrónomo",
+    more: "Ajustes del metrónomo y el bordón",
+    settings: "Ajustes",
+    barTitle: "Metrónomo y bordón",
   },
   startHere: {
     title: "Empieza aquí",
@@ -331,6 +336,21 @@ export const es: UiMessages = {
     session: (completed, avgSeconds, mistakes) =>
       `Esta sesión: ${completed} ${completed === 1 ? "nota" : "notas"} · ${avgSeconds} s de media · ${mistakes} ${mistakes === 1 ? "error" : "errores"}`,
     hint: "Toca los lugares en el mástil. Solo pregunta notas dentro de los trastes visibles — y dentro de las formas elegidas, si hay alguna.",
+  },
+  drone: {
+    title: "Bordón",
+    label: (note) => `Bordón · ${note}`,
+    start: "Iniciar el bordón: una nota que sigue sonando bajo lo que tocas, en la tonalidad actual",
+    stop: "Detener el bordón",
+    sound: "Sonido del bordón",
+    pad: "Pad",
+    harmonium: "Armonio",
+    padTitle: "Pad cálido: un sonido de sintetizador suave que se mueve lentamente",
+    harmoniumTitle: "Armonio: un órgano de lengüetas estable y cantarín",
+    fifth: "+ quinta",
+    fifthTitle: "Añade la quinta sobre la tónica, para un sonido más lleno",
+    volume: "Volumen del bordón",
+    note: "El bordón toca la tónica de la tonalidad actual y la sigue cuando cambias de tonalidad. Toca encima y escucha cómo suena cada nota: la ♭3 suena triste, la 3 alegre, y la 7 quiere subir a la tónica.",
   },
   footer: {
     madeBy: (name) => `Creado por ${name}`,
