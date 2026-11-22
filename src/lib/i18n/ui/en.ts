@@ -368,6 +368,13 @@ export const en = {
     githubLink: "GitHub's privacy statement",
     rights: "Because Fretistry itself stores no personal data, there is nothing to request, correct or delete under the GDPR. Links you share contain only what's on the screen: key, scale, tuning, shape and chord.",
   },
+  seo: {
+    pageTitle: (scale: string) => `${scale} on guitar: notes, shapes & chords`,
+    description: (scale: string, notes: string, mood: string) =>
+      `${scale}: ${notes}. ${mood} See it on all 24 frets, in CAGED shapes and with the chords in the key, with the theory explained. Free, in your browser.`,
+    otherKeys: (scaleName: string) => `${scaleName} in other keys`,
+    loading: "Loading the fretboard…",
+  },
   footer: {
     madeBy: (name: string) => `Made by ${name}`,
   },

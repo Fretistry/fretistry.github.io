@@ -1,18 +1,31 @@
 "use client";
 
+import { createContext, useContext, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 
 /**
  * The explorer runs entirely in the browser (it reads saved settings from
- * local storage), so it is loaded client-side with a lightweight skeleton.
+ * local storage), so it is loaded client-side. Until it's ready, the page shows
+ * what it was given: on a scale page the scale's name, notes and explanation as
+ * real text (also what search engines read), on the home page a light skeleton.
  */
+const Placeholder = createContext<ReactNode>(null);
+
+function LoadingView() {
+  return useContext(Placeholder) ?? <ExplorerSkeleton />;
+}
+
 const GuitarScaleExplorer = dynamic(
   () => import("./guitar-scale-explorer").then((m) => m.GuitarScaleExplorer),
-  { ssr: false, loading: () => <ExplorerSkeleton /> },
+  { ssr: false, loading: () => <LoadingView /> },
 );
 
-export function ExplorerLoader() {
-  return <GuitarScaleExplorer />;
+export function ExplorerLoader({ placeholder }: { placeholder?: ReactNode }) {
+  return (
+    <Placeholder.Provider value={placeholder ?? null}>
+      <GuitarScaleExplorer />
+    </Placeholder.Provider>
+  );
 }
 
 function ExplorerSkeleton() {

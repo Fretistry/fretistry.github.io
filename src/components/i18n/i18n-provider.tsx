@@ -10,6 +10,8 @@ import {
   type I18nBundle,
   type Locale,
 } from "@/lib/i18n";
+import { parseScalePagePath } from "@/lib/pages";
+import { BASE_PATH } from "@/lib/site";
 import type { NoteNaming } from "@/lib/theory";
 
 const LOCALE_KEY = "fretistry-locale";
@@ -41,12 +43,17 @@ function write(key: string, value: string | null): void {
   }
 }
 
-/** Language for this visit: ?lang= in the link, else the saved choice, else the browser's language. */
+/**
+ * Language for this visit: ?lang= in the link, else a language you picked in
+ * Settings before, else the page's own language (/nl/…), else the browser's.
+ */
 function initialLocale(): Locale {
   const fromUrl = new URLSearchParams(window.location.search).get("lang");
   if (isLocale(fromUrl)) return fromUrl;
   const saved = read(LOCALE_KEY);
   if (isLocale(saved)) return saved;
+  const page = parseScalePagePath(window.location.pathname, BASE_PATH);
+  if (page) return page.locale;
   return detectLocale(navigator.languages ?? [navigator.language]);
 }
 
@@ -61,10 +68,10 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const naming = namingOverride ?? defaultNamingFor(locale);
   const bundle = useMemo(() => createBundle(locale, naming), [locale, naming]);
 
+  // (The page title follows the scale and is set by the explorer.)
   useEffect(() => {
     document.documentElement.lang = locale;
-    document.title = bundle.ui.documentTitle;
-  }, [locale, bundle]);
+  }, [locale]);
 
   const setLocale = useCallback((next: Locale) => {
     setLocaleState(next);

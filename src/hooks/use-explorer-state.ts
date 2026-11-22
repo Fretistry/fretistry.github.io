@@ -1,10 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useReducer } from "react";
+import { useCallback, useEffect, useReducer, useState } from "react";
 import { DEFAULT_ROOT, ROOT_NAMES, rootNote, type RootName } from "@/lib/data/roots";
 import { DEFAULT_SCALE_ID } from "@/lib/data/scales";
 import { CUSTOM_TUNING_ID, DEFAULT_TUNING_ID, getTuningPreset } from "@/lib/data/tunings";
-import { parseSearchParams, stateToSearchParams, type PositionChoice } from "@/lib/share";
+import type { Locale } from "@/lib/i18n";
+import { parseScalePagePath, scalePagePath } from "@/lib/pages";
+import { pageSearchParams, parseSearchParams, type PositionChoice } from "@/lib/share";
+import { BASE_PATH } from "@/lib/site";
 import { noteToAscii, parsePitch, pitchClassOf, type ChordSize, type Pitch, type SpelledNote } from "@/lib/theory";
 import { FRET_RANGES, type FretRange } from "@/components/fretboard/geometry";
 
@@ -165,11 +168,16 @@ export function settingsFromSaved(data: Record<string, unknown>): ExplorerSettin
   }
 }
 
-/** Saved settings, overridden by anything in a shared link. */
+/** Saved settings, overridden by the page's key and scale (/nl/a-minor-pentatonic) and anything after the "?". */
 function loadInitialSettings(): ExplorerSettings {
   const saved = loadSavedSettings();
   if (typeof window === "undefined") return saved;
-  return { ...saved, ...parseSearchParams(new URLSearchParams(window.location.search)) };
+  const page = parseScalePagePath(window.location.pathname, BASE_PATH);
+  return {
+    ...saved,
+    ...parseSearchParams(new URLSearchParams(window.location.search)),
+    ...(page ? { rootName: page.rootName, scaleId: page.scaleId } : {}),
+  };
 }
 
 function saveSettings(settings: ExplorerSettings): void {
@@ -184,17 +192,27 @@ function saveSettings(settings: ExplorerSettings): void {
   }
 }
 
-/** Keeps the address bar in sync, so the current view can always be shared. */
-function syncUrl(settings: ExplorerSettings): void {
+/**
+ * Keeps the address bar on the page of what you're looking at
+ * (/nl/a-minor-pentatonic?tuning=drop-d), so the view can always be shared or
+ * bookmarked — and reloading it opens exactly that page.
+ */
+function syncUrl(settings: ExplorerSettings, locale: Locale): void {
   try {
-    const query = stateToSearchParams(settings).toString();
-    const url = `${window.location.pathname}?${query}${window.location.hash}`;
+    const query = pageSearchParams(settings).toString();
+    const path = `${BASE_PATH}${scalePagePath({ locale, rootName: settings.rootName, scaleId: settings.scaleId })}`;
+    const url = `${path}${query ? `?${query}` : ""}${window.location.hash}`;
     if (url !== `${window.location.pathname}${window.location.search}${window.location.hash}`) {
       window.history.replaceState(window.history.state, "", url);
     }
   } catch {
     // Some embedded browsers block history changes; sharing still works via the share button.
   }
+}
+
+/** A plain visit to the home page (no scale page, nothing after the "?") — its address stays as it is until you change something. */
+function isUntouchedHome(): boolean {
+  return !parseScalePagePath(window.location.pathname, BASE_PATH) && window.location.search === "";
 }
 
 function stringCountOf(settings: ExplorerSettings): number {
@@ -235,16 +253,23 @@ export function explorerReducer(state: ExplorerState, action: ExplorerAction): E
  * fretboard is displayed. Settings are remembered between visits, and the
  * musical part is mirrored in the URL for sharing.
  */
-export function useExplorerState() {
+export function useExplorerState(locale: Locale) {
   const [state, dispatch] = useReducer(explorerReducer, undefined, () => ({
     settings: loadInitialSettings(),
     selection: null,
   }));
+  const [initialSettings] = useState(state.settings);
+  const [homeUntouched] = useState(isUntouchedHome);
 
   useEffect(() => {
     saveSettings(state.settings);
-    syncUrl(state.settings);
   }, [state.settings]);
+
+  // The address follows the key, scale and language — except on a plain home-page visit where nothing changed yet.
+  useEffect(() => {
+    if (homeUntouched && state.settings === initialSettings) return;
+    syncUrl(state.settings, locale);
+  }, [state.settings, locale, homeUntouched, initialSettings]);
 
   const update = useCallback((patch: Partial<ExplorerSettings>) => dispatch({ type: "update", patch }), []);
   const select = useCallback((selection: Selection | null) => dispatch({ type: "select", selection }), []);

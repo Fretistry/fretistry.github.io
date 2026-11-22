@@ -1,15 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Moon, RectangleHorizontal, RectangleVertical, Settings, Smartphone, Sun, Volume2, VolumeX } from "lucide-react";
+import { Check, Languages, Moon, RectangleHorizontal, RectangleVertical, Settings, Smartphone, Sun, Volume2, VolumeX } from "lucide-react";
 import { FretistryMark, FretistryWordmark } from "@/components/brand/fretistry-mark";
 import { useI18n } from "@/components/i18n/i18n-provider";
 import { MetronomeHeaderButton } from "@/components/metronome/metronome-control";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type { ExplorerSettings } from "@/hooks/use-explorer-state";
-import { LOCALES, defaultNamingFor } from "@/lib/i18n";
+import { LOCALES, defaultNamingFor, isLocale } from "@/lib/i18n";
 import type { NoteNaming } from "@/lib/theory";
 import { applyTheme, getCurrentTheme, type Theme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
@@ -38,9 +39,10 @@ export function AppHeader({
       <div className="mx-auto flex h-14 max-w-[1600px] min-[1760px]:max-w-[112rem] items-center gap-3 px-[max(1rem,env(safe-area-inset-left))] sm:px-6">
         <div className="flex min-w-0 items-center gap-2.5">
           <FretistryMark className="size-8 drop-shadow-[0_0_14px_rgba(247,169,59,0.35)]" />
-          <h1 className="min-w-0 truncate text-[17px]">
+          {/* (the page's main heading is the scale's name, not the logo) */}
+          <p className="min-w-0 truncate text-[17px]">
             <FretistryWordmark />
-          </h1>
+          </p>
         </div>
         <div className="ml-auto flex items-center gap-0.5 sm:gap-2">
           <MetronomeHeaderButton barVisible={metronomeBarVisible} onToggleBar={onToggleMetronomeBar} />
@@ -131,13 +133,20 @@ function SettingsMenu({ settings, onChange }: { settings: ExplorerSettings; onCh
         <div className="space-y-4">
         <section>
           <SectionTitle>{ui.settings.language}</SectionTitle>
-          <div role="radiogroup" aria-label={ui.settings.language} className="space-y-0.5">
-            {LOCALES.map((l) => (
-              <OptionButton key={l.code} active={l.code === locale} onClick={() => setLocale(l.code)}>
-                <span lang={l.code}>{l.nativeName}</span>
-              </OptionButton>
-            ))}
-          </div>
+          {/* one compact dropdown (room for more languages without a long list) */}
+          <Select value={locale} onValueChange={(value) => isLocale(value) && setLocale(value)}>
+            <SelectTrigger aria-label={ui.settings.language} className="h-9! w-full bg-card font-medium dark:bg-card">
+              <Languages className="size-4 text-muted-foreground" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent position="popper">
+              {LOCALES.map((l) => (
+                <SelectItem key={l.code} value={l.code}>
+                  <span lang={l.code}>{l.nativeName}</span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </section>
         <section>
           <SectionTitle>{ui.settings.noteNames}</SectionTitle>

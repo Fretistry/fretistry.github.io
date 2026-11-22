@@ -44,7 +44,7 @@ export function ScaleHeader({
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <div className="flex items-center gap-1">
-              <h2 className="text-2xl font-semibold tracking-tight sm:text-[28px]">{e.title}</h2>
+              <h1 className="text-2xl font-semibold tracking-tight sm:text-[28px]">{e.title}</h1>
               {titleAddon}
             </div>
             <Button

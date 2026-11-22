@@ -36,7 +36,7 @@ export function DroneControls({ drone, rootName, className }: { drone: DroneApi;
         <span className="hidden font-normal opacity-80 sm:inline">· {rootName}</span>
       </Button>
       <SegmentedControl<DroneSound>
-        className="max-sm:[&>button]:px-2"
+        className="max-sm:[&>button]:px-2 max-sm:[&>button]:text-xs"
         ariaLabel={t.sound}
         value={settings.sound}
         onChange={(sound) => update({ sound })}
@@ -48,6 +48,7 @@ export function DroneControls({ drone, rootName, className }: { drone: DroneApi;
       <button
         type="button"
         aria-pressed={settings.fifth}
+        aria-label={t.fifth}
         title={t.fifthTitle}
         onClick={() => update({ fifth: !settings.fifth })}
         className={cn(
@@ -55,7 +56,9 @@ export function DroneControls({ drone, rootName, className }: { drone: DroneApi;
           settings.fifth ? "bg-foreground text-background ring-foreground" : "bg-card text-muted-foreground ring-border hover:text-foreground",
         )}
       >
-        {t.fifth}
+        {/* phones: "+5" (as in power chords, A5), so the drone fits on one row in every language */}
+        <span className="sm:hidden">+5</span>
+        <span className="hidden sm:inline">{t.fifth}</span>
       </button>
       <InfoTip label={t.infoTitle} paragraphs={t.info(rootName)} />
     </div>

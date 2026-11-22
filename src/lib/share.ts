@@ -1,12 +1,14 @@
 import { isRootName, type RootName } from "@/lib/data/roots";
 import { findScale } from "@/lib/data/scales";
-import { CUSTOM_TUNING_ID, CUSTOM_TUNING_MIDI_RANGE, getTuningPreset } from "@/lib/data/tunings";
+import { CUSTOM_TUNING_ID, CUSTOM_TUNING_MIDI_RANGE, DEFAULT_TUNING_ID, getTuningPreset } from "@/lib/data/tunings";
 import { midiOf, noteToAscii, parsePitch, type ChordSize, type Pitch } from "@/lib/theory";
 
 /**
  * Shareable links: the musical state (root, scale, tuning, position, chord)
- * is stored in the address bar, e.g.
- *   ?root=A&scale=dorian&tuning=drop-d&pos=box2&chord=4
+ * is stored in the address bar. The key and scale are the page itself
+ * (see lib/pages), the rest follows the "?", e.g.
+ *   /en/a-dorian?tuning=drop-d&pos=boxes2&chord=4
+ * Older links put everything after the "?" (?root=A&scale=dorian&…); they still work.
  * Personal display preferences (labels, theme, left-handed…) are not shared.
  */
 
@@ -65,6 +67,19 @@ export function stateToSearchParams(state: SharedState): URLSearchParams {
     params.set("chord", String(state.chordDegree + 1));
     if (state.chordSize === "seventh") params.set("chord7", "1");
   }
+  return params;
+}
+
+/**
+ * What a scale page's address carries after the "?" — the key and scale are
+ * already in the page itself (/nl/a-minor-pentatonic), and standard tuning is
+ * left out, so most addresses have nothing after the "?" at all.
+ */
+export function pageSearchParams(state: SharedState): URLSearchParams {
+  const params = stateToSearchParams(state);
+  params.delete("root");
+  params.delete("scale");
+  if (state.tuningId === DEFAULT_TUNING_ID) params.delete("tuning");
   return params;
 }
 

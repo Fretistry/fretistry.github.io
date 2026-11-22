@@ -365,6 +365,13 @@ export const fr: UiMessages = {
     githubLink: "Déclaration de confidentialité de GitHub",
     rights: "Comme Fretistry ne conserve lui-même aucune donnée personnelle, il n’y a rien à demander, rectifier ou effacer au titre du RGPD. Les liens que vous partagez ne contiennent que ce qui est à l’écran : tonalité, gamme, accordage, forme et accord.",
   },
+  seo: {
+    pageTitle: (scale) => `${scale} à la guitare : notes, formes et accords`,
+    description: (scale, notes, mood) =>
+      `${scale} : ${notes}. ${mood} Sur les 24 cases, en formes CAGED et avec les accords de la tonalité, avec la théorie expliquée. Gratuit, dans votre navigateur.`,
+    otherKeys: (scaleName) => `${scaleName} dans d’autres tonalités`,
+    loading: "Chargement du manche…",
+  },
   footer: {
     madeBy: (name) => `Créé par ${name}`,
   },

@@ -363,6 +363,13 @@ export const es: UiMessages = {
     githubLink: "Declaración de privacidad de GitHub",
     rights: "Como Fretistry no guarda ningún dato personal, no hay nada que solicitar, rectificar o borrar en virtud del RGPD. Los enlaces que compartes solo contienen lo que hay en pantalla: tonalidad, escala, afinación, forma y acorde.",
   },
+  seo: {
+    pageTitle: (scale) => `${scale} en la guitarra: notas, formas y acordes`,
+    description: (scale, notes, mood) =>
+      `${scale}: ${notes}. ${mood} En los 24 trastes, en formas CAGED y con los acordes de la tonalidad, con la teoría explicada. Gratis, en tu navegador.`,
+    otherKeys: (scaleName) => `${scaleName} en otras tonalidades`,
+    loading: "Cargando el mástil…",
+  },
   footer: {
     madeBy: (name) => `Creado por ${name}`,
   },

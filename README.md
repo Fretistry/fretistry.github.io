@@ -61,7 +61,7 @@ Then open <http://localhost:3000>.
 
 **Settings** (gear button, top right)
 
-- Everything personal in one place: language, note names, left-handed, neck direction (Auto, Across, Down), fret numbers, even fret spacing, and light/dark theme.
+- Everything personal in one place: language (a compact dropdown), note names, left-handed, neck direction (Auto, Across, Down), fret numbers, even fret spacing, and light/dark theme.
 - Settings are remembered on this device and never included in shared links.
 
 **CAGED shapes and scale positions**
@@ -97,9 +97,19 @@ Then open <http://localhost:3000>.
 - Position choices (e.g. "box 2" or "3 per string") carry over to the new key.
 - A clicked note keeps its place on the neck, and the note summary explains what that fret means in the new key.
 
+**A page for every scale (findable in search engines)**
+
+- Every scale in every key has its own address in each language: 12 keys × 22 scales × 5 languages = **1,320 pages**, e.g. `/en/a-minor-pentatonic/`, `/nl/c-sharp-dorian/`, `/de/e-flat-major/`. (Each page is a folder of its own, hence the closing slash; addresses typed without it are forwarded.)
+- Each page has its own title and description in its language ("A Minor Pentatonic on guitar: notes, shapes & chords"), links to its versions in the other languages, and opens the app on that scale.
+- While the app starts (a moment), the page already shows the scale's name, mood, notes, formula, how it's built and links to the same scale in the other keys, as real text. That's also what search engines read.
+- A `sitemap.xml` lists every page and `robots.txt` points to it. Nothing is written by hand: the pages are generated from the same data when the site is built.
+- **Language:** a language you chose yourself in Settings wins; otherwise the page's language is used (on the home page: the browser's language).
+
 **Shareable links**
 
-- The address bar always describes what you're looking at: root, scale, tuning (including custom tunings), position and chord. For example: `?root=A&scale=dorian&tuning=drop-d&pos=boxes2&chord=4`. Older links that still say `mode=practice` simply open normally.
+- The address bar always describes what you're looking at: the page is the key and scale (in the current language), and anything else follows after the "?", e.g. `/en/a-dorian/?tuning=drop-d&pos=boxes2&chord=4`. Standard tuning and the plain view need nothing after the "?". Reloading or sharing opens exactly that view.
+- A plain visit to the home page keeps its address until you change something.
+- Older links (`?root=A&scale=dorian&…`, or with `mode=practice`) still open normally.
 - The **Share & save** menu has two choices: **Copy link** (on phones: **Share link…**, which opens the share sheet) and **Save as image…**.
 - Personal preferences (theme, labels, left-handed, sound) stay on your own device.
 
@@ -122,7 +132,7 @@ Then open <http://localhost:3000>.
 **Drone** (in the same bar)
 
 - A note that keeps sounding under your playing: the root of the current key, so you hear what every note does against it (the ♭3 sad, the 3 happy, the 7 pulling up to the root). Change key and it glides to the new root.
-- Two sounds: **Pad** (a warm, slowly moving synth sound) and **Harmonium** (a steady, singing reed organ), both with a soft room around them. **+5th** adds the fifth for a fuller sound.
+- Two sounds: **Pad** (a warm, slowly moving synth sound) and **Harmonium** (a steady, singing reed organ), both with a soft room around them. **+5th** (on phones **+5**, as in power chords) adds the fifth for a fuller sound.
 - The ⓘ next to it explains what a drone is and how to practise with it.
 - Its volume is in **Settings**, separate from the metronome and the note sounds. Closing the bar stops the drone. Sound, fifth and volume are remembered.
 
@@ -225,6 +235,8 @@ The site description used for search engines and link previews is in `src/lib/si
 
 ```
 src/
+  app/              page.tsx (home), [lang]/[slug]/page.tsx (the 1,320 scale pages, made at build time),
+                    sitemap.ts, robots.ts, layout.tsx
   lib/theory/       Music theory engine — pure TypeScript, no React (fully unit-tested)
     notes.ts          letters, accidentals, pitch classes, MIDI ↔ pitch, octaves
     intervals.ts      interval quality/names from spelled notes
@@ -244,6 +256,7 @@ src/
   lib/data/         scales.ts, tunings.ts, roots.ts  ← add new scales/tunings here
   lib/audio/        shared audio context, plucked-string synth, Web Audio playback,
                     scale & chord sequences, metronome scheduler (metronome.ts, tested), drone (drone.ts, tested)
+  lib/pages.ts      scale page addresses: /nl/a-minor-pentatonic ↔ language, key and scale (tested)
   lib/share.ts      shareable-link encoding (tested)
   lib/file-name.ts  file names for saved pictures (tested)
   lib/favourites.ts favourite scales: storing, reading, adding/removing (tested)
@@ -294,7 +307,7 @@ Add one line to `src/lib/data/tunings.ts`, e.g. `tuning("open-f", "Open F", "C2 
 
 ## Tests
 
-`npm test` runs 468 automated checks, including:
+`npm test` runs 473 automated checks, including:
 
 - **Required cases:** C Major, A Natural Minor, A Minor Pentatonic, E Minor Pentatonic, Drop D, and custom tunings.
 - **Spelling:** every root × every scale for correct pitches and spelling.
@@ -306,6 +319,7 @@ Add one line to `src/lib/data/tunings.ts`, e.g. `tuning("open-f", "Open F", "C2 
   - A sweep over every tuning × root × scale × position checks that each note is valid, in the scale and never duplicated.
 - **Chords:** diatonic triads and 7ths with Roman numerals in major, minor and harmonic minor keys, and every chord identified for every root and scale.
 - **Shareable links:** round-tripping every field (including 7-string tunings), rejecting invalid links, and ignoring old practice-mode links.
+- **Scale pages:** every key × scale gets its own address that reads back to exactly that key and scale (no two alike, "c-sharp-…" never mistaken for "c"), one page per language, addresses recognised in a sub-folder too, and only the extras after the "?".
 - **Saved pictures:** readable, safe file names in every language, and picture markup that Firefox accepts (no duplicate namespace).
 - **Favourites:** adding, removing, saving and reading back, ignoring broken or unknown entries, and the 30-item limit.
 - **Fretboard geometry:** real fret spacing, the softened spacing that fits narrower screens (never softer than needed), no overlapping markers, the left-handed mirror, and the vertical layout.
@@ -333,5 +347,6 @@ Add one line to `src/lib/data/tunings.ts`, e.g. `tuning("open-f", "Open F", "C2 
 - **6 or 7 strings in the custom-tuning editor.** The engine also handles 8-string tunings (and links with 4–8 strings work), but the editor only offers 6 and 7.
 - **CAGED letters only in standard-type tunings** (including 7-string standard and Drop A). Other tunings show numbered positions.
 - **Saved pictures use Latin-script fonts.** The ♯ and ♭ signs come from your system's font, so they can look slightly different from the rest of the text.
-- **Link previews and search results stay in English.** The page title and description that WhatsApp, Facebook or Google show are written before the app knows the visitor's language.
+- **The home page's link preview is in English.** Scale pages have their title and description in their own language, but the home page's are written before the app knows the visitor's language. (The page's language tag also says English until the app has started.)
+- **Search engines take time.** New pages typically appear in Google after days to weeks. Submitting the sitemap in Google Search Console (free) speeds this up.
 - **Translations deserve a native speaker's read.** They were written with care and checked for correct music terms, but a native guitarist may still spot wording to polish.

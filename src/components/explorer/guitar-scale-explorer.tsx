@@ -34,7 +34,8 @@ import { SCALES, getScale } from "@/lib/data/scales";
 import { CUSTOM_TUNING_ID, DEFAULT_TUNING_ID, getTuningPreset, makeCustomTuning } from "@/lib/data/tunings";
 import { isFavourite } from "@/lib/favourites";
 import { imageFileName } from "@/lib/file-name";
-import { BASE_PATH, CREATOR, SITE_URL } from "@/lib/site";
+import { parseScalePagePath } from "@/lib/pages";
+import { BASE_PATH, CREATOR, SITE_NAME, SITE_URL } from "@/lib/site";
 import { cagedIndex, type StartingPoint } from "@/lib/start-here";
 import { inTrainerArea, pickTarget, trainerTargets } from "@/lib/trainer";
 import { cn } from "@/lib/utils";
@@ -124,7 +125,7 @@ export function GuitarScaleExplorer() {
 function ExplorerApp() {
   const i18n = useI18n();
   const { ui, theory } = i18n;
-  const { settings, selection, update, select, goToScale } = useExplorerState();
+  const { settings, selection, update, select, goToScale } = useExplorerState(i18n.locale);
   const favourites = useFavourites();
   const metronome = useSharedMetronome();
   const currentFavourite = useMemo(() => ({ rootName: settings.rootName, scaleId: settings.scaleId }), [settings.rootName, settings.scaleId]);
@@ -148,6 +149,18 @@ function ExplorerApp() {
   const explanation = useMemo(() => explainScale(spelled, SCALES, theory), [spelled, theory]);
   const caged = hasCagedShapes(tuning);
   const tuningKey = board.map((row) => row[0]?.midi).join(",");
+
+  // The browser tab names the scale (the same title search engines see on the scale's page).
+  useEffect(() => {
+    const apply = () => {
+      const onScalePage = parseScalePagePath(window.location.pathname, BASE_PATH) !== null;
+      document.title = onScalePage ? `${ui.seo.pageTitle(explanation.title)} · ${SITE_NAME}` : ui.documentTitle;
+    };
+    apply();
+    // Right after start-up Next.js may put the page's original title back once; apply ours again after that.
+    const again = window.setTimeout(apply, 300);
+    return () => window.clearTimeout(again);
+  }, [ui, explanation.title, settings]);
 
   // ── Scale positions (box shapes) ─────────────────────────────────────────
   const availableSystems = useMemo(() => positionSystemsFor(spelled), [spelled]);

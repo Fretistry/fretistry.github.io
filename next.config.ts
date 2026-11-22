@@ -13,6 +13,9 @@ const basePath = process.env.NEXT_PUBLIC_BASE_PATH || undefined;
 const nextConfig: NextConfig = {
   ...(staticExport ? { output: "export" as const } : {}),
   basePath,
+  // Every page in a folder of its own (/nl/a-minor-pentatonic/index.html): the scale pages'
+  // extra data lives in that same folder, and GitHub Pages serves folder addresses reliably.
+  trailingSlash: true,
   // Hide the small Next.js badge in development so the app looks clean; errors are still shown.
   devIndicators: false,
   // (Server-side caching features are not used: the whole app runs in the browser, and

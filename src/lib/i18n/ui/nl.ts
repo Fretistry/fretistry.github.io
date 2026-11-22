@@ -365,6 +365,13 @@ export const nl: UiMessages = {
     githubLink: "Privacyverklaring van GitHub",
     rights: "Omdat Fretistry zelf geen persoonsgegevens bewaart, valt er onder de AVG (GDPR) niets op te vragen, te verbeteren of te wissen. Links die je deelt bevatten alleen wat er op het scherm staat: toonsoort, toonladder, stemming, vorm en akkoord.",
   },
+  seo: {
+    pageTitle: (scale) => `${scale} op gitaar: noten, vormen en akkoorden`,
+    description: (scale, notes, mood) =>
+      `${scale}: ${notes}. ${mood} Bekijk de toonladder op alle 24 frets, in CAGED-vormen en met de akkoorden in de toonsoort, met uitleg over de theorie. Gratis, in je browser.`,
+    otherKeys: (scaleName) => `${scaleName} in andere toonsoorten`,
+    loading: "De hals wordt geladen…",
+  },
   footer: {
     madeBy: (name) => `Gemaakt door ${name}`,
   },

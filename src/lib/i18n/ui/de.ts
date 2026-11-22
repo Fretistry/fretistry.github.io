@@ -363,6 +363,13 @@ export const de: UiMessages = {
     githubLink: "Datenschutzerklärung von GitHub",
     rights: "Da Fretistry selbst keine personenbezogenen Daten speichert, gibt es nach der DSGVO nichts anzufordern, zu berichtigen oder zu löschen. Geteilte Links enthalten nur, was auf dem Bildschirm zu sehen ist: Tonart, Tonleiter, Stimmung, Form und Akkord.",
   },
+  seo: {
+    pageTitle: (scale) => `${scale} auf der Gitarre: Töne, Formen und Akkorde`,
+    description: (scale, notes, mood) =>
+      `${scale}: ${notes}. ${mood} Auf allen 24 Bünden, in CAGED-Formen und mit den Akkorden der Tonart, mit erklärter Theorie. Kostenlos im Browser.`,
+    otherKeys: (scaleName) => `${scaleName} in anderen Tonarten`,
+    loading: "Griffbrett wird geladen…",
+  },
   footer: {
     madeBy: (name) => `Erstellt von ${name}`,
   },
