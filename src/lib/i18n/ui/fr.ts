@@ -301,8 +301,6 @@ export const fr: UiMessages = {
     note: "Le métronome continue pendant que vous explorez. L’icône du métronome en haut affiche ou masque sa barre au-dessus du manche, et « Jouer la gamme » suit son tempo. Il a son propre volume, indépendant du son des notes.",
     showBar: "Afficher le métronome et le bourdon au-dessus du manche",
     hideBar: "Masquer la barre du métronome et du bourdon",
-    startShort: "Démarrer",
-    stopShort: "Arrêter",
     more: "Réglages du métronome et du bourdon",
     settings: "Réglages",
     barTitle: "Métronome et bourdon",
@@ -341,7 +339,6 @@ export const fr: UiMessages = {
   },
   drone: {
     title: "Bourdon",
-    label: (note) => `Bourdon · ${note}`,
     start: "Lancer le bourdon : une note qui continue de sonner sous votre jeu, dans la tonalité actuelle",
     stop: "Arrêter le bourdon",
     sound: "Son du bourdon",
@@ -353,10 +350,23 @@ export const fr: UiMessages = {
     fifthTitle: "Ajouter la quinte au-dessus de la tonique, pour un son plus plein",
     volume: "Volume du bourdon",
     note: "Le bourdon joue la tonique de la tonalité actuelle et suit quand vous changez de tonalité. Jouez par-dessus et écoutez l’effet de chaque note : la ♭3 sonne triste, la 3 joyeuse, et la 7 veut monter vers la tonique.",
+    infoTitle: "Qu’est-ce qu’un bourdon ?",
+    info: (note) => [
+      `Un **bourdon** est une note qui continue de sonner pendant que vous jouez : ici **${note}**, la tonique de la tonalité choisie. Il suit quand vous changez de tonalité.`,
+      "Appuyez sur ▶, puis jouez la gamme par-dessus et écoutez l’effet de chaque note : la ♭3 sonne triste, la 3 joyeuse, et la 7 veut monter vers la tonique. Cela entraîne votre oreille à ce que fait chaque note.",
+      "**Nappe** est un son de synthé doux, **Harmonium** un orgue à anches. **+ quinte** ajoute la quinte pour un son plus plein. Le volume se règle dans Réglages.",
+    ],
+  },
+  privacy: {
+    title: "Confidentialité",
+    intro: "**Pas de compte, pas de cookies, pas de suivi, pas de publicité.** Fretistry ne collecte aucune donnée personnelle : tout est calculé dans votre propre navigateur, et rien de ce que vous faites n’est envoyé nulle part.",
+    storage: "Vos préférences (accordage, étiquettes, langue…) et vos favoris sont enregistrés uniquement dans ce navigateur, sur cet appareil, pour que l’application s’en souvienne la prochaine fois. Elle y garde aussi une copie d’elle-même pour fonctionner hors ligne. Effacer les données de ce site dans votre navigateur supprime le tout.",
+    hosting: "Le site est hébergé par GitHub Pages. Comme la plupart des hébergeurs, GitHub enregistre les adresses IP des visiteurs pour des raisons de sécurité.",
+    githubLink: "Déclaration de confidentialité de GitHub",
+    rights: "Comme Fretistry ne conserve lui-même aucune donnée personnelle, il n’y a rien à demander, rectifier ou effacer au titre du RGPD. Les liens que vous partagez ne contiennent que ce qui est à l’écran : tonalité, gamme, accordage, forme et accord.",
   },
   footer: {
     madeBy: (name) => `Créé par ${name}`,
-    local: "Tout est calculé localement dans votre navigateur.",
   },
   loading: "Chargement de Fretistry",
 };

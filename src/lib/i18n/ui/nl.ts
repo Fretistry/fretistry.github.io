@@ -301,8 +301,6 @@ export const nl: UiMessages = {
     note: "De metronoom blijft lopen terwijl je verder verkent. Met het metronoomicoon bovenaan toon of verberg je de balk boven de hals, en ‘Speel toonladder’ volgt zijn tempo. Hij heeft een eigen volume, los van het notengeluid.",
     showBar: "Metronoom en drone boven de hals tonen",
     hideBar: "Balk met metronoom en drone verbergen",
-    startShort: "Start",
-    stopShort: "Stop",
     more: "Instellingen voor metronoom en drone",
     settings: "Instellingen",
     barTitle: "Metronoom en drone",
@@ -341,7 +339,6 @@ export const nl: UiMessages = {
   },
   drone: {
     title: "Drone",
-    label: (note) => `Drone · ${note}`,
     start: "Drone starten: een noot die onder je spel blijft klinken, in de huidige toonsoort",
     stop: "Drone stoppen",
     sound: "Klank van de drone",
@@ -353,10 +350,23 @@ export const nl: UiMessages = {
     fifthTitle: "Voeg de kwint boven de grondtoon toe, voor een vollere klank",
     volume: "Volume van de drone",
     note: "De drone speelt de grondtoon van de huidige toonsoort en volgt mee als je van toonsoort wisselt. Speel erover en luister hoe elke noot klinkt: de ♭3 klinkt droevig, de 3 vrolijk, en de 7 wil omhoog naar de grondtoon.",
+    infoTitle: "Wat is een drone?",
+    info: (note) => [
+      `Een **drone** is een noot die blijft klinken terwijl je speelt: hier **${note}**, de grondtoon van de toonsoort die je koos. Hij volgt mee als je van toonsoort wisselt.`,
+      "Druk op ▶, speel dan de toonladder eroverheen en luister hoe elke noot ertegen klinkt: de ♭3 klinkt droevig, de 3 vrolijk, en de 7 wil omhoog naar de grondtoon. Zo train je je oor voor wat elke noot doet.",
+      "**Pad** is een zachte synthesizerklank, **Harmonium** een rietorgel. **+ kwint** voegt de kwint toe voor een vollere klank. Het volume staat bij Instellingen.",
+    ],
+  },
+  privacy: {
+    title: "Privacy",
+    intro: "**Geen account, geen cookies, geen tracking, geen advertenties.** Fretistry verzamelt geen persoonsgegevens: alles wordt in je eigen browser berekend, en niets van wat je doet wordt ergens naartoe gestuurd.",
+    storage: "Je voorkeuren (zoals stemming, labels en taal) en je favorieten worden alleen in deze browser op dit toestel bewaard, zodat de app ze de volgende keer nog weet. De app bewaart er ook een kopie van zichzelf, zodat hij offline werkt. Als je de gegevens van deze site in je browser wist, verdwijnt dat allemaal.",
+    hosting: "De site wordt gehost op GitHub Pages. Zoals de meeste webhosts registreert GitHub de IP-adressen van bezoekers om veiligheidsredenen.",
+    githubLink: "Privacyverklaring van GitHub",
+    rights: "Omdat Fretistry zelf geen persoonsgegevens bewaart, valt er onder de AVG (GDPR) niets op te vragen, te verbeteren of te wissen. Links die je deelt bevatten alleen wat er op het scherm staat: toonsoort, toonladder, stemming, vorm en akkoord.",
   },
   footer: {
     madeBy: (name) => `Gemaakt door ${name}`,
-    local: "Alles wordt lokaal in je browser berekend.",
   },
   loading: "Fretistry wordt geladen",
 };

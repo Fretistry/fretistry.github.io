@@ -304,8 +304,6 @@ export const en = {
     note: "The metronome keeps going while you explore. The metronome icon in the header shows or hides its bar above the neck, and “Play scale” follows its tempo. It has its own volume, separate from the note sounds.",
     showBar: "Show the metronome and drone above the neck",
     hideBar: "Hide the metronome and drone bar",
-    startShort: "Start",
-    stopShort: "Stop",
     more: "Metronome and drone settings",
     settings: "Settings",
     barTitle: "Metronome and drone",
@@ -344,7 +342,6 @@ export const en = {
   },
   drone: {
     title: "Drone",
-    label: (note: string) => `Drone · ${note}`,
     start: "Start the drone: a note that keeps sounding under your playing, in the current key",
     stop: "Stop the drone",
     sound: "Drone sound",
@@ -356,10 +353,23 @@ export const en = {
     fifthTitle: "Add the fifth above the root, for a fuller sound",
     volume: "Drone volume",
     note: "The drone plays the root of the current key and follows along when you change key. Play over it and listen to how each note feels: the ♭3 sounds sad, the 3 happy, and the 7 wants to move up to the root.",
+    infoTitle: "What is a drone?",
+    info: (note: string) => [
+      `A **drone** is a note that keeps sounding while you play: here **${note}**, the root of the key you picked. It follows along when you change key.`,
+      "Press ▶, then play the scale over it and listen to how each note feels against it: the ♭3 sounds sad, the 3 happy, and the 7 wants to move up to the root. It trains your ear for what each note does.",
+      "**Pad** is a soft synth sound, **Harmonium** a reed organ. **+5th** adds the fifth for a fuller sound. The volume is in Settings.",
+    ],
+  },
+  privacy: {
+    title: "Privacy",
+    intro: "**No account, no cookies, no tracking, no ads.** Fretistry doesn't collect any personal data: everything is calculated in your own browser, and nothing you do is sent anywhere.",
+    storage: "Your preferences (such as tuning, labels and language) and your favourites are saved only in this browser on this device, so the app remembers them next time. The app also keeps a copy of itself there, so it works offline. Clearing this site's data in your browser removes all of it.",
+    hosting: "The site is hosted on GitHub Pages. Like most web hosts, GitHub records visitors' IP addresses for security purposes.",
+    githubLink: "GitHub's privacy statement",
+    rights: "Because Fretistry itself stores no personal data, there is nothing to request, correct or delete under the GDPR. Links you share contain only what's on the screen: key, scale, tuning, shape and chord.",
   },
   footer: {
     madeBy: (name: string) => `Made by ${name}`,
-    local: "Everything is calculated locally in your browser.",
   },
   loading: "Loading Fretistry",
 };

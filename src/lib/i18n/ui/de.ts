@@ -299,8 +299,6 @@ export const de: UiMessages = {
     note: "Das Metronom läuft weiter, während du die App nutzt. Mit dem Metronom-Symbol oben blendest du seine Leiste über dem Griffbrett ein oder aus, und „Tonleiter abspielen“ folgt seinem Tempo. Es hat eine eigene Lautstärke, unabhängig vom Notenklang.",
     showBar: "Metronom und Bordun über dem Griffbrett zeigen",
     hideBar: "Leiste mit Metronom und Bordun ausblenden",
-    startShort: "Start",
-    stopShort: "Stopp",
     more: "Einstellungen für Metronom und Bordun",
     settings: "Einstellungen",
     barTitle: "Metronom und Bordun",
@@ -339,7 +337,6 @@ export const de: UiMessages = {
   },
   drone: {
     title: "Bordun",
-    label: (note) => `Bordun · ${note}`,
     start: "Bordun starten: ein Ton, der unter deinem Spiel weiterklingt, in der aktuellen Tonart",
     stop: "Bordun stoppen",
     sound: "Klang des Borduns",
@@ -351,10 +348,23 @@ export const de: UiMessages = {
     fifthTitle: "Die Quinte über dem Grundton hinzufügen, für einen volleren Klang",
     volume: "Lautstärke des Borduns",
     note: "Der Bordun spielt den Grundton der aktuellen Tonart und folgt, wenn du die Tonart wechselst. Spiel darüber und hör, wie jeder Ton wirkt: die ♭3 klingt traurig, die 3 fröhlich, und die 7 will hinauf zum Grundton.",
+    infoTitle: "Was ist ein Bordun?",
+    info: (note) => [
+      `Ein **Bordun** ist ein Ton, der weiterklingt, während du spielst: hier **${note}**, der Grundton der gewählten Tonart. Er folgt, wenn du die Tonart wechselst.`,
+      "Drück ▶, spiel dann die Tonleiter darüber und hör, wie jeder Ton dagegen wirkt: die ♭3 klingt traurig, die 3 fröhlich, und die 7 will hinauf zum Grundton. So trainierst du dein Gehör dafür, was jeder Ton bewirkt.",
+      "**Pad** ist ein weicher Synthesizerklang, **Harmonium** eine Zungenorgel. **+ Quinte** fügt die Quinte für einen volleren Klang hinzu. Die Lautstärke findest du unter Einstellungen.",
+    ],
+  },
+  privacy: {
+    title: "Datenschutz",
+    intro: "**Kein Konto, keine Cookies, kein Tracking, keine Werbung.** Fretistry erhebt keine personenbezogenen Daten: Alles wird in deinem eigenen Browser berechnet, und nichts von dem, was du tust, wird irgendwohin gesendet.",
+    storage: "Deine Einstellungen (etwa Stimmung, Beschriftungen und Sprache) und deine Favoriten werden nur in diesem Browser auf diesem Gerät gespeichert, damit die App sie beim nächsten Mal noch kennt. Die App legt dort auch eine Kopie von sich ab, damit sie offline funktioniert. Wenn du die Daten dieser Website in deinem Browser löschst, ist alles weg.",
+    hosting: "Die Website wird über GitHub Pages bereitgestellt. Wie die meisten Webhoster speichert GitHub aus Sicherheitsgründen die IP-Adressen der Besucher.",
+    githubLink: "Datenschutzerklärung von GitHub",
+    rights: "Da Fretistry selbst keine personenbezogenen Daten speichert, gibt es nach der DSGVO nichts anzufordern, zu berichtigen oder zu löschen. Geteilte Links enthalten nur, was auf dem Bildschirm zu sehen ist: Tonart, Tonleiter, Stimmung, Form und Akkord.",
   },
   footer: {
     madeBy: (name) => `Erstellt von ${name}`,
-    local: "Alles wird lokal in deinem Browser berechnet.",
   },
   loading: "Fretistry wird geladen",
 };

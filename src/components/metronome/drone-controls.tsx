@@ -1,6 +1,7 @@
 "use client";
 
-import { AudioWaveform, Volume1, Volume2 } from "lucide-react";
+import { Play, Square, Volume1, Volume2 } from "lucide-react";
+import { InfoTip } from "@/components/explorer/info-tip";
 import { SegmentedControl } from "@/components/explorer/segmented-control";
 import { useI18n } from "@/components/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
@@ -19,7 +20,8 @@ export function DroneControls({ drone, rootName, className }: { drone: DroneApi;
   const t = useI18n().ui.drone;
   const { settings, update, running, toggle } = drone;
   return (
-    <div role="group" aria-label={t.title} className={cn("flex items-center gap-1.5", className)}>
+    <div role="group" aria-label={t.title} className={cn("flex flex-wrap items-center gap-1 sm:gap-1.5", className)}>
+      {/* ▶ / ■ like the metronome's button, so it's clear this starts something */}
       <Button
         variant={running ? "default" : "outline"}
         size="sm"
@@ -28,10 +30,13 @@ export function DroneControls({ drone, rootName, className }: { drone: DroneApi;
         title={running ? t.stop : t.start}
         onClick={toggle}
       >
-        <AudioWaveform className={cn("max-sm:hidden", running && "animate-pulse")} />
-        {t.label(rootName)}
+        {running ? <Square className="fill-current" /> : <Play className="fill-current" />}
+        {t.title}
+        {/* the note it plays (phones: in the ⓘ, so the drone fits on one row) */}
+        <span className="hidden font-normal opacity-80 sm:inline">· {rootName}</span>
       </Button>
       <SegmentedControl<DroneSound>
+        className="max-sm:[&>button]:px-2"
         ariaLabel={t.sound}
         value={settings.sound}
         onChange={(sound) => update({ sound })}
@@ -52,6 +57,7 @@ export function DroneControls({ drone, rootName, className }: { drone: DroneApi;
       >
         {t.fifth}
       </button>
+      <InfoTip label={t.infoTitle} paragraphs={t.info(rootName)} />
     </div>
   );
 }

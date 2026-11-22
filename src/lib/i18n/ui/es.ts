@@ -299,8 +299,6 @@ export const es: UiMessages = {
     note: "El metrónomo sigue sonando mientras exploras. El icono del metrónomo de arriba muestra u oculta su barra sobre el mástil, y «Tocar la escala» sigue su tempo. Tiene su propio volumen, independiente del sonido de las notas.",
     showBar: "Mostrar el metrónomo y el bordón sobre el mástil",
     hideBar: "Ocultar la barra del metrónomo y el bordón",
-    startShort: "Iniciar",
-    stopShort: "Parar",
     more: "Ajustes del metrónomo y el bordón",
     settings: "Ajustes",
     barTitle: "Metrónomo y bordón",
@@ -339,7 +337,6 @@ export const es: UiMessages = {
   },
   drone: {
     title: "Bordón",
-    label: (note) => `Bordón · ${note}`,
     start: "Iniciar el bordón: una nota que sigue sonando bajo lo que tocas, en la tonalidad actual",
     stop: "Detener el bordón",
     sound: "Sonido del bordón",
@@ -351,10 +348,23 @@ export const es: UiMessages = {
     fifthTitle: "Añade la quinta sobre la tónica, para un sonido más lleno",
     volume: "Volumen del bordón",
     note: "El bordón toca la tónica de la tonalidad actual y la sigue cuando cambias de tonalidad. Toca encima y escucha cómo suena cada nota: la ♭3 suena triste, la 3 alegre, y la 7 quiere subir a la tónica.",
+    infoTitle: "¿Qué es un bordón?",
+    info: (note) => [
+      `Un **bordón** es una nota que sigue sonando mientras tocas: aquí **${note}**, la tónica de la tonalidad que elegiste. Te sigue cuando cambias de tonalidad.`,
+      "Pulsa ▶, toca la escala encima y escucha cómo suena cada nota contra él: la ♭3 suena triste, la 3 alegre, y la 7 quiere subir a la tónica. Así entrenas el oído para lo que hace cada nota.",
+      "**Pad** es un sonido de sintetizador suave, **Armonio** un órgano de lengüetas. **+ quinta** añade la quinta para un sonido más lleno. El volumen está en Ajustes.",
+    ],
+  },
+  privacy: {
+    title: "Privacidad",
+    intro: "**Sin cuenta, sin cookies, sin seguimiento, sin anuncios.** Fretistry no recoge ningún dato personal: todo se calcula en tu propio navegador, y nada de lo que haces se envía a ningún sitio.",
+    storage: "Tus preferencias (como la afinación, las etiquetas y el idioma) y tus favoritos se guardan solo en este navegador, en este dispositivo, para que la aplicación los recuerde la próxima vez. También guarda ahí una copia de sí misma para funcionar sin conexión. Si borras los datos de este sitio en tu navegador, todo desaparece.",
+    hosting: "El sitio está alojado en GitHub Pages. Como la mayoría de los servicios de alojamiento, GitHub registra las direcciones IP de los visitantes por motivos de seguridad.",
+    githubLink: "Declaración de privacidad de GitHub",
+    rights: "Como Fretistry no guarda ningún dato personal, no hay nada que solicitar, rectificar o borrar en virtud del RGPD. Los enlaces que compartes solo contienen lo que hay en pantalla: tonalidad, escala, afinación, forma y acorde.",
   },
   footer: {
     madeBy: (name) => `Creado por ${name}`,
-    local: "Todo se calcula localmente en tu navegador.",
   },
   loading: "Cargando Fretistry",
 };

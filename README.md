@@ -112,8 +112,8 @@ Then open <http://localhost:3000>.
 
 **Metronome**
 
-- **Docked at the neck:** a slim bar sits right above the fretboard with the metronome (start/stop, the tempo with ± buttons, tap tempo and big **beat lights**, so the beat stays in view while you play) and the drone. The **Settings** button holds the rest.
-- It's shown on every screen; its × or the metronome icon in the header hides it (and the icon brings it back). With a vertical neck it stays pinned under the header as you scroll down the neck (string names pinned just below it). On phones the drone gets its own row and Tap tempo moves into Settings.
+- **Docked at the neck:** a slim bar sits right above the fretboard with the metronome (**▶ Metronome**, the tempo with ± buttons, tap tempo and big **beat lights**, so the beat stays in view while you play) and the drone (**▶ Drone · A**; on phones just **▶ Drone**). Each start button names what it starts. The **Settings** button holds the rest.
+- It's shown on every screen; its × or the metronome icon in the header hides it (and the icon brings it back). With a vertical neck it stays pinned under the header as you scroll down the neck (string names pinned just below it). On phones the drone gets its own row, and Tap tempo and the × move into Settings.
 - Tempo from 30 to 260 BPM, set with a slider, ± buttons, quick presets or **tap tempo**. The Italian tempo name is shown too (Andante, Allegro…).
 - Beats per bar (2–7), clicks per beat (beats, 8ths, triplets, 16ths), an accent on beat one, and its own volume.
 - Sample-accurate timing: clicks are scheduled on the audio clock, so they stay steady even when the computer is busy, and keep going in a background tab.
@@ -123,6 +123,7 @@ Then open <http://localhost:3000>.
 
 - A note that keeps sounding under your playing: the root of the current key, so you hear what every note does against it (the ♭3 sad, the 3 happy, the 7 pulling up to the root). Change key and it glides to the new root.
 - Two sounds: **Pad** (a warm, slowly moving synth sound) and **Harmonium** (a steady, singing reed organ), both with a soft room around them. **+5th** adds the fifth for a fuller sound.
+- The ⓘ next to it explains what a drone is and how to practise with it.
 - Its volume is in **Settings**, separate from the metronome and the note sounds. Closing the bar stops the drone. Sound, fifth and volume are remembered.
 
 **Fretboard trainer** (the **Train** button next to Share & save)
@@ -188,6 +189,13 @@ Then open <http://localhost:3000>.
 - Fretistry logo and wordmark, favicon (SVG + ICO), iPhone home-screen icon, Android icons (including adaptive "maskable" icons), and a 1200×630 link preview image for social media and chat apps.
 - All are generated from `public/brand/*.svg` with `npm run brand`. The horizontal logos are in `public/brand/fretistry-logo-dark.png` and `fretistry-logo-light.png`.
 - A small "Made by Bart Vangerven" credit sits in the page footer (translated), and the same name is set as the page's author in its metadata. Change it in `src/lib/site.ts` (`CREATOR`).
+
+**Privacy**
+
+- Fretistry has no account, cookies, analytics, trackers or ads, and sends nothing anywhere. Fonts are bundled with the site and all sounds are generated in the browser, so no other services are contacted.
+- Preferences and favourites are kept only in the visitor's own browser (local storage), plus the offline copy of the app. That's storage for features the visitor uses, so no cookie banner is needed.
+- The footer has a fold-out **Privacy** statement in all five languages: what stays in the browser, that GitHub Pages logs visitors' IP addresses for security (with a link to GitHub's privacy statement), and that there's nothing to request or delete under the GDPR.
+- Adding donations, visitor counting or a contact address later means updating that statement (`privacy` in `src/lib/i18n/ui/*.ts`).
 
 ---
 

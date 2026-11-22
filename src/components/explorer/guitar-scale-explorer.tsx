@@ -63,6 +63,7 @@ import { DisplayToolbar } from "./display-toolbar";
 import { FavouriteButton, FavouritesBar, StartHereBar } from "./favourites";
 import { Legend } from "./legend";
 import { PositionPicker } from "./position-picker";
+import { SiteFooter } from "./privacy-note";
 import { RootNotePicker } from "./root-note-picker";
 import { ScaleHeader } from "./scale-header";
 import { ShareMenu } from "./share-button";
@@ -697,10 +698,7 @@ function ExplorerApp() {
         />
       </main>
 
-      {/* (On phones a tapped note shows on the neck itself — ring, same-pitch rings and sound — without a panel over the neck.) */}
-      <footer className="border-t border-border/60 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] text-center text-xs text-muted-foreground">
-        Fretistry · {ui.footer.madeBy(CREATOR)} · {ui.footer.local}
-      </footer>
+      <SiteFooter creator={CREATOR} />
     </div>
   );
 }

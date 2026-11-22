@@ -22,9 +22,12 @@ interface DisplayToolbarProps {
 export function ToolbarGroup({ label, info, children }: { label: string; info?: ReactNode; children: ReactNode }) {
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <span className="min-w-12 text-[11px] font-medium tracking-wider text-muted-foreground uppercase sm:min-w-0">{label}</span>
+      {/* the ⓘ sits right after its label, so it never ends up alone on a line */}
+      <span className="flex min-w-12 items-center gap-0.5 sm:min-w-0">
+        <span className="text-[11px] font-medium tracking-wider text-muted-foreground uppercase">{label}</span>
+        {info}
+      </span>
       {children}
-      {info}
     </div>
   );
 }

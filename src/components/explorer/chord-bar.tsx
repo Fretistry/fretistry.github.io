@@ -27,7 +27,11 @@ export function ChordBar({ chordSet, size, selected, soundEnabled, onSizeChange,
   return (
     <div className="space-y-2.5">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-        <ToolbarGroup label={t.chords}>
+        <ToolbarGroup
+          label={t.chords}
+          // What triads, 7ths and the numerals are — plus, for pentatonic/blues, where the chords come from
+          info={<InfoTip label={t.info} paragraphs={chordSet.basis !== "scale" ? [ui.info.chords, chordSet.note] : [ui.info.chords]} />}
+        >
           <SegmentedControl
             ariaLabel={t.size}
             value={effectiveSize}
@@ -37,8 +41,6 @@ export function ChordBar({ chordSet, size, selected, soundEnabled, onSizeChange,
               ...(chordSet.seventhsAvailable ? [{ value: "seventh" as const, label: t.sevenths, title: t.seventhsTitle }] : []),
             ]}
           />
-          {/* What triads, 7ths and the numerals are — plus, for pentatonic/blues, where the chords come from */}
-          <InfoTip label={t.info} paragraphs={chordSet.basis !== "scale" ? [ui.info.chords, chordSet.note] : [ui.info.chords]} />
         </ToolbarGroup>
         <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label={t.inKey}>
           {chordSet.chords.map((chord) => {
