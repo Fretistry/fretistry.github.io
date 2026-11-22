@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ExplorerLoader } from "@/components/explorer/explorer-loader";
 import { ScalePagePreview, describeScalePage } from "@/components/explorer/scale-page-preview";
+import { JsonLd, PageLanguage, breadcrumbData } from "@/components/seo/seo-tags";
 import { LOCALES, isLocale, type Locale } from "@/lib/i18n";
-import { allScalePages, parseScalePageSlug, scalePagePath, scalePageSlug, type ScalePage } from "@/lib/pages";
+import { titleWithAlternative } from "@/lib/i18n/spoken";
+import { allScalePages, parseScalePageSlug, scaleIndexPath, scalePagePath, scalePageSlug, type ScalePage } from "@/lib/pages";
 import { BASE_PATH, SITE_NAME } from "@/lib/site";
 
 /**
@@ -43,9 +45,13 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { lang, slug } = await params;
   const page = resolve(lang, slug);
   if (!page) return {};
-  const { bundle, explanation } = describeScalePage(page);
-  const title = bundle.ui.seo.pageTitle(explanation.title);
-  const description = bundle.ui.seo.description(explanation.title, explanation.notes.join(" "), explanation.mood);
+  const { bundle, explanation, altTitle } = describeScalePage(page);
+  const title = bundle.ui.seo.pageTitle(explanation.title, altTitle);
+  const description = bundle.ui.seo.description(
+    titleWithAlternative(explanation.title, altTitle),
+    explanation.notes.join(" "),
+    explanation.mood,
+  );
   return {
     title,
     description,
@@ -74,5 +80,18 @@ export default async function ScalePageRoute({ params }: Params) {
   const { lang, slug } = await params;
   const page = resolve(lang, slug);
   if (!page) notFound();
-  return <ExplorerLoader placeholder={<ScalePagePreview page={page} />} />;
+  const { bundle, explanation } = describeScalePage(page);
+  return (
+    <>
+      <PageLanguage locale={page.locale} />
+      <JsonLd
+        data={breadcrumbData([
+          { name: SITE_NAME, path: "/" },
+          { name: bundle.ui.hub.crumb, path: scaleIndexPath(page.locale) },
+          { name: explanation.title, path: scalePagePath(page) },
+        ])}
+      />
+      <ExplorerLoader placeholder={<ScalePagePreview page={page} />} />
+    </>
+  );
 }

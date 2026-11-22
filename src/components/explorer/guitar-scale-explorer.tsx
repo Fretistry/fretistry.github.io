@@ -34,6 +34,7 @@ import { SCALES, getScale } from "@/lib/data/scales";
 import { CUSTOM_TUNING_ID, DEFAULT_TUNING_ID, getTuningPreset, makeCustomTuning } from "@/lib/data/tunings";
 import { isFavourite } from "@/lib/favourites";
 import { imageFileName } from "@/lib/file-name";
+import { alternativeScaleTitle } from "@/lib/i18n/spoken";
 import { parseScalePagePath } from "@/lib/pages";
 import { BASE_PATH, CREATOR, SITE_NAME, SITE_URL } from "@/lib/site";
 import { cagedIndex, type StartingPoint } from "@/lib/start-here";
@@ -154,13 +155,15 @@ function ExplorerApp() {
   useEffect(() => {
     const apply = () => {
       const onScalePage = parseScalePagePath(window.location.pathname, BASE_PATH) !== null;
-      document.title = onScalePage ? `${ui.seo.pageTitle(explanation.title)} · ${SITE_NAME}` : ui.documentTitle;
+      document.title = onScalePage
+        ? `${ui.seo.pageTitle(explanation.title, alternativeScaleTitle(i18n, spelled))} · ${SITE_NAME}`
+        : ui.documentTitle;
     };
     apply();
     // Right after start-up Next.js may put the page's original title back once; apply ours again after that.
     const again = window.setTimeout(apply, 300);
     return () => window.clearTimeout(again);
-  }, [ui, explanation.title, settings]);
+  }, [ui, i18n, spelled, explanation.title, settings]);
 
   // ── Scale positions (box shapes) ─────────────────────────────────────────
   const availableSystems = useMemo(() => positionSystemsFor(spelled), [spelled]);

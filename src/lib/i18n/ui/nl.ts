@@ -366,11 +366,24 @@ export const nl: UiMessages = {
     rights: "Omdat Fretistry zelf geen persoonsgegevens bewaart, valt er onder de AVG (GDPR) niets op te vragen, te verbeteren of te wissen. Links die je deelt bevatten alleen wat er op het scherm staat: toonsoort, toonladder, stemming, vorm en akkoord.",
   },
   seo: {
-    pageTitle: (scale) => `${scale} op gitaar: noten, vormen en akkoorden`,
+    pageTitle: (scale, alt) => `${scale}${alt ? ` (${alt})` : ""} — toonladder op gitaar: noten, vormen en akkoorden`,
     description: (scale, notes, mood) =>
       `${scale}: ${notes}. ${mood} Bekijk de toonladder op alle 24 frets, in CAGED-vormen en met de akkoorden in de toonsoort, met uitleg over de theorie. Gratis, in je browser.`,
     otherKeys: (scaleName) => `${scaleName} in andere toonsoorten`,
     loading: "De hals wordt geladen…",
+    moreScales: (key) => `Meer toonladders in ${key}`,
+    related: "Verwante toonladders",
+    chordsIn: (scale) => `Akkoorden in ${scale}`,
+    allScales: "Alle toonladders",
+  },
+  hub: {
+    title: "Gitaartoonladders in elke toonsoort",
+    metaTitle: "Gitaartoonladders in elke toonsoort: noten, vormen en akkoorden",
+    description: "Alle 22 toonladders in alle 12 toonsoorten (majeur, mineur, pentatonisch, blues, de modi, jazz- en wereldtoonladders), elk op een eigen pagina met de noten, CAGED-vormen, de akkoorden in de toonsoort en uitleg over de theorie. Gratis, in je browser.",
+    intro: "Kies een toonladder en een toonsoort: elke pagina opent de interactieve gitaarhals op die toonladder, met de noten, vormen, akkoorden en theorie.",
+    openApp: "Fretistry openen",
+    otherLanguages: "Ook beschikbaar in",
+    crumb: "Gitaartoonladders",
   },
   footer: {
     madeBy: (name) => `Gemaakt door ${name}`,

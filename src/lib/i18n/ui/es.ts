@@ -364,11 +364,24 @@ export const es: UiMessages = {
     rights: "Como Fretistry no guarda ningún dato personal, no hay nada que solicitar, rectificar o borrar en virtud del RGPD. Los enlaces que compartes solo contienen lo que hay en pantalla: tonalidad, escala, afinación, forma y acorde.",
   },
   seo: {
-    pageTitle: (scale) => `${scale} en la guitarra: notas, formas y acordes`,
+    pageTitle: (scale, alt) => `${scale}${alt ? ` (${alt})` : ""} — escala en la guitarra: notas, formas y acordes`,
     description: (scale, notes, mood) =>
       `${scale}: ${notes}. ${mood} En los 24 trastes, en formas CAGED y con los acordes de la tonalidad, con la teoría explicada. Gratis, en tu navegador.`,
     otherKeys: (scaleName) => `${scaleName} en otras tonalidades`,
     loading: "Cargando el mástil…",
+    moreScales: (key) => `Más escalas en ${key}`,
+    related: "Escalas relacionadas",
+    chordsIn: (scale) => `Acordes de ${scale}`,
+    allScales: "Todas las escalas",
+  },
+  hub: {
+    title: "Escalas de guitarra en todas las tonalidades",
+    metaTitle: "Escalas de guitarra en todas las tonalidades: notas, formas y acordes",
+    description: "Las 22 escalas en las 12 tonalidades (mayores, menores, pentatónicas, blues, modos, jazz y escalas del mundo), cada una en su propia página con las notas, las formas CAGED, los acordes de la tonalidad y la teoría explicada. Gratis, en tu navegador.",
+    intro: "Elige una escala y una tonalidad: cada página abre el mástil interactivo con esa escala, sus notas, formas, acordes y teoría.",
+    openApp: "Abrir Fretistry",
+    otherLanguages: "También en",
+    crumb: "Escalas de guitarra",
   },
   footer: {
     madeBy: (name) => `Creado por ${name}`,

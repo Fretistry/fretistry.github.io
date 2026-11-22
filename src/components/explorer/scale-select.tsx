@@ -12,19 +12,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SCALES, SCALE_CATEGORIES } from "@/lib/data/scales";
+import { shortMood } from "@/lib/short-mood";
 
 interface ScaleSelectProps {
   value: string;
   onChange: (scaleId: string) => void;
-}
-
-/**
- * The first part of a scale's character text ("Bright, stable and happy — the
- * reference point…" → "Bright, stable and happy"), as a hint in the list.
- */
-export function shortMood(character: string): string {
-  const first = character.split(/\s[—–]\s|:\s|;\s|\.\s/)[0].replace(/[.,;:]$/, "").trim();
-  return first.length > 60 ? `${first.slice(0, 57).trimEnd()}…` : first;
 }
 
 /** Scale picker grouped by category, with a short mood line per scale. New scales appear here automatically. */

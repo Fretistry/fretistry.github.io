@@ -1,6 +1,7 @@
-import { ROOT_NAMES, type RootName } from "@/lib/data/roots";
+import { ROOT_NAMES, rootNote, type RootName } from "@/lib/data/roots";
 import { SCALES, findScale } from "@/lib/data/scales";
 import { LOCALES, isLocale, type Locale } from "@/lib/i18n";
+import { noteToAscii, pitchClassOf, type SpelledNote } from "@/lib/theory";
 
 /**
  * Findable pages: every scale in every key gets its own address, per language,
@@ -62,6 +63,20 @@ export function parseScalePagePath(pathname: string, basePath = ""): ScalePage |
   if (!match || !isLocale(match[1].toLowerCase())) return null;
   const page = parseScalePageSlug(match[2]);
   return page ? { locale: match[1].toLowerCase() as Locale, ...page } : null;
+}
+
+/** "/nl/": a language's overview of every scale in every key. */
+export function scaleIndexPath(locale: Locale): string {
+  return `/${locale}/`;
+}
+
+/** The root-picker key for a spelled note ("D♭" → "C#" when D♭ isn't one of the 12 offered names). */
+export function rootNameForNote(note: SpelledNote): RootName {
+  const ascii = noteToAscii(note);
+  const exact = ROOT_NAMES.find((r) => r === ascii);
+  if (exact) return exact;
+  const pc = pitchClassOf(note);
+  return ROOT_NAMES.find((r) => pitchClassOf(rootNote(r)) === pc) ?? "C";
 }
 
 /** Every page: each language × each key × each scale. */

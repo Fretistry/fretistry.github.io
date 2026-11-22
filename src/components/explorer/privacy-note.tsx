@@ -4,6 +4,8 @@ import { useId, useState } from "react";
 import { ChevronDown, ShieldCheck } from "lucide-react";
 import { useI18n } from "@/components/i18n/i18n-provider";
 import { RichText } from "@/components/theory/rich-text";
+import { scaleIndexPath } from "@/lib/pages";
+import { BASE_PATH } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 const GITHUB_PRIVACY_STATEMENT = "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement";
@@ -14,7 +16,7 @@ const GITHUB_PRIVACY_STATEMENT = "https://docs.github.com/en/site-policy/privacy
  * GitHub Pages hosting).
  */
 export function SiteFooter({ creator }: { creator: string }) {
-  const { ui } = useI18n();
+  const { ui, locale } = useI18n();
   const t = ui.privacy;
   const [open, setOpen] = useState(false);
   const panelId = useId();
@@ -22,6 +24,11 @@ export function SiteFooter({ creator }: { creator: string }) {
     <footer className="border-t border-border/60 px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] text-center text-xs text-muted-foreground">
       <p className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1">
         <span>Fretistry · {ui.footer.madeBy(creator)} ·</span>
+        {/* the overview of every scale in every key (also how search engines find all scale pages) */}
+        <a href={`${BASE_PATH}${scaleIndexPath(locale)}`} className="rounded-md px-1 py-0.5 underline-offset-2 hover:text-foreground hover:underline">
+          {ui.seo.allScales}
+        </a>
+        <span>·</span>
         <button
           type="button"
           aria-expanded={open}

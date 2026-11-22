@@ -369,11 +369,24 @@ export const en = {
     rights: "Because Fretistry itself stores no personal data, there is nothing to request, correct or delete under the GDPR. Links you share contain only what's on the screen: key, scale, tuning, shape and chord.",
   },
   seo: {
-    pageTitle: (scale: string) => `${scale} on guitar: notes, shapes & chords`,
+    pageTitle: (scale: string, alt: string | null) => `${scale} scale${alt ? ` (${alt})` : ""} on guitar: notes, shapes & chords`,
     description: (scale: string, notes: string, mood: string) =>
       `${scale}: ${notes}. ${mood} See it on all 24 frets, in CAGED shapes and with the chords in the key, with the theory explained. Free, in your browser.`,
     otherKeys: (scaleName: string) => `${scaleName} in other keys`,
     loading: "Loading the fretboard…",
+    moreScales: (key: string) => `More scales in ${key}`,
+    related: "Related scales",
+    chordsIn: (scale: string) => `Chords in ${scale}`,
+    allScales: "All scales",
+  },
+  hub: {
+    title: "Guitar scales in every key",
+    metaTitle: "Guitar scales in every key: notes, shapes & chords",
+    description: "All 22 scales in all 12 keys (major, minor, pentatonic, blues, the modes, jazz and world scales), each on its own page with the notes, CAGED shapes, the chords in the key and the theory explained. Free, in your browser.",
+    intro: "Pick a scale and a key: each page opens the interactive fretboard on that scale, with its notes, shapes, chords and theory.",
+    openApp: "Open Fretistry",
+    otherLanguages: "Also in",
+    crumb: "Guitar scales",
   },
   footer: {
     madeBy: (name: string) => `Made by ${name}`,

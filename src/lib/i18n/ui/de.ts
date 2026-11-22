@@ -364,11 +364,24 @@ export const de: UiMessages = {
     rights: "Da Fretistry selbst keine personenbezogenen Daten speichert, gibt es nach der DSGVO nichts anzufordern, zu berichtigen oder zu löschen. Geteilte Links enthalten nur, was auf dem Bildschirm zu sehen ist: Tonart, Tonleiter, Stimmung, Form und Akkord.",
   },
   seo: {
-    pageTitle: (scale) => `${scale} auf der Gitarre: Töne, Formen und Akkorde`,
+    pageTitle: (scale, alt) => `${scale}${alt ? ` (${alt})` : ""} – Tonleiter auf der Gitarre: Töne, Formen und Akkorde`,
     description: (scale, notes, mood) =>
       `${scale}: ${notes}. ${mood} Auf allen 24 Bünden, in CAGED-Formen und mit den Akkorden der Tonart, mit erklärter Theorie. Kostenlos im Browser.`,
     otherKeys: (scaleName) => `${scaleName} in anderen Tonarten`,
     loading: "Griffbrett wird geladen…",
+    moreScales: (key) => `Weitere Tonleitern mit Grundton ${key}`,
+    related: "Verwandte Tonleitern",
+    chordsIn: (scale) => `Akkorde in ${scale}`,
+    allScales: "Alle Tonleitern",
+  },
+  hub: {
+    title: "Gitarrentonleitern in jeder Tonart",
+    metaTitle: "Gitarrentonleitern in jeder Tonart: Töne, Formen und Akkorde",
+    description: "Alle 22 Tonleitern in allen 12 Tonarten (Dur, Moll, Pentatonik, Blues, die Kirchentonarten, Jazz- und Welttonleitern), jede auf einer eigenen Seite mit den Tönen, CAGED-Formen, den Akkorden der Tonart und erklärter Theorie. Kostenlos im Browser.",
+    intro: "Wähle eine Tonleiter und einen Grundton: Jede Seite öffnet das interaktive Griffbrett mit dieser Tonleiter, mit Tönen, Formen, Akkorden und Theorie.",
+    openApp: "Fretistry öffnen",
+    otherLanguages: "Auch auf",
+    crumb: "Gitarrentonleitern",
   },
   footer: {
     madeBy: (name) => `Erstellt von ${name}`,

@@ -366,11 +366,24 @@ export const fr: UiMessages = {
     rights: "Comme Fretistry ne conserve lui-même aucune donnée personnelle, il n’y a rien à demander, rectifier ou effacer au titre du RGPD. Les liens que vous partagez ne contiennent que ce qui est à l’écran : tonalité, gamme, accordage, forme et accord.",
   },
   seo: {
-    pageTitle: (scale) => `${scale} à la guitare : notes, formes et accords`,
+    pageTitle: (scale, alt) => `${scale}${alt ? ` (${alt})` : ""} — gamme à la guitare : notes, formes et accords`,
     description: (scale, notes, mood) =>
       `${scale} : ${notes}. ${mood} Sur les 24 cases, en formes CAGED et avec les accords de la tonalité, avec la théorie expliquée. Gratuit, dans votre navigateur.`,
     otherKeys: (scaleName) => `${scaleName} dans d’autres tonalités`,
     loading: "Chargement du manche…",
+    moreScales: (key) => `Autres gammes en ${key}`,
+    related: "Gammes apparentées",
+    chordsIn: (scale) => `Accords de ${scale}`,
+    allScales: "Toutes les gammes",
+  },
+  hub: {
+    title: "Les gammes de guitare dans toutes les tonalités",
+    metaTitle: "Gammes de guitare dans toutes les tonalités : notes, formes et accords",
+    description: "Les 22 gammes dans les 12 tonalités (majeures, mineures, pentatoniques, blues, modes, jazz et gammes du monde), chacune sur sa propre page avec les notes, les formes CAGED, les accords de la tonalité et la théorie expliquée. Gratuit, dans votre navigateur.",
+    intro: "Choisissez une gamme et une tonalité : chaque page ouvre le manche interactif sur cette gamme, avec ses notes, ses formes, ses accords et sa théorie.",
+    openApp: "Ouvrir Fretistry",
+    otherLanguages: "Aussi en",
+    crumb: "Gammes de guitare",
   },
   footer: {
     madeBy: (name) => `Créé par ${name}`,
