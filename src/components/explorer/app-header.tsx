@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Check, Moon, RectangleHorizontal, RectangleVertical, Settings, Smartphone, Sun, Volume2, VolumeX } from "lucide-react";
 import { FretistryMark, FretistryWordmark } from "@/components/brand/fretistry-mark";
 import { useI18n } from "@/components/i18n/i18n-provider";
-import { MetronomeControl } from "@/components/metronome/metronome-control";
+import { MetronomeHeaderButton } from "@/components/metronome/metronome-control";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -21,9 +21,18 @@ interface AppHeaderProps {
   onSoundChange: (enabled: boolean) => void;
   settings: ExplorerSettings;
   onSettingsChange: (patch: Partial<ExplorerSettings>) => void;
+  metronomeBarVisible: boolean;
+  onToggleMetronomeBar: () => void;
 }
 
-export function AppHeader({ soundEnabled, onSoundChange, settings, onSettingsChange }: AppHeaderProps) {
+export function AppHeader({
+  soundEnabled,
+  onSoundChange,
+  settings,
+  onSettingsChange,
+  metronomeBarVisible,
+  onToggleMetronomeBar,
+}: AppHeaderProps) {
   return (
     <header className="sticky top-0 z-30 border-b border-border/60 bg-background/80 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
       <div className="mx-auto flex h-14 max-w-[1600px] min-[1760px]:max-w-[112rem] items-center gap-3 px-[max(1rem,env(safe-area-inset-left))] sm:px-6">
@@ -34,7 +43,7 @@ export function AppHeader({ soundEnabled, onSoundChange, settings, onSettingsCha
           </h1>
         </div>
         <div className="ml-auto flex items-center gap-0.5 sm:gap-2">
-          <MetronomeControl />
+          <MetronomeHeaderButton barVisible={metronomeBarVisible} onToggleBar={onToggleMetronomeBar} />
           <SoundToggle enabled={soundEnabled} onChange={onSoundChange} />
           <SettingsMenu settings={settings} onChange={onSettingsChange} />
         </div>

@@ -13,6 +13,10 @@ interface LegendProps {
   shapes?: readonly { label: string; color: string }[];
   /** A note is selected (white ring). */
   showSelected?: boolean;
+  /** The selected pitch also lives elsewhere on the neck (dashed rings). */
+  showSamePitch?: boolean;
+  /** The fretboard trainer is on: explain its markers instead. */
+  trainer?: boolean;
   className?: string;
 }
 
@@ -21,9 +25,27 @@ function Swatch({ className }: { className: string }) {
 }
 
 /** Colour key for the fretboard markers — only lists what is on the neck right now. */
-export function Legend({ showOutside, chordSymbol, scaleRoot, shapes = [], showSelected, className }: LegendProps) {
+export function Legend({ showOutside, chordSymbol, scaleRoot, shapes = [], showSelected, showSamePitch, trainer, className }: LegendProps) {
   const t = useI18n().ui.legend;
   const showPosition = shapes.length > 0;
+  if (trainer) {
+    return (
+      <ul className={cn("flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground", className)} aria-label={t.legend}>
+        <li className="flex items-center gap-1.5">
+          <Swatch className="bg-note-scale" />
+          {t.trainerFound}
+        </li>
+        <li className="flex items-center gap-1.5">
+          <Swatch className="size-3 border border-note-outside/80 bg-transparent" />
+          {t.trainerHidden}
+        </li>
+        <li className="flex items-center gap-1.5">
+          <Swatch className="border-2 border-red-500 bg-red-500/35" />
+          {t.trainerWrong}
+        </li>
+      </ul>
+    );
+  }
   return (
     <ul className={cn("flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground", className)} aria-label={t.legend}>
       <li className="flex items-center gap-1.5">
@@ -70,6 +92,12 @@ export function Legend({ showOutside, chordSymbol, scaleRoot, shapes = [], showS
         <li className="flex items-center gap-1.5">
           <Swatch className="border-2 border-foreground/80 bg-transparent" />
           {t.selected}
+        </li>
+      )}
+      {showSelected && showSamePitch && (
+        <li className="flex items-center gap-1.5">
+          <Swatch className="border-2 border-dashed border-foreground/80 bg-transparent" />
+          {t.samePitch}
         </li>
       )}
     </ul>

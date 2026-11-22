@@ -118,6 +118,17 @@ describe("metronome scheduler", () => {
     expect(next.sub).toBe(0);
   });
 
+  it("knows when the next beat falls, so a played scale can start exactly on it", () => {
+    const h = harness({ ...DEFAULT_METRONOME, bpm: 120, subdivision: 2 }); // beats every 0.5 s, clicks every 0.25 s
+    expect(h.scheduler.nextBeatTime(0)).toBeCloseTo(0, 10);
+    h.advance(1.1);
+    expect(h.scheduler.nextBeatTime(1.1)).toBeCloseTo(1.5, 10); // not the "and" at 1.25
+    expect(h.scheduler.nextBeatTime(1.5)).toBeCloseTo(1.5, 10);
+    expect(h.scheduler.nextBeatTime(1.51)).toBeCloseTo(2, 10);
+    h.scheduler.stop();
+    expect(h.scheduler.nextBeatTime(2)).toBeNull();
+  });
+
   it("reports the click that is currently sounding and stops cleanly", () => {
     const h = harness({ ...DEFAULT_METRONOME, bpm: 120 });
     h.advance(1.1);

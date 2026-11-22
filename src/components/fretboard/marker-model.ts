@@ -49,6 +49,10 @@ export interface MarkerOptions {
   selectedKey: string | null;
   /** Pitch class of the selected note: other notes with the same name get a subtle ring. */
   selectedPitchClass: number | null;
+  /** Exact pitch of the selected note: the same pitch elsewhere on the neck gets a dashed ring. */
+  selectedMidi?: number | null;
+  /** The note sounding right now in "Play scale" (lit up on the neck). */
+  playingKey?: string | null;
 }
 
 export interface MarkerModel {
@@ -58,9 +62,15 @@ export interface MarkerModel {
   /** Shown as a small faint dot for context (outside the chosen position or chord). */
   dimmed: boolean;
   label: string | null;
-  emphasis: "selected" | "related" | "none";
+  /**
+   * selected = the tapped note; unison = exactly the same pitch elsewhere; related = same note
+   * name in another octave; wrong = a wrong guess in the trainer.
+   */
+  emphasis: "selected" | "unison" | "related" | "wrong" | "none";
   /** While a chord is highlighted: this is the scale's own root, marked with a ring so the key stays visible. */
   home: boolean;
+  /** Sounding right now in "Play scale". */
+  playing: boolean;
   ariaLabel: string;
 }
 
@@ -130,15 +140,59 @@ export function computeMarker(note: FretboardNote, options: MarkerOptions): Mark
     label = markerLabel(note, options.labelMode, text);
   }
 
+  // The note sounding in "Play scale" always shows, fully — and so does exactly the same pitch as
+  // the tapped note, also outside the chosen shape, so you see every place to play it.
+  const playing = options.playingKey === note.key;
+  const unison = !isSelected && visible && options.selectedMidi != null && note.midi === options.selectedMidi;
+  if (playing || unison) {
+    visible = true;
+    dimmed = false;
+    label ??= markerLabel(note, options.labelMode, text);
+  }
+
   if (dimmed) label = null;
 
+  const shown = visible && !dimmed;
   const emphasis = isSelected
     ? "selected"
-    : visible && !dimmed && options.selectedPitchClass === note.pitchClass
-      ? "related"
-      : "none";
+    : unison
+      ? "unison"
+      : shown && options.selectedPitchClass === note.pitchClass
+        ? "related"
+        : "none";
 
   const home = Boolean(options.chord) && note.isRoot && visible;
 
-  return { key: note.key, variant, visible, dimmed, label, emphasis, home, ariaLabel: describe(note, text, chordInterval) };
+  return { key: note.key, variant, visible, dimmed, label, emphasis, home, playing, ariaLabel: describe(note, text, chordInterval) };
+}
+
+export interface TrainerMarkerOptions {
+  text?: MarkerText;
+  /** The spot is part of the quiz (inside the chosen frets and shapes). */
+  inArea: boolean;
+  /** Already found in this round: shown with its name. */
+  found: boolean;
+  /** Just tapped by mistake: flashes red. */
+  wrong: boolean;
+}
+
+/**
+ * The neck in the fretboard trainer: every spot of the quiz area is an empty
+ * circle to tap; found notes appear with their name, a wrong tap flashes red.
+ * Screen readers hear only the position, never the answer.
+ */
+export function computeTrainerMarker(note: FretboardNote, options: TrainerMarkerOptions): MarkerModel {
+  const text = options.text ?? ENGLISH_MARKER_TEXT;
+  const found = options.inArea && options.found;
+  return {
+    key: note.key,
+    variant: found ? (note.isRoot ? "root" : "scale") : "outside",
+    visible: options.inArea,
+    dimmed: false,
+    label: found ? text.note(note.note) : null,
+    emphasis: options.wrong ? "wrong" : "none",
+    home: false,
+    playing: false,
+    ariaLabel: found ? describe(note, text) : text.where(note.stringNumber, note.fret),
+  };
 }

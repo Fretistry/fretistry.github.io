@@ -8,5 +8,6 @@ export * from "./relationships";
 export * from "./explain";
 export * from "./chords";
 export * from "./positions";
+export * from "./play-path";
 export * from "./note-names";
 export * from "./language";

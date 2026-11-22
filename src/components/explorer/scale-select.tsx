@@ -18,7 +18,16 @@ interface ScaleSelectProps {
   onChange: (scaleId: string) => void;
 }
 
-/** Scale picker grouped by category. New scales in the registry appear here automatically. */
+/**
+ * The first part of a scale's character text ("Bright, stable and happy — the
+ * reference point…" → "Bright, stable and happy"), as a hint in the list.
+ */
+export function shortMood(character: string): string {
+  const first = character.split(/\s[—–]\s|:\s|;\s|\.\s/)[0].replace(/[.,;:]$/, "").trim();
+  return first.length > 60 ? `${first.slice(0, 57).trimEnd()}…` : first;
+}
+
+/** Scale picker grouped by category, with a short mood line per scale. New scales appear here automatically. */
 export function ScaleSelect({ value, onChange }: ScaleSelectProps) {
   const { ui, theory, categoryLabel } = useI18n();
   return (
@@ -34,7 +43,7 @@ export function ScaleSelect({ value, onChange }: ScaleSelectProps) {
               {categoryLabel(cat.id)}
             </SelectLabel>
             {SCALES.filter((s) => s.category === cat.id).map((s) => (
-              <SelectItem key={s.id} value={s.id}>
+              <SelectItem key={s.id} value={s.id} description={shortMood(theory.character(s))} className="py-1.5">
                 {theory.scaleFullName(s)}
               </SelectItem>
             ))}

@@ -12,6 +12,10 @@ interface ScaleHeaderProps {
   /** Buttons shown after "Play scale" (the Share menu). */
   actions?: React.ReactNode;
   soundEnabled: boolean;
+  /** Hover text for "Play scale" (e.g. the metronome tempo it uses). */
+  playTitle?: string;
+  /** "Play scale" unavailable for another reason than sound being off (e.g. during the trainer). */
+  playDisabled?: boolean;
   isPlaying: boolean;
   /** Scale note currently sounding during "Play scale" (highlighted). */
   playingIndex: number | null;
@@ -25,6 +29,8 @@ export function ScaleHeader({
   titleAddon,
   actions,
   soundEnabled,
+  playTitle,
+  playDisabled = false,
   isPlaying,
   playingIndex,
   onPlay,
@@ -45,8 +51,8 @@ export function ScaleHeader({
               variant={isPlaying ? "default" : "outline"}
               size="sm"
               onClick={isPlaying ? onStop : onPlay}
-              disabled={!soundEnabled}
-              title={soundEnabled ? undefined : t.soundOffHint}
+              disabled={!soundEnabled || playDisabled}
+              title={soundEnabled ? playTitle : t.soundOffHint}
               className="rounded-full"
             >
               {isPlaying ? <Square className="fill-current" /> : <Play className="fill-current" />}

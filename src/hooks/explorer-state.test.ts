@@ -12,6 +12,8 @@ describe("explorer state", () => {
     expect(DEFAULT_SETTINGS.rootName).toBe("C");
     expect(DEFAULT_SETTINGS.scaleId).toBe("major");
     expect(DEFAULT_SETTINGS.chordDegree).toBeNull();
+    // the metronome bar: shown on larger screens, behind the header button on phones
+    expect(DEFAULT_SETTINGS.metronomeBar).toBe("auto");
   });
 
   it("clears the highlighted chord when the root or scale changes", () => {

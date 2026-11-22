@@ -6,6 +6,7 @@ import type { PositionChoice } from "@/lib/share";
 import { positionStartFret, type PositionSystem, type ScalePosition } from "@/lib/theory";
 import { cn } from "@/lib/utils";
 import { ToolbarGroup } from "./display-toolbar";
+import { InfoTip } from "./info-tip";
 import { SegmentedControl } from "./segmented-control";
 
 interface PositionPickerProps {
@@ -29,7 +30,9 @@ const pill =
  * the same place; only their colour changes.
  */
 export function PositionPicker({ system, available, positions, selected, caged, onChange }: PositionPickerProps) {
-  const t = useI18n().ui.positions;
+  const { ui } = useI18n();
+  const t = ui.positions;
+  const shapesInfo = [caged ? ui.info.caged : ui.info.positions, ...(available.includes("3nps") ? [ui.info.threePerString] : [])];
   const count = positions.length;
   const multi = system === "boxes";
   const allShown = multi && count > 0 && selected.length === count;
@@ -51,11 +54,11 @@ export function PositionPicker({ system, available, positions, selected, caged, 
       }${single.occurrences.length > 1 ? ` ${t.repeats}` : ""}`
     : selected.length === 0
       ? t.noneShown
-      : t.multiple(selected.length);
+      : null; // several shapes: the coloured buttons already say it all
 
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5">
-      <ToolbarGroup label={t.shapes}>
+      <ToolbarGroup label={t.shapes} info={<InfoTip label={ui.info.shapesTitle} paragraphs={shapesInfo} />}>
         <SegmentedControl
           ariaLabel={t.shapes}
           value={system}
@@ -118,7 +121,7 @@ export function PositionPicker({ system, available, positions, selected, caged, 
               </button>
             )}
           </div>
-          <span className="text-xs text-muted-foreground">{detail}</span>
+          {detail && <span className="text-xs text-muted-foreground">{detail}</span>}
         </div>
       )}
     </div>

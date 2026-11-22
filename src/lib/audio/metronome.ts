@@ -102,6 +102,8 @@ export class MetronomeScheduler {
   private tickInBar = 0;
   private queue: ScheduledTick[] = [];
   private running = false;
+  /** Time of the most recently booked click that falls on a beat. */
+  private beatAnchor: number | null = null;
   lookahead: number;
 
   constructor(private readonly options: SchedulerOptions) {
@@ -117,6 +119,7 @@ export class MetronomeScheduler {
     this.running = true;
     this.tickInBar = 0;
     this.queue = [];
+    this.beatAnchor = null;
     this.nextTime = this.options.now() + startDelay;
     this.pump();
   }
@@ -124,6 +127,21 @@ export class MetronomeScheduler {
   stop(): void {
     this.running = false;
     this.queue = [];
+    this.beatAnchor = null;
+  }
+
+  /**
+   * The first beat (not a subdivision click) at or after `time`, on the audio
+   * clock — so something else (a played scale) can start exactly on a beat.
+   * Null while the metronome isn't running.
+   */
+  nextBeatTime(time: number): number | null {
+    if (!this.running || this.beatAnchor === null) return null;
+    const beat = 60 / this.settings.bpm;
+    let t = this.beatAnchor;
+    while (t < time) t += beat;
+    while (t - beat >= time) t -= beat;
+    return t;
   }
 
   /** New settings take effect from the next click (tempo changes are seamless). */
@@ -154,6 +172,7 @@ export class MetronomeScheduler {
         kind: tickKind(this.tickInBar, s),
       };
       this.queue.push(tick);
+      if (tick.sub === 0) this.beatAnchor = tick.time;
       this.options.onSchedule(tick, s);
       this.nextTime += secondsPerTick(s);
       this.tickInBar = (this.tickInBar + 1) % (s.beatsPerBar * s.subdivision);

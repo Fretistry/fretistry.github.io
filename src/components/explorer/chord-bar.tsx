@@ -1,12 +1,12 @@
 "use client";
 
-import { Info, Play, X } from "lucide-react";
+import { Play, X } from "lucide-react";
 import { useI18n } from "@/components/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { describeChordStack, type ChordSet, type ChordSize, type ScaleChord } from "@/lib/theory";
 import { cn } from "@/lib/utils";
 import { ToolbarGroup } from "./display-toolbar";
+import { InfoTip } from "./info-tip";
 import { SegmentedControl } from "./segmented-control";
 
 interface ChordBarProps {
@@ -17,22 +17,6 @@ interface ChordBarProps {
   onSizeChange: (size: ChordSize) => void;
   onSelect: (degree: number | null) => void;
   onPlay: (chord: ScaleChord) => void;
-}
-
-/** A small ⓘ button that shows a short explanation (tap or click — works on phones too). */
-export function InfoTip({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon-xs" aria-label={label} title={label} className="rounded-full text-muted-foreground">
-          <Info />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent align="start" className="w-[min(20rem,calc(100vw-1.5rem))] text-sm text-foreground/85">
-        {children}
-      </PopoverContent>
-    </Popover>
-  );
 }
 
 /** The chords that belong to the scale. Picking one highlights its notes on the fretboard. */
@@ -53,7 +37,8 @@ export function ChordBar({ chordSet, size, selected, soundEnabled, onSizeChange,
               ...(chordSet.seventhsAvailable ? [{ value: "seventh" as const, label: t.sevenths, title: t.seventhsTitle }] : []),
             ]}
           />
-          {chordSet.basis !== "scale" && <InfoTip label={t.info}>{chordSet.note}</InfoTip>}
+          {/* What triads, 7ths and the numerals are — plus, for pentatonic/blues, where the chords come from */}
+          <InfoTip label={t.info} paragraphs={chordSet.basis !== "scale" ? [ui.info.chords, chordSet.note] : [ui.info.chords]} />
         </ToolbarGroup>
         <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label={t.inKey}>
           {chordSet.chords.map((chord) => {
@@ -93,9 +78,7 @@ export function ChordBar({ chordSet, size, selected, soundEnabled, onSizeChange,
             {selected.name} · <span className="font-mono">{selected.numeral}</span> ·{" "}
             <span className="font-mono">{selected.tones.map((tone) => note(tone.note)).join(" ")}</span>
           </span>
-          <InfoTip label={t.info}>
-            {t.stacked} {describeChordStack(selected, theory)}. {t.highlighted}
-          </InfoTip>
+          <InfoTip label={t.info} paragraphs={[`${t.stacked} ${describeChordStack(selected, theory)}. ${t.highlighted}`]} />
           <Button variant="ghost" size="xs" onClick={() => onPlay(selected)} disabled={!soundEnabled}>
             <Play className="fill-current" /> {t.play}
           </Button>

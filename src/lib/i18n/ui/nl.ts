@@ -82,6 +82,7 @@ export const nl: UiMessages = {
     stop: "Stop",
     soundOffHint: "Zet het notengeluid aan (luidsprekericoon rechtsboven) om de toonladder te horen",
     scaleNotes: "Noten van de toonladder",
+    playTitle: (bpm) => `Speelt de toonladder in één vorm op de hals, op het tempo van de metronoom (${bpm} BPM)`,
   },
   share: {
     share: "Delen & bewaren",
@@ -165,7 +166,6 @@ export const nl: UiMessages = {
     none: "Geen",
     noneTitle: "Verberg alle vormen",
     noneShown: "Tik op een letter om die vorm te tonen",
-    multiple: (n) => `${n} vormen, elk in een eigen kleur`,
     threePerStringTitle: "Patronen met drie noten per snaar",
     previous: "Vorige positie",
     next: "Volgende positie",
@@ -203,6 +203,10 @@ export const nl: UiMessages = {
     position: "Positie",
     notInScale: "Niet in de toonladder",
     selected: "Geselecteerd",
+    samePitch: "Zelfde toonhoogte",
+    trainerFound: "Gevonden",
+    trainerHidden: "Nog niet gevonden",
+    trainerWrong: "Foute tik",
   },
   hints: {
     explore: "Tik op een noot voor details.",
@@ -219,25 +223,12 @@ export const nl: UiMessages = {
   },
   inspector: {
     title: "Geselecteerde noot",
-    play: "Speel",
     playAria: "Speel deze noot opnieuw",
     clear: "Selectie wissen",
-    empty: "Klik op een noot op de hals om te zien welke noot het is en hoe ze zich verhoudt tot de grondtoon.",
     root: "Grondtoon",
     nthNote: (n) => `${rang(n)} noot van de toonladder`,
     notInScale: "Niet in de toonladder",
-    string: "Snaar",
-    stringName: (note) => `(${note}-snaar)`,
-    fret: "Fret",
-    openString: "Losse snaar",
-    interval: "Interval vanaf de grondtoon",
-    distance: "Afstand",
-    sameNote: (root) => `Dezelfde noot als ${root}`,
-    above: (steps, root) => `${steps} boven ${root}`,
-    inChord: "In het akkoord",
     ofChord: (chord) => `van ${chord}`,
-    pitch: "Toonhoogte",
-    samePitch: "Dezelfde toonhoogte elders op de hals",
     position: (string, fret) => `Snaar ${string} · ${fret === 0 ? "open" : `fret ${fret}`}`,
   },
   theory: {
@@ -304,7 +295,44 @@ export const nl: UiMessages = {
     sixteenthsTitle: "Vier tikken per tel (zestiende noten)",
     accent: "Accent op de eerste tel",
     volume: "Volume van de metronoom",
-    note: "De metronoom blijft lopen terwijl je verder verkent — het icoon bovenaan zwaait en flitst op elke tel. Hij heeft een eigen volume, los van het notengeluid.",
+    note: "De metronoom blijft lopen terwijl je verder verkent. Met het metronoomicoon bovenaan toon of verberg je de balk boven de hals, en ‘Speel toonladder’ volgt zijn tempo. Hij heeft een eigen volume, los van het notengeluid.",
+    showBar: "Metronoom boven de hals tonen",
+    hideBar: "Metronoombalk verbergen",
+    startShort: "Start",
+    stopShort: "Stop",
+    more: "Meer metronoominstellingen",
+  },
+  startHere: {
+    title: "Begin hier",
+    hint: "Populaire eerste toonladders, elk in één vorm. Tik op de ☆ naast de naam van een toonladder om die hier te bewaren.",
+  },
+  info: {
+    labelsTitle: "Wat betekenen de labels?",
+    labels:
+      "**Noten** toont de notennamen. **Intervallen** toont hoe ver elke noot van de grondtoon ligt: G is de grondtoon, ♭3 een kleine terts, 5 een reine kwint — zoals improvisatoren denken. **Nummers** toont de plaats van elke noot in de toonladder (1 = grondtoon, 2 = tweede noot…).",
+    shapesTitle: "Wat zijn vormen?",
+    caged:
+      "**CAGED** verdeelt de hals in vijf overlappende vormen, genoemd naar de open akkoorden C, A, G, E en D. Elke vorm beslaat zo’n vier à vijf frets, zodat je de toonladder speelt zonder je hand te verplaatsen. Leer één vorm tegelijk en verbind hem daarna met zijn buren om de hele hals te bestrijken.",
+    positions:
+      "**Posities** verdelen de hals in vijf overlappende blokvormen. Elke vorm beslaat zo’n vier à vijf frets, zodat je de toonladder speelt zonder je hand te verplaatsen. Leer er één tegelijk en verbind ze daarna om de hele hals te bestrijken.",
+    threePerString:
+      "**3 per snaar**-patronen spelen precies drie noten op elke snaar. Ze vragen iets meer rek, maar maken snelle loopjes en legato makkelijker.",
+    chords:
+      "**Drieklanken** zijn akkoorden van drie noten; **septiemen** voegen er een vierde noot aan toe. Het Romeinse cijfer zegt op welke noot van de toonladder het akkoord gebouwd is: hoofdletters zijn majeur, kleine letters mineur, ° is verminderd. Tik op een akkoord om zijn noten op de hals te zien.",
+  },
+  trainer: {
+    button: "Oefenen",
+    buttonTitle: "Halstrainer: vind elke plek waar een noot ligt",
+    find: (note) => `Vind elke **${note}**`,
+    done: (total, seconds) => `Alle ${total} gevonden in ${seconds} s!`,
+    progress: (found, total) => `${found} van ${total}`,
+    mistakes: (n) => (n === 1 ? "1 fout" : `${n} fouten`),
+    next: "Volgende noot",
+    skip: "Overslaan",
+    stop: "Trainer stoppen",
+    session: (completed, avgSeconds, mistakes) =>
+      `Deze sessie: ${completed} ${completed === 1 ? "noot" : "noten"} · gemiddeld ${avgSeconds} s · ${mistakes} ${mistakes === 1 ? "fout" : "fouten"}`,
+    hint: "Tik de plekken aan op de hals. Er worden alleen noten gevraagd binnen de zichtbare frets — en binnen de gekozen vormen, als die getoond worden.",
   },
   footer: {
     madeBy: (name) => `Gemaakt door ${name}`,

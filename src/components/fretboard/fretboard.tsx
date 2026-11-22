@@ -202,8 +202,9 @@ export function Fretboard({
   if (vertical) {
     return (
       <div ref={containerRef} className={cn(shell, "overflow-clip")}>
-        {/* String names stay pinned below the app header while scrolling down the neck */}
-        <div className="sticky top-[calc(3.5rem+env(safe-area-inset-top))] z-10 flex justify-center border-b border-white/5 bg-[#120d0a]/95 backdrop-blur-sm">
+        {/* String names stay pinned below the app header (and the metronome/trainer bars, whose
+            height the page passes in as --neck-sticky-offset) while scrolling down the neck */}
+        <div className="sticky top-[calc(3.5rem+env(safe-area-inset-top)+var(--neck-sticky-offset,0px))] z-10 flex justify-center border-b border-white/5 bg-[#120d0a]/95 backdrop-blur-sm">
           <svg width={geometry.width} height={VERTICAL_LABEL_HEIGHT} aria-hidden="true">
             {tuning.strings.map((pitch, i) => (
               <StringLabel key={i} x={geometry.toXY(0, geometry.stringC(i)).x} y={VERTICAL_LABEL_HEIGHT / 2} pitch={pitch} />

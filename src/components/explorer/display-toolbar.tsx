@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
 import type { ExplorerSettings } from "@/hooks/use-explorer-state";
+import { InfoTip } from "./info-tip";
 import { SegmentedControl } from "./segmented-control";
 
 interface DisplayToolbarProps {
@@ -15,11 +16,12 @@ interface DisplayToolbarProps {
   onChange: (patch: Partial<ExplorerSettings>) => void;
 }
 
-export function ToolbarGroup({ label, children }: { label: string; children: ReactNode }) {
+export function ToolbarGroup({ label, info, children }: { label: string; info?: ReactNode; children: ReactNode }) {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <span className="min-w-12 text-[11px] font-medium tracking-wider text-muted-foreground uppercase sm:min-w-0">{label}</span>
       {children}
+      {info}
     </div>
   );
 }
@@ -83,10 +85,11 @@ export function DisplayToolbar({ settings, onChange }: DisplayToolbarProps) {
 }
 
 function DisplayControls({ settings, onChange, stacked = false }: DisplayToolbarProps & { stacked?: boolean }) {
-  const t = useI18n().ui.toolbar;
+  const { ui } = useI18n();
+  const t = ui.toolbar;
   return (
     <div className={stacked ? "space-y-3" : "flex flex-wrap items-center gap-x-5 gap-y-2.5"}>
-      <ToolbarGroup label={t.labels}>
+      <ToolbarGroup label={t.labels} info={<InfoTip label={ui.info.labelsTitle} paragraphs={[ui.info.labels]} />}>
         <SegmentedControl
           ariaLabel={t.noteLabels}
           value={settings.labelMode}

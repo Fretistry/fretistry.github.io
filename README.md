@@ -47,13 +47,15 @@ Then open <http://localhost:3000>.
   - **grey ring** = not in the scale
   - **small faint dot** = outside the chosen position or chord
   - **coloured areas** = the chosen CAGED shapes or boxes (one colour each), shaded on the fret grid; a light neutral area for a 3-per-string pattern
-  - **white ring** = selected note
-- Labels: note names, intervals (R, ♭3, 5…), note numbers (1, 2, 3… within the scale), or none.
+  - **white ring** = selected note, or the note sounding in Play scale
+  - **dashed white ring** = exactly the same pitch as the selected note, somewhere else on the neck
+- Labels: note names, intervals (R, ♭3, 5…), note numbers (1, 2, 3… within the scale), or none. The ⓘ button next to them explains what each one means.
 - Show all notes, scale notes only, or roots only. Choose a fret range: 0–24, 0–12 or 12–24. On phones these three sit behind one **Display** button, so the neck starts on the first screen.
 - **Left-handed view:** the whole neck is mirrored.
 - **Vertical neck on phones:** the nut is at the top and you scroll down the neck, with the string names pinned below the header.
 - **Tapping a note** shows a summary right where you're looking: a strip under the neck on computers and tablets, a panel sliding up from the bottom on phones. It gives the name, role in the scale, interval, string and fret, the role in a highlighted chord, and a Play button.
-- On larger screens the **Selected note** card adds the frequency and every other place on the neck with the same pitch.
+- **Same pitch elsewhere:** every other place to play exactly that pitch gets a dashed ring on the neck itself, also outside the chosen shape. (This replaces the old "Selected note" card, so the music theory panel now uses the full width.)
+- **Scale picker with moods:** each scale in the list has a short line under its name ("Bright, stable and happy", "Dark and exotic"…), so you can choose by sound.
 
 **Settings** (gear button, top right)
 
@@ -74,22 +76,24 @@ Then open <http://localhost:3000>.
 - **Other tunings:** the same 5 boxes, numbered 1–5, calculated from the tuning so they are correct in Drop D, open tunings and custom tunings too.
 - **7-string guitars:** the shapes are the ones a 6-string player knows, extended onto the low string, so they keep their CAGED names.
 - **3 per string:** the 3-notes-per-string patterns, one starting on each scale degree.
+- The ⓘ button next to **Shapes** explains what CAGED, positions and 3-per-string patterns are, and how to learn them.
 
 **Chords in the key**
 
 - Triads or 7th chords built on every scale degree, with Roman numerals (I, ii, iii, IV, V, vi, vii°; ♭III, ♭VII… for minor keys).
 - Tap a chord to highlight its notes. The chord's root is amber, the other chord tones are teal, and labels switch to the chord's own intervals (R, 3, 5, ♭7). The scale's own root keeps an amber ring. Combine it with a position to see the chord inside one box.
-- A one-line summary shows the chord's name, numeral and notes. The ⓘ buttons explain how it's stacked, or why pentatonic scales borrow their chords.
+- A one-line summary shows the chord's name, numeral and notes. The ⓘ buttons explain triads, 7ths and Roman numerals, how the chord is stacked, and why pentatonic scales borrow their chords.
 - Pentatonic and blues scales use the chords of their parent scale. Whole-tone and diminished scales give their symmetric chords.
 - The theory panel has a **Chords** tab explaining how the chords are stacked and how to read the numerals.
 
 **Starting point and selections**
 
 - A fresh visit always starts on **C Major**, unless you open a shared link.
-- Your preferences are remembered: tuning, labels, view options, sound, metronome settings, and whether the theory panel is folded.
+- **Start here:** until you have favourites of your own, a row of popular first scales sits under the controls: A minor pentatonic (box 1, E shape), E minor pentatonic in open position, C major (C shape) and A blues. One tap shows the scale in that one shape instead of the whole neck.
+- Your preferences are remembered: tuning, labels, view options, sound, metronome settings (and whether its bar is shown), and whether the theory panel is folded.
 - A highlighted chord belongs to one key, so it is cleared when you change the root or scale.
 - Position choices (e.g. "box 2" or "3 per string") carry over to the new key.
-- A clicked note keeps its place on the neck, and the inspector explains what that fret means in the new key.
+- A clicked note keeps its place on the neck, and the note summary explains what that fret means in the new key.
 
 **Shareable links**
 
@@ -100,16 +104,25 @@ Then open <http://localhost:3000>.
 **Sound**
 
 - Notes play as a plucked guitar string at the exact pitch. A new note on the same string cuts off the previous one; notes on different strings ring together.
-- **Play scale** plays the scale up and down while lighting up each note, and **Play chord** strums the highlighted chord.
+- **Play scale** plays one shape on the neck, from its lowest note to its highest and back, and lights up each spot as it sounds, so you can follow along with your fingers. It uses the shape you chose (or, with several shapes or the whole neck shown, the one nearest the nut that fits in the visible frets). It plays one note per metronome click at the metronome's tempo, and when the metronome is running it starts exactly on the next beat.
+- **Play chord** strums the highlighted chord.
 - The speaker icon turns note sounds on or off. The metronome has its own volume. On iPhone the sound plays even when the silent switch is on (iOS 16.4+).
 
 **Metronome**
 
-- The metronome icon in the header opens the panel.
+- **Docked at the neck:** a slim metronome bar sits right above the fretboard, with start/stop, the tempo with ± buttons, tap tempo and big **beat lights**, so the beat stays in view while you play. The ⋯ button holds the rest.
+- It's shown by default on computers and tablets. On phones it starts hidden to save space; the metronome icon in the header shows or hides it on any screen. With a vertical neck it stays pinned under the header as you scroll down the neck (string names pinned just below it), and Tap tempo moves behind ⋯ so it fits on one row.
 - Tempo from 30 to 260 BPM, set with a slider, ± buttons, quick presets or **tap tempo**. The Italian tempo name is shown too (Andante, Allegro…).
 - Beats per bar (2–7), clicks per beat (beats, 8ths, triplets, 16ths), an accent on beat one, and its own volume.
 - Sample-accurate timing: clicks are scheduled on the audio clock, so they stay steady even when the computer is busy, and keep going in a background tab.
-- It keeps running while you explore. The header icon's pendulum swings and a light flashes on every beat. Your metronome settings are remembered.
+- It keeps running while you explore. Even with the bar hidden, the header icon's pendulum swings and flashes on every beat. Your metronome settings are remembered.
+
+**Fretboard trainer** (the **Train** button next to Share & save)
+
+- Asks you to **find every spot** of one note of the scale ("Find every G"). The neck turns into blank circles; tap the right spots. Found notes appear with their name, a wrong tap flashes red, and you hear every note you tap.
+- It quizzes the visible frets only, and only the chosen CAGED shapes or boxes if any are shown, so you can learn one shape at a time.
+- A bar above the neck shows progress, mistakes and a timer, plus your totals for the session. **Next note** picks another note of the scale (never the same one twice in a row); **Skip** moves on without finishing.
+- Changing the key, scale, tuning, fret range or shapes starts a fresh round. While training, the chord bar, the note summary and Play scale step aside; a saved picture still shows the normal neck.
 
 **Music theory panel** (collapsible — click "Music theory" to fold it away) — every sentence is generated from the scale data
 
@@ -202,6 +215,7 @@ src/
     scales.ts         correct scale spelling incl. enharmonic decisions
     fretboard.ts      pitch at every string/fret, annotated with scale info
     positions.ts      box shapes, CAGED and 3-notes-per-string patterns for any tuning
+    play-path.ts      which shape "Play scale" plays, and in what order
     chords.ts         chords in the key, chord identification, Roman numerals
     relationships.ts  modes, relatives, subsets, symmetry
     explain.ts        generates all explanation text from the data
@@ -217,18 +231,21 @@ src/
   lib/share.ts      shareable-link encoding (tested)
   lib/file-name.ts  file names for saved pictures (tested)
   lib/favourites.ts favourite scales: storing, reading, adding/removing (tested)
+  lib/start-here.ts the "Start here" first scales (tested)
+  lib/trainer.ts    fretboard trainer: quiz area, target spots, choosing the next note (tested)
   lib/site.ts       site name, description and URLs
   components/
     fretboard/      SVG fretboard: orientation/handedness geometry + marker logic (tested),
                     fretboard-image.tsx draws the "Save image" picture
-    explorer/       app shell, controls, settings menu, position picker, chord bar, share menu & save image
+    explorer/       app shell, controls, settings menu, position picker, chord bar, share menu & save image,
+                    trainer bar, "Start here" row, ⓘ info buttons
     theory/         theory panel (overview, why, chords, relationships)
-    inspector/      selected-note card, plus the strip under the neck / phone panel (note-summary.tsx)
+    inspector/      the note summary: strip under the neck / phone panel (note-summary.tsx)
     brand/          logo mark and wordmark
-    metronome/      header metronome button and panel
+    metronome/      one shared metronome (provider), the header button and the bar at the neck
     i18n/           language provider (choice, detection, remembering it)
     pwa/            offline service-worker registration
-  hooks/            app state (local storage + URL, tested), favourites, scale playback, metronome, media queries
+  hooks/            app state (local storage + URL, tested), favourites, scale playback, metronome, trainer, media queries
 public/brand/       logo sources (SVG) and generated logo PNGs
 public/sw.js        offline service worker
 scripts/            brand asset generator
@@ -261,7 +278,7 @@ Add one line to `src/lib/data/tunings.ts`, e.g. `tuning("open-f", "Open F", "C2 
 
 ## Tests
 
-`npm test` runs 447 automated checks, including:
+`npm test` runs 460 automated checks, including:
 
 - **Required cases:** C Major, A Natural Minor, A Minor Pentatonic, E Minor Pentatonic, Drop D, and custom tunings.
 - **Spelling:** every root × every scale for correct pitches and spelling.
@@ -279,8 +296,12 @@ Add one line to `src/lib/data/tunings.ts`, e.g. `tuning("open-f", "Open F", "C2 
 - **Chord view:** the scale's root stays marked while a chord is highlighted.
 - **Display logic:** filters, chord highlighting and positions.
 - **Sound:** every synthesized note must be within 5 cents of its true pitch.
-- **Metronome:** exact click spacing, accents and subdivisions, seamless tempo changes, tap tempo, and a clean stop.
-- **Selection rules:** C Major start, a chord cleared on key change, and positions kept.
+- **Metronome:** exact click spacing, accents and subdivisions, seamless tempo changes, tap tempo, a clean stop, and knowing when the next beat falls (so Play scale can start on it).
+- **Play scale on the neck:** the chosen shape where it fits in the visible frets, nearest the nut, played up and back down with the top note once.
+- **Fretboard trainer:** every spot of a note within the frets and shapes, answers hidden until found (also from screen readers), wrong taps flagged, and a varied, repeatable choice of notes that never repeats one straight away.
+- **Start here:** every suggestion is a real scale in a real CAGED shape, in the familiar place on the neck.
+- **Same pitch:** exact-pitch rings, also outside the chosen shape, kept apart from the same note in other octaves.
+- **Selection rules:** C Major start, a chord cleared on key change, positions kept, and the metronome bar's default.
 - **Languages:** every interface text exists in all five languages, every scale is translated, German H/B and do-re-mi names are correct, and a sweep over every language × note-name system × root × scale checks that no text comes out broken.
 
 ---
@@ -289,7 +310,8 @@ Add one line to `src/lib/data/tunings.ts`, e.g. `tuning("open-f", "Open F", "C2 
 
 - **Sound is a synthesized pluck, not a recorded guitar.** There's no volume slider yet.
 - **Favourites stay on one device.** There's no way yet to copy your list to another phone or computer.
-- **No practice mode for now.** It was removed to keep the app focused; a proper fretboard trainer (quizzes, score, timer) could replace it later.
+- **The trainer doesn't keep scores between visits.** Session totals reset when you stop it or reload the page. It asks for scale notes only.
+- **Play scale doesn't follow tempo changes mid-run.** Change the tempo, then press Play scale again.
 - **6 or 7 strings in the custom-tuning editor.** The engine also handles 8-string tunings (and links with 4–8 strings work), but the editor only offers 6 and 7.
 - **CAGED letters only in standard-type tunings** (including 7-string standard and Drop A). Other tunings show numbered positions.
 - **Saved pictures use Latin-script fonts.** The ♯ and ♭ signs come from your system's font, so they can look slightly different from the rest of the text.

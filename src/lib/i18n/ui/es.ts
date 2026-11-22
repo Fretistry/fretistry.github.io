@@ -80,6 +80,7 @@ export const es: UiMessages = {
     stop: "Parar",
     soundOffHint: "Activa el sonido de las notas (altavoz arriba a la derecha) para oír la escala",
     scaleNotes: "Notas de la escala",
+    playTitle: (bpm) => `Toca la escala en una forma del mástil, al tempo del metrónomo (${bpm} BPM)`,
   },
   share: {
     share: "Compartir y guardar",
@@ -163,7 +164,6 @@ export const es: UiMessages = {
     none: "Ninguna",
     noneTitle: "Ocultar todas las formas",
     noneShown: "Toca una letra para mostrar esa forma",
-    multiple: (n) => `${n} formas, cada una con su color`,
     threePerStringTitle: "Patrones de tres notas por cuerda",
     previous: "Posición anterior",
     next: "Posición siguiente",
@@ -201,6 +201,10 @@ export const es: UiMessages = {
     position: "Posición",
     notInScale: "Fuera de la escala",
     selected: "Seleccionada",
+    samePitch: "Misma altura",
+    trainerFound: "Encontrada",
+    trainerHidden: "Aún sin encontrar",
+    trainerWrong: "Toque incorrecto",
   },
   hints: {
     explore: "Toca una nota para ver los detalles.",
@@ -217,25 +221,12 @@ export const es: UiMessages = {
   },
   inspector: {
     title: "Nota seleccionada",
-    play: "Tocar",
     playAria: "Volver a tocar esta nota",
     clear: "Quitar la selección",
-    empty: "Haz clic en una nota del mástil para ver qué nota es y cómo se relaciona con la tónica.",
     root: "Tónica",
     nthNote: (n) => `${n}.ª nota de la escala`,
     notInScale: "Fuera de la escala",
-    string: "Cuerda",
-    stringName: (note) => `(cuerda ${note})`,
-    fret: "Traste",
-    openString: "Cuerda al aire",
-    interval: "Intervalo desde la tónica",
-    distance: "Distancia",
-    sameNote: (root) => `La misma nota que ${root}`,
-    above: (steps, root) => `${steps} por encima de ${root}`,
-    inChord: "En el acorde",
     ofChord: (chord) => `de ${chord}`,
-    pitch: "Altura",
-    samePitch: "La misma altura en otros lugares del mástil",
     position: (string, fret) => `Cuerda ${string} · ${fret === 0 ? "al aire" : `traste ${fret}`}`,
   },
   theory: {
@@ -302,7 +293,44 @@ export const es: UiMessages = {
     sixteenthsTitle: "Cuatro clics por pulso (semicorcheas)",
     accent: "Acentuar el primer pulso",
     volume: "Volumen del metrónomo",
-    note: "El metrónomo sigue sonando mientras exploras: el icono de arriba se balancea y parpadea en cada pulso. Tiene su propio volumen, independiente del sonido de las notas.",
+    note: "El metrónomo sigue sonando mientras exploras. El icono del metrónomo de arriba muestra u oculta su barra sobre el mástil, y «Tocar la escala» sigue su tempo. Tiene su propio volumen, independiente del sonido de las notas.",
+    showBar: "Mostrar el metrónomo sobre el mástil",
+    hideBar: "Ocultar la barra del metrónomo",
+    startShort: "Iniciar",
+    stopShort: "Parar",
+    more: "Más ajustes del metrónomo",
+  },
+  startHere: {
+    title: "Empieza aquí",
+    hint: "Escalas populares para empezar, cada una en una forma. Toca la ☆ junto al nombre de una escala para guardarla aquí.",
+  },
+  info: {
+    labelsTitle: "¿Qué significan las etiquetas?",
+    labels:
+      "**Notas** muestra el nombre de las notas. **Intervalos** muestra a qué distancia está cada nota de la tónica: T es la tónica, ♭3 una tercera menor, 5 una quinta justa — como piensan los improvisadores. **Números** muestra el lugar de cada nota en la escala (1 = tónica, 2 = segunda nota…).",
+    shapesTitle: "¿Qué son las formas?",
+    caged:
+      "**CAGED** divide el mástil en cinco formas que se solapan, con el nombre de los acordes abiertos C, A, G, E y D (do, la, sol, mi, re). Cada forma abarca unos cuatro o cinco trastes, así que tocas la escala sin mover la mano. Aprende una forma cada vez y luego únela con sus vecinas para cubrir todo el mástil.",
+    positions:
+      "**Posiciones** divide el mástil en cinco formas de caja que se solapan. Cada una abarca unos cuatro o cinco trastes, así que tocas la escala sin mover la mano. Aprende una cada vez y luego únelas para cubrir todo el mástil.",
+    threePerString:
+      "Los patrones de **3 por cuerda** tocan exactamente tres notas en cada cuerda. Requieren algo más de apertura, pero facilitan las escalas rápidas y el legato.",
+    chords:
+      "Las **tríadas** son acordes de tres notas; las **cuatríadas** añaden una cuarta nota. El número romano indica sobre qué nota de la escala se construye el acorde: mayúscula = mayor, minúscula = menor, ° = disminuido. Toca un acorde para ver sus notas en el mástil.",
+  },
+  trainer: {
+    button: "Practicar",
+    buttonTitle: "Entrenador del mástil: encuentra cada lugar donde está una nota",
+    find: (note) => `Encuentra cada **${note}**`,
+    done: (total, seconds) => `¡Los ${total} lugares encontrados en ${seconds} s!`,
+    progress: (found, total) => `${found} de ${total}`,
+    mistakes: (n) => (n === 1 ? "1 error" : `${n} errores`),
+    next: "Siguiente nota",
+    skip: "Saltar",
+    stop: "Detener el entrenador",
+    session: (completed, avgSeconds, mistakes) =>
+      `Esta sesión: ${completed} ${completed === 1 ? "nota" : "notas"} · ${avgSeconds} s de media · ${mistakes} ${mistakes === 1 ? "error" : "errores"}`,
+    hint: "Toca los lugares en el mástil. Solo pregunta notas dentro de los trastes visibles — y dentro de las formas elegidas, si hay alguna.",
   },
   footer: {
     madeBy: (name) => `Creado por ${name}`,

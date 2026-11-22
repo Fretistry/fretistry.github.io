@@ -82,6 +82,7 @@ export const fr: UiMessages = {
     stop: "Arrêter",
     soundOffHint: "Activez le son des notes (haut-parleur en haut à droite) pour entendre la gamme",
     scaleNotes: "Notes de la gamme",
+    playTitle: (bpm) => `Joue la gamme dans une forme sur le manche, au tempo du métronome (${bpm} BPM)`,
   },
   share: {
     share: "Partager & enregistrer",
@@ -165,7 +166,6 @@ export const fr: UiMessages = {
     none: "Aucune",
     noneTitle: "Masquer toutes les formes",
     noneShown: "Touchez une lettre pour afficher cette forme",
-    multiple: (n) => `${n} formes, chacune dans sa couleur`,
     threePerStringTitle: "Motifs à trois notes par corde",
     previous: "Position précédente",
     next: "Position suivante",
@@ -203,6 +203,10 @@ export const fr: UiMessages = {
     position: "Position",
     notInScale: "Hors de la gamme",
     selected: "Sélectionnée",
+    samePitch: "Même hauteur",
+    trainerFound: "Trouvée",
+    trainerHidden: "Pas encore trouvée",
+    trainerWrong: "Mauvaise touche",
   },
   hints: {
     explore: "Touchez une note pour les détails.",
@@ -219,25 +223,12 @@ export const fr: UiMessages = {
   },
   inspector: {
     title: "Note sélectionnée",
-    play: "Jouer",
     playAria: "Rejouer cette note",
     clear: "Effacer la sélection",
-    empty: "Cliquez sur une note du manche pour voir de quelle note il s’agit et son lien avec la tonique.",
     root: "Tonique",
     nthNote: (n) => `${rang(n)} note de la gamme`,
     notInScale: "Hors de la gamme",
-    string: "Corde",
-    stringName: (note) => `(corde de ${note})`,
-    fret: "Case",
-    openString: "Corde à vide",
-    interval: "Intervalle depuis la tonique",
-    distance: "Écart",
-    sameNote: (root) => `Même note que ${root}`,
-    above: (steps, root) => `${steps} au-dessus de ${root}`,
-    inChord: "Dans l’accord",
     ofChord: (chord) => `de ${chord}`,
-    pitch: "Hauteur",
-    samePitch: "Même hauteur ailleurs sur le manche",
     position: (string, fret) => `Corde ${string} · ${fret === 0 ? "à vide" : `case ${fret}`}`,
   },
   theory: {
@@ -304,7 +295,44 @@ export const fr: UiMessages = {
     sixteenthsTitle: "Quatre clics par temps (doubles croches)",
     accent: "Accentuer le premier temps",
     volume: "Volume du métronome",
-    note: "Le métronome continue pendant que vous explorez — l’icône en haut se balance et clignote à chaque temps. Il a son propre volume, indépendant du son des notes.",
+    note: "Le métronome continue pendant que vous explorez. L’icône du métronome en haut affiche ou masque sa barre au-dessus du manche, et « Jouer la gamme » suit son tempo. Il a son propre volume, indépendant du son des notes.",
+    showBar: "Afficher le métronome au-dessus du manche",
+    hideBar: "Masquer la barre du métronome",
+    startShort: "Démarrer",
+    stopShort: "Arrêter",
+    more: "Plus de réglages du métronome",
+  },
+  startHere: {
+    title: "Pour commencer",
+    hint: "Des premières gammes populaires, chacune dans une forme. Touchez le ☆ à côté du nom d’une gamme pour la garder ici à la place.",
+  },
+  info: {
+    labelsTitle: "Que signifient les étiquettes ?",
+    labels:
+      "**Notes** affiche le nom des notes. **Intervalles** indique la distance de chaque note par rapport à la tonique : T est la tonique, ♭3 une tierce mineure, 5 une quinte juste — comme pensent les improvisateurs. **Numéros** indique la place de chaque note dans la gamme (1 = tonique, 2 = deuxième note…).",
+    shapesTitle: "Que sont les formes ?",
+    caged:
+      "**CAGED** découpe le manche en cinq formes qui se chevauchent, nommées d’après les accords ouverts C, A, G, E et D (do, la, sol, mi, ré). Chaque forme couvre environ quatre ou cinq cases, pour jouer la gamme sans déplacer la main. Apprenez une forme à la fois, puis reliez-la à ses voisines pour couvrir tout le manche.",
+    positions:
+      "**Positions** découpe le manche en cinq formes « boîtes » qui se chevauchent. Chacune couvre environ quatre ou cinq cases, pour jouer la gamme sans déplacer la main. Apprenez-en une à la fois, puis reliez-les pour couvrir tout le manche.",
+    threePerString:
+      "Les motifs **3 par corde** jouent exactement trois notes sur chaque corde. Ils demandent un peu plus d’écart, mais facilitent les traits rapides et le legato.",
+    chords:
+      "Les **triades** sont des accords de trois notes ; les **septièmes** ajoutent une quatrième note. Le chiffre romain indique sur quelle note de la gamme l’accord est construit : majuscule = majeur, minuscule = mineur, ° = diminué. Touchez un accord pour voir ses notes sur le manche.",
+  },
+  trainer: {
+    button: "S’entraîner",
+    buttonTitle: "Entraînement du manche : trouvez chaque emplacement d’une note",
+    find: (note) => `Trouvez chaque **${note}**`,
+    done: (total, seconds) => `Les ${total} emplacements trouvés en ${seconds} s !`,
+    progress: (found, total) => `${found} sur ${total}`,
+    mistakes: (n) => (n <= 1 ? `${n} erreur` : `${n} erreurs`),
+    next: "Note suivante",
+    skip: "Passer",
+    stop: "Arrêter l’entraînement",
+    session: (completed, avgSeconds, mistakes) =>
+      `Cette session : ${completed} ${completed <= 1 ? "note" : "notes"} · ${avgSeconds} s en moyenne · ${mistakes} ${mistakes <= 1 ? "erreur" : "erreurs"}`,
+    hint: "Touchez les emplacements sur le manche. Seules les notes dans les cases visibles sont demandées — et dans les formes choisies, s’il y en a.",
   },
   footer: {
     madeBy: (name) => `Créé par ${name}`,

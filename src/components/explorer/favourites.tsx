@@ -1,12 +1,13 @@
 "use client";
 
-import { Star, X } from "lucide-react";
+import { Sparkles, Star, X } from "lucide-react";
 import { useI18n } from "@/components/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { rootNote } from "@/lib/data/roots";
 import { getScale } from "@/lib/data/scales";
 import { sameFavourite, type Favourite } from "@/lib/favourites";
+import { START_HERE, type StartingPoint } from "@/lib/start-here";
 import { spellScale } from "@/lib/theory";
 import { cn } from "@/lib/utils";
 
@@ -30,6 +31,55 @@ export function FavouriteButton({ active, onToggle }: { active: boolean; onToggl
       </TooltipTrigger>
       <TooltipContent>{label}</TooltipContent>
     </Tooltip>
+  );
+}
+
+/**
+ * "Start here": a few recognisable first scales, each in one shape, for
+ * someone new to the app. Shown in place of the favourites until there are any.
+ */
+export function StartHereBar({
+  caged,
+  isCurrent,
+  onSelect,
+}: {
+  /** The tuning has CAGED shapes (otherwise the shape part is left out). */
+  caged: boolean;
+  isCurrent: (point: StartingPoint) => boolean;
+  onSelect: (point: StartingPoint) => void;
+}) {
+  const { ui, theory, note } = useI18n();
+  return (
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
+      <p className="mr-1 flex items-center gap-1 text-[11px] font-medium tracking-wider text-muted-foreground uppercase">
+        <Sparkles className="size-3.5 text-primary" aria-hidden="true" />
+        {ui.startHere.title}
+      </p>
+      <ul className="flex flex-wrap gap-1.5" aria-label={ui.startHere.title}>
+        {START_HERE.map((point) => {
+          const scale = getScale(point.scaleId);
+          const name = theory.title(note(spellScale(rootNote(point.rootName), scale).root), theory.scaleName(scale));
+          const active = isCurrent(point);
+          return (
+            <li key={`${point.rootName}|${point.scaleId}|${point.shape}`}>
+              <button
+                type="button"
+                onClick={() => onSelect(point)}
+                aria-current={active ? "true" : undefined}
+                className={cn(
+                  "flex h-8 items-center gap-1.5 rounded-full px-3 text-sm font-medium ring-1 transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                  active ? "bg-foreground/10 text-foreground ring-foreground/50" : "bg-card text-foreground/85 ring-border/70 hover:bg-accent",
+                )}
+              >
+                {name}
+                {caged && <span className="text-xs font-normal text-muted-foreground">· {ui.positions.shape(point.shape)}</span>}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+      <span className="text-xs text-muted-foreground">{ui.startHere.hint}</span>
+    </div>
   );
 }
 

@@ -109,5 +109,10 @@ export function useMetronome() {
 
   useEffect(() => stop, [stop]);
 
-  return { settings, update, running, start, stop, toggle, tap, current };
+  /** Audio-clock time of the next beat (null when not running), to start things exactly on the beat. */
+  const nextBeatTime = useCallback((after: number) => scheduler.current?.nextBeatTime(after) ?? null, []);
+
+  return { settings, update, running, start, stop, toggle, tap, current, nextBeatTime };
 }
+
+export type MetronomeApi = ReturnType<typeof useMetronome>;

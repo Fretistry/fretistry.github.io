@@ -38,7 +38,11 @@ export interface ExplorerSettings {
   orientation: Orientation;
   /** Music theory panel folded away. */
   theoryCollapsed: boolean;
+  /** The metronome bar at the neck: "auto" = shown on larger screens, hidden on phones. */
+  metronomeBar: MetronomeBarSetting;
 }
+
+export type MetronomeBarSetting = "auto" | "shown" | "hidden";
 
 export interface Selection {
   stringIndex: number;
@@ -72,6 +76,7 @@ export const DEFAULT_SETTINGS: ExplorerSettings = {
   leftHanded: false,
   orientation: "auto",
   theoryCollapsed: false,
+  metronomeBar: "auto",
 };
 
 /**
@@ -92,6 +97,7 @@ const PREFERENCE_KEYS = [
   "leftHanded",
   "orientation",
   "theoryCollapsed",
+  "metronomeBar",
 ] as const satisfies readonly (keyof ExplorerSettings)[];
 
 function oneOf<T extends string>(value: unknown, options: readonly T[], fallback: T): T {
@@ -130,6 +136,7 @@ function loadSavedSettings(): ExplorerSettings {
       leftHanded: bool(data.leftHanded, false),
       orientation: oneOf(data.orientation, ["auto", "horizontal", "vertical"], DEFAULT_SETTINGS.orientation),
       theoryCollapsed: bool(data.theoryCollapsed, false),
+      metronomeBar: oneOf(data.metronomeBar, ["auto", "shown", "hidden"], DEFAULT_SETTINGS.metronomeBar),
     };
   } catch {
     return DEFAULT_SETTINGS;

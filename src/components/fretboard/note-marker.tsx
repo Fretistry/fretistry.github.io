@@ -120,7 +120,19 @@ export const NoteMarker = memo(function NoteMarker({ note, model, cx, cy, radius
           <circle cx={cx} cy={cy} r={r + 3.2} className="fill-none stroke-white" strokeWidth={2} />
         </>
       )}
-      {emphasis === "related" && <circle cx={cx} cy={cy} r={r + 3} className="fill-none stroke-white/45" strokeWidth={1.5} />}
+      {/* exactly the same pitch elsewhere on the neck: a clear dashed ring */}
+      {emphasis === "unison" && (
+        <circle cx={cx} cy={cy} r={r + 3} className="fill-none stroke-white/90" strokeWidth={1.8} strokeDasharray="3.5 2.5" />
+      )}
+      {emphasis === "related" && <circle cx={cx} cy={cy} r={r + 3} className="fill-none stroke-white/40" strokeWidth={1.4} />}
+      {/* trainer: a wrong guess flashes red */}
+      {emphasis === "wrong" && (
+        <circle cx={cx} cy={cy} r={radius * 0.9} className="marker-wrong fill-red-500/35 stroke-red-500" strokeWidth={2.2} />
+      )}
+      {/* "Play scale": the note sounding right now lights up */}
+      {model.playing && interactive && (
+        <circle cx={cx} cy={cy} r={r + 4.5} className="marker-playing fill-white/15 stroke-white" strokeWidth={2.5} />
+      )}
 
       {dimmed ? (
         <circle cx={cx} cy={cy} r={r} className={DIMMED_FILL[variant]} />

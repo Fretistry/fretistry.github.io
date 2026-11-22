@@ -11,7 +11,7 @@ import {
   spellScale,
 } from "@/lib/theory";
 import { MAX_TAPER, TRUE_TAPER, computeGeometry, fitTaper, minimumLength, positionArea } from "./geometry";
-import { computeMarker, type ChordDisplay, type MarkerOptions } from "./marker-model";
+import { computeMarker, computeTrainerMarker, type ChordDisplay, type MarkerOptions } from "./marker-model";
 import { SHAPE_COLORS, hueOf, shapeColor } from "./shape-colors";
 
 const standard = getTuningPreset("standard")!;
@@ -67,6 +67,42 @@ describe("marker model — explore mode", () => {
     expect(outside.visible).toBe(true);
     expect(outside.dimmed).toBe(true);
     expect(outside.label).toBeNull();
+  });
+
+  it("rings exactly the same pitch elsewhere (dashed) apart from the same note in other octaves", () => {
+    const opts = { ...base, selectedKey: A5.key, selectedPitchClass: A5.pitchClass, selectedMidi: A5.midi };
+    expect(computeMarker(A5, opts).emphasis).toBe("selected");
+    expect(computeMarker(board[1][0], opts).emphasis).toBe("unison"); // open A string = the same A2
+    expect(computeMarker(board[2][7], opts).emphasis).toBe("related"); // A3, an octave higher
+    expect(computeMarker(C8, opts).emphasis).toBe("none");
+    // also outside the chosen shape: the open A lights up instead of staying a faint dot
+    const box1 = scalePositions(aMinorPent, standard, "boxes").find((p) => p.cagedShape === "E")!;
+    const keys = new Set(box1.occurrences.flat().map((n) => positionKey(n.stringIndex, n.fret)));
+    expect(computeMarker(board[1][0], { ...opts, positionKeys: keys })).toMatchObject({ emphasis: "unison", dimmed: false, label: "A" });
+    expect(computeMarker(board[3][2], { ...opts, positionKeys: keys }).dimmed).toBe(true); // A3 on the G string, outside: stays faint
+  });
+
+  it("always shows the note sounding in Play scale, fully and labelled", () => {
+    const box1 = scalePositions(aMinorPent, standard, "boxes").find((p) => p.cagedShape === "E")!;
+    const keys = new Set(box1.occurrences.flat().map((n) => positionKey(n.stringIndex, n.fret)));
+    const playing = computeMarker(lowE[3], { ...base, positionKeys: keys, playingKey: lowE[3].key });
+    expect(playing).toMatchObject({ playing: true, visible: true, dimmed: false, label: "G" });
+    expect(computeMarker(A5, { ...base, playingKey: lowE[3].key }).playing).toBe(false);
+  });
+});
+
+describe("marker model — fretboard trainer", () => {
+  it("hides the answers until they are found", () => {
+    const hidden = computeTrainerMarker(A5, { inArea: true, found: false, wrong: false });
+    expect(hidden).toMatchObject({ visible: true, variant: "outside", label: null, emphasis: "none" });
+    expect(hidden.ariaLabel).toBe("string 6, fret 5"); // the position only, never the note
+    expect(computeTrainerMarker(A5, { inArea: true, found: true, wrong: false })).toMatchObject({ variant: "root", label: "A" });
+    expect(computeTrainerMarker(C8, { inArea: true, found: true, wrong: false })).toMatchObject({ variant: "scale", label: "C" });
+  });
+
+  it("flashes wrong taps and leaves spots outside the quiz off the neck", () => {
+    expect(computeTrainerMarker(B7, { inArea: true, found: false, wrong: true }).emphasis).toBe("wrong");
+    expect(computeTrainerMarker(B7, { inArea: false, found: false, wrong: false }).visible).toBe(false);
   });
 });
 

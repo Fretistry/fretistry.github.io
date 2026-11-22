@@ -191,6 +191,44 @@
   }
 }
 
+/* "Play scale": the sounding note pops in with a short burst */
+.marker-playing {
+  animation: marker-play 0.35s ease-out;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes marker-play {
+  0% {
+    opacity: 0.4;
+    transform: scale(1.5);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Trainer: a wrong tap shakes briefly */
+.marker-wrong {
+  animation: marker-wrong 0.4s ease-in-out;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes marker-wrong {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-3px);
+  }
+  75% {
+    transform: translateX(3px);
+  }
+}
+
 /* Metronome beat light in the header */
 .animate-beat-flash {
   animation: beat-flash 0.35s ease-out;
@@ -217,7 +255,9 @@
   .fret-marker text {
     transition: none;
   }
-  .marker-pulse {
+  .marker-pulse,
+  .marker-playing,
+  .marker-wrong {
     animation: none;
   }
 }

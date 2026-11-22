@@ -80,6 +80,7 @@ export const de: UiMessages = {
     stop: "Stopp",
     soundOffHint: "Schalte den Notenklang ein (Lautsprecher oben rechts), um die Tonleiter zu hören",
     scaleNotes: "Töne der Tonleiter",
+    playTitle: (bpm) => `Spielt die Tonleiter in einer Form auf dem Griffbrett, im Tempo des Metronoms (${bpm} BPM)`,
   },
   share: {
     share: "Teilen & speichern",
@@ -163,7 +164,6 @@ export const de: UiMessages = {
     none: "Keine",
     noneTitle: "Alle Formen ausblenden",
     noneShown: "Tippe auf einen Buchstaben, um die Form zu zeigen",
-    multiple: (n) => `${n} Formen, jede in ihrer eigenen Farbe`,
     threePerStringTitle: "Muster mit drei Tönen pro Saite",
     previous: "Vorherige Lage",
     next: "Nächste Lage",
@@ -201,6 +201,10 @@ export const de: UiMessages = {
     position: "Lage",
     notInScale: "Nicht in der Tonleiter",
     selected: "Ausgewählt",
+    samePitch: "Gleiche Tonhöhe",
+    trainerFound: "Gefunden",
+    trainerHidden: "Noch nicht gefunden",
+    trainerWrong: "Falsch getippt",
   },
   hints: {
     explore: "Tippe auf einen Ton für Details.",
@@ -217,25 +221,12 @@ export const de: UiMessages = {
   },
   inspector: {
     title: "Ausgewählter Ton",
-    play: "Spielen",
     playAria: "Diesen Ton noch einmal spielen",
     clear: "Auswahl aufheben",
-    empty: "Klicke auf einen Ton auf dem Griffbrett, um zu sehen, welcher Ton es ist und wie er zum Grundton steht.",
     root: "Grundton",
     nthNote: (n) => `${n}. Ton der Tonleiter`,
     notInScale: "Nicht in der Tonleiter",
-    string: "Saite",
-    stringName: (note) => `(${note}-Saite)`,
-    fret: "Bund",
-    openString: "Leere Saite",
-    interval: "Intervall zum Grundton",
-    distance: "Abstand",
-    sameNote: (root) => `Derselbe Ton wie ${root}`,
-    above: (steps, root) => `${steps} über ${root}`,
-    inChord: "Im Akkord",
     ofChord: (chord) => `von ${chord}`,
-    pitch: "Tonhöhe",
-    samePitch: "Dieselbe Tonhöhe an anderen Stellen",
     position: (string, fret) => `Saite ${string} · ${fret === 0 ? "leer" : `Bund ${fret}`}`,
   },
   theory: {
@@ -302,7 +293,44 @@ export const de: UiMessages = {
     sixteenthsTitle: "Vier Klicks pro Schlag (Sechzehntelnoten)",
     accent: "Ersten Schlag betonen",
     volume: "Lautstärke des Metronoms",
-    note: "Das Metronom läuft weiter, während du die App nutzt — das Symbol oben schwingt und blinkt auf jedem Schlag. Es hat eine eigene Lautstärke, unabhängig vom Notenklang.",
+    note: "Das Metronom läuft weiter, während du die App nutzt. Mit dem Metronom-Symbol oben blendest du seine Leiste über dem Griffbrett ein oder aus, und „Tonleiter abspielen“ folgt seinem Tempo. Es hat eine eigene Lautstärke, unabhängig vom Notenklang.",
+    showBar: "Metronom über dem Griffbrett zeigen",
+    hideBar: "Metronomleiste ausblenden",
+    startShort: "Start",
+    stopShort: "Stopp",
+    more: "Weitere Metronom-Einstellungen",
+  },
+  startHere: {
+    title: "Hier anfangen",
+    hint: "Beliebte erste Tonleitern, jeweils in einer Form. Tippe auf den ☆ neben dem Namen einer Tonleiter, um sie stattdessen hier zu behalten.",
+  },
+  info: {
+    labelsTitle: "Was bedeuten die Beschriftungen?",
+    labels:
+      "**Töne** zeigt die Notennamen. **Intervalle** zeigt, wie weit jeder Ton vom Grundton entfernt ist: G ist der Grundton, ♭3 eine kleine Terz, 5 eine reine Quinte — so denken Improvisierende. **Nummern** zeigt die Stelle jedes Tons in der Tonleiter (1 = Grundton, 2 = zweiter Ton…).",
+    shapesTitle: "Was sind Formen?",
+    caged:
+      "**CAGED** teilt das Griffbrett in fünf überlappende Formen, benannt nach den offenen Akkorden C, A, G, E und D. Jede Form umfasst etwa vier bis fünf Bünde, sodass du die Tonleiter spielen kannst, ohne die Hand zu verschieben. Lerne eine Form nach der anderen und verbinde sie dann mit ihren Nachbarn, um das ganze Griffbrett abzudecken.",
+    positions:
+      "**Lagen** teilen das Griffbrett in fünf überlappende Boxformen. Jede umfasst etwa vier bis fünf Bünde, sodass du die Tonleiter spielen kannst, ohne die Hand zu verschieben. Lerne eine nach der anderen und verbinde sie dann, um das ganze Griffbrett abzudecken.",
+    threePerString:
+      "**3 pro Saite**-Muster spielen genau drei Töne auf jeder Saite. Sie erfordern etwas mehr Spreizung, machen schnelle Läufe und Legato aber leichter.",
+    chords:
+      "**Dreiklänge** sind Akkorde aus drei Tönen; **Septakkorde** fügen einen vierten Ton hinzu. Die römische Ziffer sagt, auf welchem Ton der Tonleiter der Akkord aufgebaut ist: Großbuchstaben bedeuten Dur, Kleinbuchstaben Moll, ° vermindert. Tippe auf einen Akkord, um seine Töne auf dem Griffbrett zu sehen.",
+  },
+  trainer: {
+    button: "Üben",
+    buttonTitle: "Griffbrett-Trainer: finde jede Stelle, an der ein Ton liegt",
+    find: (note) => `Finde jedes **${note}**`,
+    done: (total, seconds) => `Alle ${total} Stellen in ${seconds} s gefunden!`,
+    progress: (found, total) => `${found} von ${total}`,
+    mistakes: (n) => `${n} Fehler`,
+    next: "Nächster Ton",
+    skip: "Überspringen",
+    stop: "Trainer beenden",
+    session: (completed, avgSeconds, mistakes) =>
+      `Diese Sitzung: ${completed} ${completed === 1 ? "Ton" : "Töne"} · im Schnitt ${avgSeconds} s · ${mistakes} Fehler`,
+    hint: "Tippe die Stellen auf dem Griffbrett an. Gefragt werden nur Töne innerhalb der sichtbaren Bünde — und innerhalb der gewählten Formen, falls welche angezeigt werden.",
   },
   footer: {
     madeBy: (name) => `Erstellt von ${name}`,

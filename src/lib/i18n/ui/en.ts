@@ -85,6 +85,7 @@ export const en = {
     stop: "Stop",
     soundOffHint: "Turn note sounds on (speaker icon, top right) to hear the scale",
     scaleNotes: "Scale notes",
+    playTitle: (bpm: number) => `Plays the scale in one shape on the neck, at the metronome’s tempo (${bpm} BPM)`,
   },
   share: {
     share: "Share & save",
@@ -168,7 +169,6 @@ export const en = {
     none: "None",
     noneTitle: "Hide all shapes",
     noneShown: "Tap a letter to show that shape",
-    multiple: (n: number) => `${n} shapes, each in its own colour`,
     threePerStringTitle: "Three-notes-per-string patterns",
     previous: "Previous position",
     next: "Next position",
@@ -206,6 +206,10 @@ export const en = {
     position: "Position",
     notInScale: "Not in scale",
     selected: "Selected",
+    samePitch: "Same pitch",
+    trainerFound: "Found",
+    trainerHidden: "Not found yet",
+    trainerWrong: "Wrong tap",
   },
   hints: {
     explore: "Tap any note for details.",
@@ -222,25 +226,12 @@ export const en = {
   },
   inspector: {
     title: "Selected note",
-    play: "Play",
     playAria: "Play this note again",
     clear: "Clear selection",
-    empty: "Click any note on the fretboard to see what it is and how it relates to the root.",
     root: "Root",
     nthNote: (n: number) => `${ordinal(n)} note of the scale`,
     notInScale: "Not in the scale",
-    string: "String",
-    stringName: (note: string) => `(${note} string)`,
-    fret: "Fret",
-    openString: "Open string",
-    interval: "Interval from root",
-    distance: "Distance",
-    sameNote: (root: string) => `Same note as ${root}`,
-    above: (steps: string, root: string) => `${steps} above ${root}`,
-    inChord: "In the chord",
     ofChord: (chord: string) => `of ${chord}`,
-    pitch: "Pitch",
-    samePitch: "Same pitch elsewhere on the neck",
     position: (string: number, fret: number) => `String ${string} · ${fret === 0 ? "open" : `fret ${fret}`}`,
   },
   theory: {
@@ -307,7 +298,44 @@ export const en = {
     sixteenthsTitle: "Four clicks per beat (sixteenth notes)",
     accent: "Accent the first beat",
     volume: "Metronome volume",
-    note: "The metronome keeps going while you explore — the icon in the header swings and flashes on every beat. It has its own volume, separate from the note sounds.",
+    note: "The metronome keeps going while you explore. The metronome icon in the header shows or hides its bar above the neck, and “Play scale” follows its tempo. It has its own volume, separate from the note sounds.",
+    showBar: "Show the metronome above the neck",
+    hideBar: "Hide the metronome bar",
+    startShort: "Start",
+    stopShort: "Stop",
+    more: "More metronome settings",
+  },
+  startHere: {
+    title: "Start here",
+    hint: "Popular first scales, each in one shape. Tap the ☆ next to a scale’s name to keep it here instead.",
+  },
+  info: {
+    labelsTitle: "What do the labels mean?",
+    labels:
+      "**Notes** shows the note names. **Intervals** shows how far each note is from the root: R is the root, ♭3 a minor third, 5 a perfect fifth — the way improvisers think. **Numbers** shows each note’s place in the scale (1 = root, 2 = second note…).",
+    shapesTitle: "What are shapes?",
+    caged:
+      "**CAGED** splits the neck into five overlapping shapes, named after the open chords C, A, G, E and D. Each shape covers about four or five frets, so you can play the scale without moving your hand. Learn one shape at a time, then link it to its neighbours to cover the whole neck.",
+    positions:
+      "**Positions** split the neck into five overlapping box shapes. Each covers about four or five frets, so you can play the scale without moving your hand. Learn one at a time, then link them to cover the whole neck.",
+    threePerString:
+      "**3 per string** patterns play exactly three notes on every string. They need a little more stretch, but make fast runs and legato easier.",
+    chords:
+      "**Triads** are three-note chords; **7ths** add a fourth note. The Roman numeral tells you which note of the scale the chord is built on: upper case is major, lower case is minor, ° is diminished. Tap a chord to see its notes on the neck.",
+  },
+  trainer: {
+    button: "Train",
+    buttonTitle: "Fretboard trainer: find every spot where a note lives",
+    find: (note: string) => `Find every **${note}**`,
+    done: (total: number, seconds: string) => `All ${total} found in ${seconds} s!`,
+    progress: (found: number, total: number) => `${found} of ${total}`,
+    mistakes: (n: number) => (n === 1 ? "1 mistake" : `${n} mistakes`),
+    next: "Next note",
+    skip: "Skip",
+    stop: "Stop the trainer",
+    session: (completed: number, avgSeconds: string, mistakes: number) =>
+      `This session: ${completed} ${completed === 1 ? "note" : "notes"} · ${avgSeconds} s on average · ${mistakes} ${mistakes === 1 ? "mistake" : "mistakes"}`,
+    hint: "Tap the spots on the neck. It only asks for notes within the visible frets — and within the chosen shapes, if any are shown.",
   },
   footer: {
     madeBy: (name: string) => `Made by ${name}`,
