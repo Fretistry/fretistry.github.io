@@ -4,8 +4,8 @@ import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
 import { FretistryMark } from "@/components/brand/fretistry-mark";
 import { SVG_NS, withSingleSvgNamespace } from "@/lib/svg-markup";
-import type { FretboardNote, PositionNote, Tuning } from "@/lib/theory";
-import { FretboardArt, LABEL_SIZE, POSITION_TINT, StringName } from "./fretboard";
+import type { FretboardNote, Tuning } from "@/lib/theory";
+import { FretboardArt, LABEL_SIZE, POSITION_TINT, StringName, type PositionArea } from "./fretboard";
 import { computeGeometry, fretRangeBounds, minimumLength, type SpacingMode } from "./geometry";
 import type { MarkerModel, MarkerVariant } from "./marker-model";
 import { MarkerSwatch, NoteMarker } from "./note-marker";
@@ -25,6 +25,8 @@ export type ImageBackground = "dark" | "light";
 export interface LegendEntry {
   variant: MarkerVariant | "position" | "home";
   dimmed?: boolean;
+  /** For "position": the shape's colour. */
+  color?: string;
   label: string;
 }
 
@@ -38,7 +40,7 @@ export interface FretboardImageInput {
   fretRange: "all" | "low" | "high";
   showFretNumbers: boolean;
   leftHanded: boolean;
-  positionOccurrences: PositionNote[][] | null;
+  positionAreas: PositionArea[] | null;
   title: string;
   /** Smaller lines under the title (notes, tuning, position, chord). */
   lines: readonly string[];
@@ -65,7 +67,9 @@ function textWidth(text: string, font: string): number {
 }
 
 /** Overall picture layout (pixel sizes before the ×2 export scale). */
-export function pictureLayout(input: Pick<FretboardImageInput, "notes" | "tuning" | "spacing" | "fretRange" | "showFretNumbers" | "leftHanded" | "lines">) {
+export function pictureLayout(
+  input: Pick<FretboardImageInput, "notes" | "tuning" | "spacing" | "fretRange" | "showFretNumbers" | "leftHanded" | "lines" | "positionAreas">,
+) {
   const fretCount = input.notes[0]?.length ? input.notes[0].length - 1 : 24;
   const [firstFret, lastFret] = fretRangeBounds(input.fretRange, fretCount);
   const geometry = computeGeometry({
@@ -78,6 +82,7 @@ export function pictureLayout(input: Pick<FretboardImageInput, "notes" | "tuning
     stringSpacing: 36,
     orientation: "horizontal",
     leftHanded: input.leftHanded,
+    labelLane: input.positionAreas?.some((a) => a.label) ? 18 : 0,
   });
   const width = PAD * 2 + LABEL_SIZE + geometry.width;
   const titleY = PAD + 28;
@@ -148,7 +153,7 @@ function FretboardPicture({ input, background, fontFamily }: { input: FretboardI
         <StringName key={i} x={labelX + LABEL_SIZE / 2 - 3} y={neckY + g.stringC(i)} name={input.stringNames[i] ?? ""} octave={pitch.octave} />
       ))}
       <svg x={boardX} y={neckY} width={g.width} height={g.height} overflow="visible">
-        <FretboardArt g={g} tuning={input.tuning} showFretNumbers={input.showFretNumbers} positionOccurrences={input.positionOccurrences} />
+        <FretboardArt g={g} tuning={input.tuning} showFretNumbers={input.showFretNumbers} positionAreas={input.positionAreas} />
         {input.notes.flat().map((note) => {
           if (note.fret < firstFret || note.fret > lastFret) return null;
           const model = input.markers.get(note.key);
@@ -162,7 +167,20 @@ function FretboardPicture({ input, background, fontFamily }: { input: FretboardI
       {legend.map((entry, i) => (
         <g key={i}>
           {entry.variant === "position" ? (
-            <rect x={entry.x} y={legendY - 7} width={20} height={14} rx={7} fill="#5b4434" stroke={POSITION_TINT} strokeOpacity={0.6} />
+            <>
+              <rect x={entry.x} y={legendY - 7} width={20} height={14} rx={7} fill="#3b2a1f" />
+              <rect
+                x={entry.x}
+                y={legendY - 7}
+                width={20}
+                height={14}
+                rx={7}
+                fill={entry.color ?? POSITION_TINT}
+                fillOpacity={entry.color && entry.color !== POSITION_TINT ? 0.45 : 0.25}
+                stroke={entry.color ?? POSITION_TINT}
+                strokeOpacity={0.8}
+              />
+            </>
           ) : (
             <MarkerSwatch cx={entry.x + 9} cy={legendY} r={8} variant={entry.variant} dimmed={entry.dimmed} />
           )}

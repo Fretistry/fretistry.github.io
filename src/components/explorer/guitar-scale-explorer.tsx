@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Fretboard } from "@/components/fretboard/fretboard";
+import { Fretboard, POSITION_TINT, type PositionArea } from "@/components/fretboard/fretboard";
 import type { FretboardImageInput, LegendEntry } from "@/components/fretboard/fretboard-image";
+import { shapeColor } from "@/components/fretboard/shape-colors";
 import { computeMarker, type ChordDisplay, type MarkerModel, type MarkerText } from "@/components/fretboard/marker-model";
 import { I18nProvider, useI18n } from "@/components/i18n/i18n-provider";
 import { NoteInspector } from "@/components/inspector/note-inspector";
@@ -115,8 +116,27 @@ function ExplorerApp() {
     () => (positionSystem === "all" ? [] : scalePositions(spelled, tuning, positionSystem)),
     [spelled, tuning, positionSystem],
   );
-  const positionIndex = Math.min(settings.positionIndex, Math.max(0, positions.length - 1));
-  const activePosition = positions[positionIndex] ?? null;
+  // Several CAGED shapes / boxes can be shown at once; 3-per-string shows one pattern at a time.
+  const positionIndices = useMemo(() => {
+    if (positions.length === 0) return [];
+    const valid = [...new Set(settings.positionIndices.filter((i) => i >= 0 && i < positions.length))].sort((a, b) => a - b);
+    const chosen = valid.length > 0 ? valid : [0];
+    return positionSystem === "3nps" ? chosen.slice(0, 1) : chosen;
+  }, [positions.length, settings.positionIndices, positionSystem]);
+  const activePositions = useMemo(() => positionIndices.map((i) => positions[i]).filter(Boolean), [positionIndices, positions]);
+  const activePosition = activePositions[0] ?? null;
+  // Each CAGED shape / box keeps its own colour (C, A, G, E, D); 3-per-string uses the neutral tint.
+  const positionAreas: PositionArea[] | null = useMemo(
+    () =>
+      activePositions.length === 0
+        ? null
+        : activePositions.map((p) =>
+            positionSystem === "boxes"
+              ? { occurrences: p.occurrences, color: shapeColor(p.index), label: p.cagedShape ?? String(p.index + 1) }
+              : { occurrences: p.occurrences, color: POSITION_TINT, label: null },
+          ),
+    [activePositions, positionSystem],
+  );
 
   // ── Chords in the key ────────────────────────────────────────────────────
   const triads = useMemo(() => scaleChords(spelled, "triad", SCALES, theory), [spelled, theory]);
@@ -129,9 +149,9 @@ function ExplorerApp() {
   // pattern itself; for chord tones (which may not belong to a pentatonic scale) it is the
   // fret area the pattern covers on each string.
   const positionKeys = useMemo(() => {
-    if (!activePosition) return null;
+    if (activePositions.length === 0) return null;
     const keys = new Set<string>();
-    for (const occurrence of activePosition.occurrences) {
+    for (const occurrence of activePositions.flatMap((p) => p.occurrences)) {
       if (!activeChord) {
         for (const n of occurrence) keys.add(positionKey(n.stringIndex, n.fret));
         continue;
@@ -144,7 +164,7 @@ function ExplorerApp() {
       for (const [s, [lo, hi]] of ranges) for (let f = lo; f <= hi; f++) keys.add(positionKey(s, f));
     }
     return keys;
-  }, [activePosition, activeChord]);
+  }, [activePositions, activeChord]);
   const chordDisplay: ChordDisplay | null = useMemo(
     () =>
       activeChord
@@ -242,16 +262,32 @@ function ExplorerApp() {
     [board, selectedNote],
   );
 
+  // Colour key entries for the shown shapes ("C shape" in coral, "A shape" in blue…).
+  const shapeKey = useMemo(
+    () =>
+      activePositions.map((p, i) => ({
+        label: p.cagedShape ? ui.positions.shape(p.cagedShape) : ui.positions.positionAria(p.index + 1, null),
+        color: positionAreas?.[i]?.color ?? POSITION_TINT,
+      })),
+    [activePositions, positionAreas, ui],
+  );
+
   // ── "Save image": the picture shows exactly what is on the neck now ──────
   const { tuningName } = i18n;
   const imageInput: FretboardImageInput = useMemo(() => {
     const rows = explanation.intervalRows;
     const details = [ui.image.tuning(tuningName(tuning), tuning.strings.map((p) => i18n.note(p.note)).join(" "))];
     if (activePosition) {
-      const label = activePosition.cagedShape
-        ? `CAGED · ${ui.positions.shape(activePosition.cagedShape)}`
-        : ui.positions.positionAria(positionIndex + 1, null);
-      details.push(positionSystem === "3nps" ? `${ui.positions.threePerString} · ${label}` : label);
+      const caged = activePositions.every((p) => p.cagedShape);
+      const label =
+        positionSystem === "3nps"
+          ? `${ui.positions.threePerString} · ${ui.positions.positionAria(activePosition.index + 1, null)}`
+          : caged
+            ? `CAGED · ${activePositions.length === 1 ? ui.positions.shape(activePosition.cagedShape!) : activePositions.map((p) => p.cagedShape).join(", ")}`
+            : activePositions.length === 1
+              ? ui.positions.positionAria(activePosition.index + 1, null)
+              : `${ui.positions.positions} ${activePositions.map((p) => p.index + 1).join(", ")}`;
+      details.push(label);
     }
     if (activeChord) details.push(ui.image.chord(activeChord.symbol));
     const legend: LegendEntry[] = [
@@ -262,7 +298,7 @@ function ExplorerApp() {
     if (activeChord || activePosition) {
       legend.push({ variant: "scale", dimmed: true, label: activeChord ? ui.legend.otherDimmed : ui.legend.outsidePosition });
     }
-    if (activePosition) legend.push({ variant: "position", label: ui.legend.position });
+    for (const shape of shapeKey) legend.push({ variant: "position", color: shape.color, label: shape.label });
     if (settings.visibility === "all" && !activeChord) legend.push({ variant: "outside", label: ui.legend.notInScale });
     return {
       notes: board,
@@ -273,7 +309,7 @@ function ExplorerApp() {
       fretRange: settings.fretRange,
       showFretNumbers: settings.showFretNumbers,
       leftHanded: settings.leftHanded,
-      positionOccurrences: activePosition?.occurrences ?? null,
+      positionAreas,
       title: explanation.title,
       lines: [
         // (SVG collapses repeated spaces, so parts are separated with "·")
@@ -291,7 +327,9 @@ function ExplorerApp() {
     tuning,
     i18n,
     activePosition,
-    positionIndex,
+    activePositions,
+    positionAreas,
+    shapeKey,
     positionSystem,
     activeChord,
     settings.visibility,
@@ -372,7 +410,7 @@ function ExplorerApp() {
               system={positionSystem}
               available={availableSystems}
               positions={positions}
-              index={positionIndex}
+              selected={positionIndices}
               caged={hasCagedShapes(tuning)}
               onChange={update}
             />
@@ -395,7 +433,7 @@ function ExplorerApp() {
             showFretNumbers={settings.showFretNumbers}
             orientation={orientation}
             leftHanded={settings.leftHanded}
-            positionOccurrences={activePosition?.occurrences ?? null}
+            positionAreas={positionAreas}
             onNoteActivate={handleActivate}
             onOverflowChange={setNeckOverflows}
           />
@@ -404,7 +442,7 @@ function ExplorerApp() {
               showOutside={settings.visibility === "all"}
               chordSymbol={activeChord?.symbol ?? null}
               scaleRoot={activeChord ? i18n.note(spelled.root) : null}
-              showPosition={Boolean(activePosition)}
+              shapes={shapeKey}
               showSelected={Boolean(selectedNote)}
             />
             {selectedNote && !isPhone ? (

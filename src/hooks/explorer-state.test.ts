@@ -3,7 +3,7 @@ import { parsePitch } from "@/lib/theory";
 import { DEFAULT_SETTINGS, explorerReducer, type ExplorerState } from "./use-explorer-state";
 
 const start: ExplorerState = {
-  settings: { ...DEFAULT_SETTINGS, chordDegree: 4, positionSystem: "boxes", positionIndex: 2 },
+  settings: { ...DEFAULT_SETTINGS, chordDegree: 4, positionSystem: "boxes", positionIndices: [2] },
   selection: { stringIndex: 0, fret: 5 },
 };
 
@@ -33,7 +33,7 @@ describe("explorer state", () => {
   it("keeps position choices and the clicked spot across key changes", () => {
     const next = explorerReducer(start, { type: "update", patch: { rootName: "E", scaleId: "natural-minor" } });
     expect(next.settings.positionSystem).toBe("boxes");
-    expect(next.settings.positionIndex).toBe(2);
+    expect(next.settings.positionIndices).toEqual([2]);
     expect(next.selection).toEqual({ stringIndex: 0, fret: 5 });
   });
 

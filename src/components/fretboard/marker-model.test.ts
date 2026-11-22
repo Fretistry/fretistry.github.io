@@ -12,6 +12,7 @@ import {
 } from "@/lib/theory";
 import { MAX_TAPER, TRUE_TAPER, computeGeometry, fitTaper, minimumLength, positionArea } from "./geometry";
 import { computeMarker, type ChordDisplay, type MarkerOptions } from "./marker-model";
+import { SHAPE_COLORS, hueOf, shapeColor } from "./shape-colors";
 
 const standard = getTuningPreset("standard")!;
 const aMinorPent = spellScale(parseNote("A"), getScale("minor-pentatonic"));
@@ -101,6 +102,25 @@ describe("marker model — chord highlighting", () => {
   });
 });
 
+describe("CAGED shape colours", () => {
+  const distance = (a: number, b: number) => Math.min(Math.abs(a - b), 360 - Math.abs(a - b));
+  const hues = SHAPE_COLORS.map(hueOf); // C, A, G, E, D
+
+  it("gives neighbouring shapes (C–A–G–E–D–C) clearly different, near-complementary colours", () => {
+    for (let i = 0; i < hues.length; i++) {
+      expect(distance(hues[i], hues[(i + 1) % hues.length]), `${i} → ${i + 1}`).toBeGreaterThanOrEqual(120);
+    }
+  });
+
+  it("never looks like the amber root or the teal scale notes", () => {
+    for (const h of hues) {
+      expect(distance(h, hueOf("#f5a524"))).toBeGreaterThanOrEqual(35); // amber
+      expect(distance(h, hueOf("#2fc2b2"))).toBeGreaterThanOrEqual(30); // teal
+    }
+    expect(shapeColor(5)).toBe(SHAPE_COLORS[0]); // repeats for any index
+  });
+});
+
 describe("fretboard geometry", () => {
   const input = { length: 1400, stringCount: 6, firstFret: 0, lastFret: 24, spacing: "realistic" as const, showFretNumbers: true };
 
@@ -145,6 +165,16 @@ describe("fretboard geometry", () => {
     expect(size(12)).toBeGreaterThan(size(24));
     expect(g.markerRadius(24) * 2).toBeLessThanOrEqual(size(24) + 0.001);
     expect(fitTaper(0, 24, 300, 24)).toBe(MAX_TAPER); // too narrow: the neck scrolls instead
+  });
+
+  it("makes room above the neck for the shape letters without changing the frets", () => {
+    const plain = computeGeometry(input);
+    const lane = computeGeometry({ ...input, labelLane: 18 });
+    expect(lane.height).toBeCloseTo(plain.height + 18, 6);
+    expect(lane.boardTop).toBeCloseTo(plain.boardTop + 18, 6);
+    expect(lane.labelLaneC).toBeLessThan(lane.boardTop);
+    expect(lane.labelLaneC).toBeGreaterThan(0);
+    expect(lane.noteXY(3, 7).x).toBeCloseTo(plain.noteXY(3, 7).x, 6); // same frets, just lower
   });
 
   it("draws the highest string at the top in the horizontal view", () => {

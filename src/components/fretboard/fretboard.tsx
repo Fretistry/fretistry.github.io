@@ -29,8 +29,8 @@ interface FretboardProps {
   showFretNumbers: boolean;
   orientation: NeckOrientation;
   leftHanded: boolean;
-  /** Occurrences of the selected scale position, drawn as soft outlines. */
-  positionOccurrences?: PositionNote[][] | null;
+  /** The scale positions (CAGED shapes / boxes) to shade, each in its own colour. */
+  positionAreas?: PositionArea[] | null;
   onNoteActivate: (note: FretboardNote) => void;
   /** Told whether the horizontal neck is wider than the screen (so a "scroll sideways" hint can be shown). */
   onOverflowChange?: (overflowing: boolean) => void;
@@ -42,6 +42,17 @@ const MIN_FRET_SIZE = 24;
 /** Neck width (px) from which the horizontal neck starts growing, and its largest size factor. */
 const WIDE_NECK = 1500;
 const MAX_SCALE = 1.45;
+/** Height (px) of the lane above the neck that holds the shape letters. */
+const LABEL_LANE = 18;
+
+/** A scale position to shade on the neck. */
+export interface PositionArea {
+  /** Every copy of the pattern on the neck (it repeats 12 frets higher). */
+  occurrences: PositionNote[][];
+  color: string;
+  /** Shown in a small badge above the shape (CAGED letter or box number); null = no badge. */
+  label: string | null;
+}
 /** Colour of the highlighted scale-position box (also used for its legend swatch). */
 export const POSITION_TINT = "#f6ead0";
 const VERTICAL_LABEL_HEIGHT = 30;
@@ -61,7 +72,7 @@ export function Fretboard({
   showFretNumbers,
   orientation,
   leftHanded,
-  positionOccurrences,
+  positionAreas,
   onNoteActivate,
   onOverflowChange,
 }: FretboardProps) {
@@ -90,11 +101,13 @@ export function Fretboard({
   // and labels), up to 45% larger than on a normal laptop screen.
   const scale = vertical ? 1 : Math.min(MAX_SCALE, Math.max(1, containerWidth / WIDE_NECK));
   const labelSize = Math.round(LABEL_SIZE * scale);
+  // Room for the shape letters (C, A, G, E, D) beside the highest string when shapes are shown.
+  const labelLane = positionAreas?.some((a) => a.label) ? Math.round(LABEL_LANE * scale) : 0;
 
   const geometry = useMemo(() => {
     if (vertical) {
       const gutter = showFretNumbers ? FRET_NUMBER_GUTTER : 8;
-      const stringSpacing = Math.max(34, Math.min(60, (containerWidth - gutter - 12) / stringCount));
+      const stringSpacing = Math.max(34, Math.min(60, (containerWidth - gutter - 12 - labelLane) / stringCount));
       return computeGeometry({
         length: minimumLength(firstFret, lastFret, spacing, 32),
         stringCount,
@@ -105,6 +118,7 @@ export function Fretboard({
         stringSpacing,
         orientation: "vertical",
         leftHanded,
+        labelLane,
       });
     }
     // Show all frets when possible: soften the narrowing only as much as the screen needs.
@@ -123,8 +137,9 @@ export function Fretboard({
       leftHanded,
       taper,
       scale,
+      labelLane,
     });
-  }, [vertical, containerWidth, firstFret, lastFret, spacing, showFretNumbers, stringCount, leftHanded, scale, labelSize]);
+  }, [vertical, containerWidth, firstFret, lastFret, spacing, showFretNumbers, stringCount, leftHanded, scale, labelSize, labelLane]);
 
   // Left-handed horizontal necks start at the right: show the nut end first.
   useLayoutEffect(() => {
@@ -155,7 +170,7 @@ export function Fretboard({
 
   const board = (
     <svg width={geometry.width} height={geometry.height} role="group" aria-label={ariaLabel} className="block shrink-0 touch-manipulation select-none">
-      <FretboardArt g={geometry} tuning={tuning} showFretNumbers={showFretNumbers} positionOccurrences={positionOccurrences} />
+      <FretboardArt g={geometry} tuning={tuning} showFretNumbers={showFretNumbers} positionAreas={positionAreas} />
       {notes.map((row) =>
         row.map((note) => {
           if (note.fret < firstFret || note.fret > lastFret) return null;
@@ -259,23 +274,29 @@ export function StringName({ x, y, name, octave, scale = 1 }: { x: number; y: nu
   );
 }
 
-/** Everything except the note markers: wood, inlays, frets, strings, numbers and position outlines. */
+/** Everything except the note markers: wood, inlays, frets, strings, numbers and position areas. */
 export function FretboardArt({
   g,
   tuning,
   showFretNumbers,
-  positionOccurrences,
+  positionAreas,
 }: {
   g: FretboardGeometry;
   tuning: Tuning;
   showFretNumbers: boolean;
-  positionOccurrences?: PositionNote[][] | null;
+  positionAreas?: PositionArea[] | null;
 }) {
   const vertical = g.orientation === "vertical";
   const stringCount = tuning.strings.length;
   const midC = (g.stringC(0) + g.stringC(stringCount - 1)) / 2;
   const boardRect = g.toRect(g.boardStart, g.boardTop, g.boardEnd, g.boardBottom);
   const visibleFrets = new Set(g.frets);
+  // Each copy of each shape, cut to the visible frets.
+  const shownAreas = (positionAreas ?? []).flatMap((area, a) =>
+    area.occurrences
+      .map((occ, o) => ({ area, key: `${a}-${o}`, notes: occ.filter((n) => visibleFrets.has(n.fret)) }))
+      .filter((x) => x.notes.length > 0),
+  );
 
   return (
     <>
@@ -351,19 +372,18 @@ export function FretboardArt({
       {/* Scale position (CAGED shape / box) areas, behind frets and strings: on each string exactly
           the frets the shape uses, edges on the fret wires. A light, neutral highlight — amber is
           reserved for root notes. */}
-      {positionOccurrences?.map((occ, i) => {
-        const inRange = occ.filter((n) => visibleFrets.has(n.fret));
-        const points = positionArea(g, inRange);
-        if (points.length === 0) return null;
+      {shownAreas.map(({ area, key, notes }) => {
+        const points = positionArea(g, notes);
+        const coloured = area.color !== POSITION_TINT;
         return (
           <polygon
-            key={`pos-${i}`}
+            key={`pos-${key}`}
             className="pointer-events-none"
             points={points.map((p) => `${p.x},${p.y}`).join(" ")}
-            fill={POSITION_TINT}
-            fillOpacity={0.13}
-            stroke={POSITION_TINT}
-            strokeOpacity={0.5}
+            fill={area.color}
+            fillOpacity={coloured ? 0.2 : 0.13}
+            stroke={area.color}
+            strokeOpacity={coloured ? 0.85 : 0.5}
             strokeWidth={1.5}
             strokeLinejoin="round"
           />
@@ -417,6 +437,27 @@ export function FretboardArt({
             >
               {fret}
             </text>
+          );
+        })}
+
+      {/* Shape letters (C, A, G, E, D) in the lane above the neck, centred over each shape */}
+      {g.labelLane > 0 &&
+        shownAreas.map(({ area, key, notes }) => {
+          if (!area.label) return null;
+          const frets = notes.map((n) => n.fret);
+          const lo = Math.min(...frets);
+          const u = ((lo === 0 ? 4 : g.wireU(lo - 1)) + g.wireU(Math.max(...frets))) / 2;
+          const w = (area.label.length > 1 ? 24 : 18) * g.scale;
+          const h = 14 * g.scale;
+          const rect = g.toRect(u - w / 2, g.labelLaneC - h / 2, u + w / 2, g.labelLaneC + h / 2);
+          const p = g.toXY(u, g.labelLaneC);
+          return (
+            <g key={`shape-label-${key}`} className="pointer-events-none">
+              <rect {...rect} rx={Math.min(rect.width, rect.height) / 2} fill={area.color} />
+              <text x={p.x} y={p.y} dy="0.35em" textAnchor="middle" fontSize={10 * g.scale} fontWeight={700} fill="#1a1310">
+                {area.label}
+              </text>
+            </g>
           );
         })}
     </>

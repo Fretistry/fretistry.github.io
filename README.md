@@ -46,7 +46,7 @@ Then open <http://localhost:3000>.
   - **teal** = scale note (or chord tone)
   - **grey ring** = not in the scale
   - **small faint dot** = outside the chosen position or chord
-  - **light area** = the chosen CAGED shape or box, shaded on the fret grid
+  - **coloured areas** = the chosen CAGED shapes or boxes (one colour each), shaded on the fret grid; a light neutral area for a 3-per-string pattern
   - **white ring** = selected note
 - Labels: note names, intervals (R, ♭3, 5…), note numbers (1, 2, 3… within the scale), or none.
 - Show all notes, scale notes only, or roots only. Choose a fret range: 0–24, 0–12 or 12–24. On phones these three sit behind one **Display** button, so the neck starts on the first screen.
@@ -65,7 +65,13 @@ Then open <http://localhost:3000>.
 - **CAGED:** the 5 shapes of each scale, in the order guitarists learn them: **C – A – G – E – D**. They're available in standard tuning (and E♭, D or C standard).
   - 7-note scales give the standard CAGED scale patterns, and an automated test checks all five C major shapes against the usual diagrams.
   - Pentatonic scales give the 5 pentatonic boxes, named by the same shapes (the familiar "box 1" at the 5th fret of A minor pentatonic is the E shape).
-- **Shaded like a CAGED diagram:** the chosen shape is shaded on the fret grid. On every string the light area covers exactly the frets that string uses, with edges on the fret wires and a step where the shape shifts (e.g. at the B string). It repeats 12 frets higher where it fits, and the rest of the scale is dimmed.
+- **Shaded like a CAGED diagram:** each shown shape is shaded on the fret grid. On every string the area covers exactly the frets that string uses, with edges on the fret wires and a step where the shape shifts (e.g. at the B string). It repeats 12 frets higher where it fits, and the rest of the scale is dimmed.
+- **Several shapes at once:** the C, A, G, E, D buttons switch shapes on and off, in any combination; **All** shows all five.
+  - Each shape has its own colour: C coral, A blue, G lime, E purple, D green.
+  - Shapes that meet on the neck get nearly opposite colours, and none of them looks like the amber root or teal scale notes (a test checks this).
+  - A letter badge above each shape names it, so you don't have to rely on colour alone.
+  - The arrows step through the shapes one at a time when a single shape is shown.
+  - Links remember the combination (e.g. `pos=boxes1-2-3` = C, A and G), and saved pictures show the colours too.
 - **Other tunings:** the same 5 boxes, numbered 1–5, calculated from the tuning so they are correct in Drop D, open tunings and custom tunings too.
 - **7-string guitars:** the shapes are the ones a 6-string player knows, extended onto the low string, so they keep their CAGED names.
 - **3 per string:** the 3-notes-per-string patterns, one starting on each scale degree.
@@ -255,13 +261,15 @@ Add one line to `src/lib/data/tunings.ts`, e.g. `tuning("open-f", "Open F", "C2 
 
 ## Tests
 
-`npm test` runs 442 automated checks, including:
+`npm test` runs 446 automated checks, including:
 
 - **Required cases:** C Major, A Natural Minor, A Minor Pentatonic, E Minor Pentatonic, Drop D, and custom tunings.
 - **Spelling:** every root × every scale for correct pitches and spelling.
 - **Tunings:** the exact pitches of all 15 presets, every preset in a menu group, and adding or removing the 7th string.
 - **Positions:** the classic pentatonic boxes, the five C major CAGED shapes against the standard diagrams, the C-A-G-E-D order, G major 3-notes-per-string, Drop D boxes, and 7-string boxes that match the 6-string shapes.
   - The shaded area of a shape always ends on fret wires.
+  - Neighbouring shapes get near-complementary colours that differ from the root and scale-note colours.
+  - Links with several shapes round-trip, and old single-shape links still open correctly.
   - A sweep over every tuning × root × scale × position checks that each note is valid, in the scale and never duplicated.
 - **Chords:** diatonic triads and 7ths with Roman numerals in major, minor and harmonic minor keys, and every chord identified for every root and scale.
 - **Shareable links:** round-tripping every field (including 7-string tunings), rejecting invalid links, and ignoring old practice-mode links.

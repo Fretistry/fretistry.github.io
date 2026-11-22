@@ -31,7 +31,7 @@ const base: SharedState = {
   tuningId: "standard",
   customTuning: [],
   positionSystem: "all",
-  positionIndex: 0,
+  positionIndices: [0],
   chordDegree: null,
   chordSize: "triad",
 };
@@ -40,7 +40,7 @@ describe("shareable links", () => {
   it("writes a short, readable query string", () => {
     expect(stateToSearchParams(base).toString()).toBe("root=C&scale=major&tuning=standard");
     expect(
-      stateToSearchParams({ ...base, rootName: "F#", scaleId: "dorian", positionSystem: "boxes", positionIndex: 1, chordDegree: 4, chordSize: "seventh" }).toString(),
+      stateToSearchParams({ ...base, rootName: "F#", scaleId: "dorian", positionSystem: "boxes", positionIndices: [1], chordDegree: 4, chordSize: "seventh" }).toString(),
     ).toBe("root=Fs&scale=dorian&tuning=standard&pos=boxes2&chord=5&chord7=1");
   });
 
@@ -51,7 +51,7 @@ describe("shareable links", () => {
       tuningId: "custom",
       customTuning: ["D2", "A2", "D3", "F#3", "A3", "D4"].map(parsePitch),
       positionSystem: "3nps",
-      positionIndex: 6,
+      positionIndices: [6],
       chordDegree: 2,
       chordSize: "triad",
     };
@@ -64,6 +64,15 @@ describe("shareable links", () => {
     expect(parseSearchParams(stateToSearchParams(seven)).tuningId).toBe("seven-standard");
     const custom: SharedState = { ...base, tuningId: "custom", customTuning: ["A1", "D2", "G2", "C3", "F3", "A3", "D4"].map(parsePitch) };
     expect(parseSearchParams(new URLSearchParams(stateToSearchParams(custom).toString())).customTuning).toEqual(custom.customTuning);
+  });
+
+  it("shares several CAGED shapes at once, and still reads single-shape links", () => {
+    const several: SharedState = { ...base, positionSystem: "boxes", positionIndices: [0, 1, 2] };
+    expect(stateToSearchParams(several).get("pos")).toBe("boxes1-2-3");
+    expect(parseSearchParams(stateToSearchParams(several)).positionIndices).toEqual([0, 1, 2]);
+    expect(parseSearchParams(new URLSearchParams("pos=boxes2")).positionIndices).toEqual([1]);
+    expect(parseSearchParams(new URLSearchParams("pos=boxes5-1-5")).positionIndices).toEqual([0, 4]); // sorted, no duplicates
+    expect(parseSearchParams(new URLSearchParams("pos=3nps2-4")).positionIndices).toEqual([1]); // 3 per string: one at a time
   });
 
   it("ignores the old practice-mode parameter", () => {

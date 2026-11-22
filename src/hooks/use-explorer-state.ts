@@ -28,7 +28,8 @@ export interface ExplorerSettings {
   soundEnabled: boolean;
   /** "all" = whole neck, otherwise highlight one position of that system. */
   positionSystem: PositionChoice;
-  positionIndex: number;
+  /** Which positions are shown (several CAGED shapes / boxes at once are allowed). */
+  positionIndices: number[];
   /** Highlighted chord (0-based scale degree), or null. */
   chordDegree: number | null;
   chordSize: ChordSize;
@@ -65,7 +66,7 @@ export const DEFAULT_SETTINGS: ExplorerSettings = {
   fretRange: "all",
   soundEnabled: true,
   positionSystem: "all",
-  positionIndex: 0,
+  positionIndices: [0],
   chordDegree: null,
   chordSize: "triad",
   leftHanded: false,

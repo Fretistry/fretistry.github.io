@@ -18,8 +18,8 @@ export interface SharedState {
   tuningId: string;
   customTuning: Pitch[];
   positionSystem: PositionChoice;
-  /** 0-based position number. */
-  positionIndex: number;
+  /** 0-based position numbers. Several = several CAGED shapes / boxes at once (3-per-string uses one). */
+  positionIndices: number[];
   /** 0-based chord degree, or null for no chord. */
   chordDegree: number | null;
   chordSize: ChordSize;
@@ -57,7 +57,9 @@ export function stateToSearchParams(state: SharedState): URLSearchParams {
   params.set("scale", state.scaleId);
   params.set("tuning", state.tuningId);
   if (state.tuningId === CUSTOM_TUNING_ID) params.set("strings", state.customTuning.map(pitchToParam).join("."));
-  if (state.positionSystem !== "all") params.set("pos", `${state.positionSystem}${state.positionIndex + 1}`);
+  if (state.positionSystem !== "all" && state.positionIndices.length > 0) {
+    params.set("pos", `${state.positionSystem}${state.positionIndices.map((i) => i + 1).join("-")}`);
+  }
   if (state.chordDegree !== null) {
     params.set("chord", String(state.chordDegree + 1));
     if (state.chordSize === "seventh") params.set("chord7", "1");
@@ -86,10 +88,13 @@ export function parseSearchParams(params: URLSearchParams): Partial<SharedState>
     result.tuningId = tuning;
   }
 
-  const pos = /^(boxes|3nps)(\d{1,2})$/.exec(params.get("pos") ?? "");
+  // "boxes2" (one shape) or "boxes1-2-3" (several shapes at once)
+  const pos = /^(boxes|3nps)(\d{1,2}(?:-\d{1,2}){0,6})$/.exec(params.get("pos") ?? "");
   if (pos) {
-    result.positionSystem = pos[1] as PositionChoice;
-    result.positionIndex = Math.max(0, Number(pos[2]) - 1);
+    const system = pos[1] as PositionChoice;
+    const indices = [...new Set(pos[2].split("-").map((n) => Math.max(0, Number(n) - 1)))].sort((a, b) => a - b);
+    result.positionSystem = system;
+    result.positionIndices = system === "3nps" ? indices.slice(0, 1) : indices;
   } else if (params.has("root") || params.has("scale")) {
     result.positionSystem = "all";
   }

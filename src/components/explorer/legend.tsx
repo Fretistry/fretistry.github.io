@@ -9,8 +9,8 @@ interface LegendProps {
   chordSymbol?: string | null;
   /** While a chord is highlighted: the scale's root, which keeps an amber ring. */
   scaleRoot?: string | null;
-  /** A scale position is highlighted. */
-  showPosition?: boolean;
+  /** The shown CAGED shapes / positions, each with its colour. */
+  shapes?: readonly { label: string; color: string }[];
   /** A note is selected (white ring). */
   showSelected?: boolean;
   className?: string;
@@ -21,8 +21,9 @@ function Swatch({ className }: { className: string }) {
 }
 
 /** Colour key for the fretboard markers — only lists what is on the neck right now. */
-export function Legend({ showOutside, chordSymbol, scaleRoot, showPosition, showSelected, className }: LegendProps) {
+export function Legend({ showOutside, chordSymbol, scaleRoot, shapes = [], showSelected, className }: LegendProps) {
   const t = useI18n().ui.legend;
+  const showPosition = shapes.length > 0;
   return (
     <ul className={cn("flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground", className)} aria-label={t.legend}>
       <li className="flex items-center gap-1.5">
@@ -47,12 +48,18 @@ export function Legend({ showOutside, chordSymbol, scaleRoot, showPosition, show
           {chordSymbol ? t.otherDimmed : t.outsidePosition}
         </li>
       )}
-      {showPosition && (
-        <li className="flex items-center gap-1.5">
-          <span className="inline-block h-3 w-5 rounded-full bg-[#5b4434] ring-1 ring-[#f6ead0]/60" />
-          {t.position}
+      {shapes.map((shape) => (
+        <li key={shape.label} className="flex items-center gap-1.5">
+          {/* the shape's colour on a piece of "wood", like on the neck */}
+          <span className="relative inline-block h-3 w-5 overflow-hidden rounded-full bg-[#3b2a1f]">
+            <span
+              className="absolute inset-0 rounded-full"
+              style={{ backgroundColor: `${shape.color}73`, boxShadow: `inset 0 0 0 1px ${shape.color}cc` }}
+            />
+          </span>
+          {shape.label}
         </li>
-      )}
+      ))}
       {showOutside && !chordSymbol && (
         <li className="flex items-center gap-1.5">
           <Swatch className="size-3 border border-note-outside/80 bg-transparent" />

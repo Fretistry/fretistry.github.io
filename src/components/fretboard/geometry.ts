@@ -31,6 +31,8 @@ export interface GeometryInput {
   taper?: number;
   /** Size of labels, fret numbers and inlays (1 = normal; larger on big monitors). */
   scale?: number;
+  /** Extra room (px) beside the highest string for the shape letters (C, A, G, E, D). */
+  labelLane?: number;
 }
 
 export interface FretWire {
@@ -71,6 +73,9 @@ export interface FretboardGeometry {
   wires: FretWire[];
   frets: number[];
   fretNumberC: number;
+  /** Middle of the shape-letter lane beside the highest string (only meaningful when labelLane > 0). */
+  labelLaneC: number;
+  labelLane: number;
   /** Position of the fret wire *after* fret n along the neck (0 = the nut). */
   wireU: (fret: number) => number;
   noteU: (fret: number) => number;
@@ -152,7 +157,8 @@ export function computeGeometry(input: GeometryInput): FretboardGeometry {
   for (let f = startWire; f <= lastFret; f++) wires.push({ fret: f, u: wireU(f), isNut: f === 0 });
 
   const half = stringSpacing * 0.5;
-  const boardTop = EDGE;
+  const labelLane = input.labelLane ?? 0;
+  const boardTop = EDGE + labelLane;
   const firstStringC = boardTop + half;
   const boardBottom = firstStringC + (stringCount - 1) * stringSpacing + half;
   const neckDepth = boardBottom + (showFretNumbers ? FRET_NUMBER_GUTTER * scale : EDGE);
@@ -199,6 +205,8 @@ export function computeGeometry(input: GeometryInput): FretboardGeometry {
     wires,
     frets,
     fretNumberC: boardBottom + 19 * scale,
+    labelLaneC: (EDGE + labelLane) / 2,
+    labelLane,
     wireU,
     noteU,
     stringC,
