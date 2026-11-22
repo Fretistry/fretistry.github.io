@@ -66,7 +66,7 @@ Then open <http://localhost:3000>.
   - 7-note scales give the standard CAGED scale patterns, and an automated test checks all five C major shapes against the usual diagrams.
   - Pentatonic scales give the 5 pentatonic boxes, named by the same shapes (the familiar "box 1" at the 5th fret of A minor pentatonic is the E shape).
 - **Shaded like a CAGED diagram:** each shown shape is shaded on the fret grid. On every string the area covers exactly the frets that string uses, with edges on the fret wires and a step where the shape shifts (e.g. at the B string). It repeats 12 frets higher where it fits, and the rest of the scale is dimmed.
-- **Several shapes at once:** the C, A, G, E, D buttons switch shapes on and off, in any combination (also all off). **All** switches all five on, or all off again. The buttons never move while you click them; only their colour changes.
+- **Several shapes at once:** the C, A, G, E, D buttons switch shapes on and off, in any combination (also all off). **All** switches all five on; once they're all on, that button reads **None** and switches them all off. The buttons never move while you click them; only their colour changes.
   - Each shape has its own colour: C coral, A blue, G lime, E purple, D green.
   - Shapes that meet on the neck get nearly opposite colours, and none of them looks like the amber root or teal scale notes (a test checks this).
   - A letter badge above each shape names it, so you don't have to rely on colour alone.
@@ -94,7 +94,7 @@ Then open <http://localhost:3000>.
 **Shareable links**
 
 - The address bar always describes what you're looking at: root, scale, tuning (including custom tunings), position and chord. For example: `?root=A&scale=dorian&tuning=drop-d&pos=boxes2&chord=4`. Older links that still say `mode=practice` simply open normally.
-- The **Share** menu has two choices: **Copy link** (on phones: **Share link…**, which opens the share sheet) and **Save as image…**.
+- The **Share & save** menu has two choices: **Copy link** (on phones: **Share link…**, which opens the share sheet) and **Save as image…**.
 - Personal preferences (theme, labels, left-handed, sound) stay on your own device.
 
 **Sound**
@@ -127,7 +127,7 @@ Then open <http://localhost:3000>.
 
 **Save as image**
 
-- **Share → Save as image…** makes a picture of the fretboard exactly as it looks now: your labels, position, highlighted chord, fret range and left-handed view.
+- **Share & save → Save as image…** makes a picture of the fretboard exactly as it looks now: your labels, position, highlighted chord, fret range and left-handed view.
 - The picture adds the scale name, its notes and formula, the tuning, and a colour key. The neck is always drawn horizontally, even when your phone shows it vertically.
 - Choose a dark background, or a white one for printing. Download it as a sharp PNG (double resolution), or on phones share it straight to Photos, WhatsApp and so on.
 - **Privacy-protected browsers:** some (e.g. Firefox with anti-fingerprinting turned on) scramble the PNG step on purpose. Fretistry checks the result, and in that case saves an equally sharp **SVG** picture instead, with a short note. The preview always shows the real picture.

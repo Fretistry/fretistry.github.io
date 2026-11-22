@@ -106,18 +106,15 @@ export function PositionPicker({ system, available, positions, selected, caged, 
               );
             })}
             {multi && count > 1 && (
+              // Names what a click does: "All" switches every shape on; once they're all on it
+              // reads "None" and switches them all off. Fixed width, so nothing shifts.
               <button
                 type="button"
-                aria-pressed={allShown}
-                title={t.allTitle}
+                title={allShown ? t.noneTitle : t.allTitle}
                 onClick={() => onChange({ positionIndices: allShown ? [] : positions.map((p) => p.index) })}
-                className={cn(
-                  pill,
-                  "ml-1 px-2.5 font-medium",
-                  allShown ? "bg-foreground text-background ring-foreground" : "bg-card text-foreground/80 ring-border hover:bg-accent",
-                )}
+                className={cn(pill, "ml-1 min-w-[4.5rem] bg-card px-2.5 font-medium text-foreground/80 ring-border hover:bg-accent")}
               >
-                {t.all}
+                {allShown ? t.none : t.all}
               </button>
             )}
           </div>
