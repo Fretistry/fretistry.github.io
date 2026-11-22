@@ -116,12 +116,11 @@ function ExplorerApp() {
     () => (positionSystem === "all" ? [] : scalePositions(spelled, tuning, positionSystem)),
     [spelled, tuning, positionSystem],
   );
-  // Several CAGED shapes / boxes can be shown at once; 3-per-string shows one pattern at a time.
+  // Any combination of CAGED shapes / boxes (also none); 3-per-string shows one pattern at a time.
   const positionIndices = useMemo(() => {
     if (positions.length === 0) return [];
     const valid = [...new Set(settings.positionIndices.filter((i) => i >= 0 && i < positions.length))].sort((a, b) => a - b);
-    const chosen = valid.length > 0 ? valid : [0];
-    return positionSystem === "3nps" ? chosen.slice(0, 1) : chosen;
+    return positionSystem === "3nps" ? (valid.length > 0 ? valid.slice(0, 1) : [0]) : valid;
   }, [positions.length, settings.positionIndices, positionSystem]);
   const activePositions = useMemo(() => positionIndices.map((i) => positions[i]).filter(Boolean), [positionIndices, positions]);
   const activePosition = activePositions[0] ?? null;
@@ -434,6 +433,7 @@ function ExplorerApp() {
             orientation={orientation}
             leftHanded={settings.leftHanded}
             positionAreas={positionAreas}
+            reserveLabelLane={positionSystem === "boxes"}
             onNoteActivate={handleActivate}
             onOverflowChange={setNeckOverflows}
           />

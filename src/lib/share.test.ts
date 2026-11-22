@@ -75,6 +75,14 @@ describe("shareable links", () => {
     expect(parseSearchParams(new URLSearchParams("pos=3nps2-4")).positionIndices).toEqual([1]); // 3 per string: one at a time
   });
 
+  it("remembers the CAGED view with every shape switched off", () => {
+    const none: SharedState = { ...base, positionSystem: "boxes", positionIndices: [] };
+    expect(stateToSearchParams(none).get("pos")).toBe("boxes");
+    const parsed = parseSearchParams(stateToSearchParams(none));
+    expect(parsed.positionSystem).toBe("boxes");
+    expect(parsed.positionIndices).toEqual([]);
+  });
+
   it("ignores the old practice-mode parameter", () => {
     expect(parseSearchParams(new URLSearchParams("root=A&scale=dorian&mode=practice"))).not.toHaveProperty("mode");
   });

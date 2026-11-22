@@ -57,7 +57,8 @@ export function stateToSearchParams(state: SharedState): URLSearchParams {
   params.set("scale", state.scaleId);
   params.set("tuning", state.tuningId);
   if (state.tuningId === CUSTOM_TUNING_ID) params.set("strings", state.customTuning.map(pitchToParam).join("."));
-  if (state.positionSystem !== "all" && state.positionIndices.length > 0) {
+  // "boxes1-3" = shapes 1 and 3; just "boxes" = CAGED view with every shape switched off
+  if (state.positionSystem !== "all") {
     params.set("pos", `${state.positionSystem}${state.positionIndices.map((i) => i + 1).join("-")}`);
   }
   if (state.chordDegree !== null) {
@@ -88,13 +89,14 @@ export function parseSearchParams(params: URLSearchParams): Partial<SharedState>
     result.tuningId = tuning;
   }
 
-  // "boxes2" (one shape) or "boxes1-2-3" (several shapes at once)
-  const pos = /^(boxes|3nps)(\d{1,2}(?:-\d{1,2}){0,6})$/.exec(params.get("pos") ?? "");
+  // "boxes2" (one shape), "boxes1-2-3" (several at once) or "boxes" (CAGED view, no shape switched on)
+  const pos = /^(boxes|3nps)(\d{1,2}(?:-\d{1,2}){0,6})?$/.exec(params.get("pos") ?? "");
   if (pos) {
     const system = pos[1] as PositionChoice;
-    const indices = [...new Set(pos[2].split("-").map((n) => Math.max(0, Number(n) - 1)))].sort((a, b) => a - b);
+    const numbers = pos[2] ? pos[2].split("-") : [];
+    const indices = [...new Set(numbers.map((n) => Math.max(0, Number(n) - 1)))].sort((a, b) => a - b);
     result.positionSystem = system;
-    result.positionIndices = system === "3nps" ? indices.slice(0, 1) : indices;
+    result.positionIndices = system === "3nps" ? (indices.length ? indices.slice(0, 1) : [0]) : indices;
   } else if (params.has("root") || params.has("scale")) {
     result.positionSystem = "all";
   }

@@ -283,28 +283,58 @@ function loadImage(url: string, width: number, height: number): Promise<HTMLImag
   });
 }
 
-async function rasterize(markup: string, width: number, height: number): Promise<Blob> {
-  const url = URL.createObjectURL(new Blob([markup], { type: "image/svg+xml;charset=utf-8" }));
-  try {
-    const image = await loadImage(url, width, height);
-    // Give embedded fonts a moment to be applied (needed by some Safari versions).
-    await new Promise((resolve) => setTimeout(resolve, 60));
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.round(width * SCALE);
-    canvas.height = Math.round(height * SCALE);
-    const context = canvas.getContext("2d");
-    if (!context) throw new Error("Canvas is not available");
-    context.drawImage(image, 0, 0, canvas.width, canvas.height);
-    return await new Promise<Blob>((resolve, reject) =>
-      canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error("PNG export failed"))), "image/png"),
-    );
-  } finally {
-    URL.revokeObjectURL(url);
-  }
+/** The finished picture: always an SVG (vector) file; a PNG too when the browser allows it. */
+export interface RenderedPicture {
+  /** The picture as an SVG file — shown as the preview, and the fallback download. */
+  svg: Blob;
+  /** Object URL of `svg` (the caller revokes it when done). */
+  svgUrl: string;
+  width: number;
+  height: number;
+  /** The loaded SVG picture, ready to be drawn onto a canvas. */
+  image: HTMLImageElement;
+  background: ImageBackground;
+  /**
+   * The picture as a PNG at double resolution, or null when the browser
+   * scrambles canvas read-back (Firefox's anti-fingerprinting protection
+   * does this unless the user has just clicked, and/or until they allow it).
+   */
+  png: Blob | null;
 }
 
-/** Renders the picture and returns it as a PNG. */
-export async function renderFretboardImage(input: FretboardImageInput, background: ImageBackground): Promise<Blob> {
+function hexToRgb(hex: string): [number, number, number] {
+  return [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)) as [number, number, number];
+}
+
+/**
+ * Draws the picture onto a canvas and turns it into a PNG. The drawing and the
+ * check happen synchronously, so calling this straight from a click counts as
+ * a user action (Firefox only allows canvas read-back then). The check reads
+ * back one pixel of the plain background: if it isn't the background colour,
+ * the browser is scrambling the read-back and null is returned instead of a
+ * garbled picture.
+ */
+export function pictureToPng(picture: RenderedPicture): Promise<Blob | null> {
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(picture.width * SCALE);
+  canvas.height = Math.round(picture.height * SCALE);
+  const context = canvas.getContext("2d");
+  if (!context) return Promise.resolve(null);
+  context.drawImage(picture.image, 0, 0, canvas.width, canvas.height);
+  let readable = false;
+  try {
+    const pixel = context.getImageData(3, 3, 1, 1).data;
+    const expected = hexToRgb(PALETTE[picture.background].background);
+    readable = expected.every((v, i) => Math.abs(pixel[i] - v) <= 3) && pixel[3] === 255;
+  } catch {
+    readable = false;
+  }
+  if (!readable) return Promise.resolve(null);
+  return new Promise((resolve) => canvas.toBlob((blob) => resolve(blob), "image/png"));
+}
+
+/** Renders the picture: an SVG always, plus a PNG when the browser allows canvas read-back. */
+export async function renderFretboardPicture(input: FretboardImageInput, background: ImageBackground): Promise<RenderedPicture> {
   // Start from a fresh task, so the synchronous render below never runs inside a React update.
   await new Promise((resolve) => setTimeout(resolve, 0));
   const container = document.createElement("div");
@@ -321,20 +351,32 @@ export async function renderFretboardImage(input: FretboardImageInput, backgroun
     const width = Number(svg.getAttribute("width"));
     const height = Number(svg.getAttribute("height"));
     const serialize = () => withSingleSvgNamespace(new XMLSerializer().serializeToString(svg));
-    const plainMarkup = serialize();
+    const candidates = [serialize()]; // without the embedded font
     const fontCss = await embeddedFontCss(families).catch(() => "");
     if (fontCss) {
       const style = document.createElementNS(SVG_NS, "style");
       style.textContent = fontCss;
       svg.insertBefore(style, svg.firstChild);
+      candidates.unshift(serialize()); // preferred: with the app's own font
+    }
+    let lastError: unknown = null;
+    for (const markup of candidates) {
+      const blob = new Blob([markup], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
       try {
-        return await rasterize(serialize(), width, height);
+        const image = await loadImage(url, width, height);
+        // Give embedded fonts a moment to be applied (needed by some Safari versions).
+        await new Promise((resolve) => setTimeout(resolve, 60));
+        const picture: RenderedPicture = { svg: blob, svgUrl: url, width, height, image, background, png: null };
+        picture.png = await pictureToPng(picture);
+        return picture;
       } catch (error) {
-        // Some browsers refuse embedded fonts in pictures: fall back to the system font.
-        console.warn("Fretboard image: retrying without the embedded font", error);
+        // Some browsers refuse embedded fonts in pictures: try again with the system font.
+        URL.revokeObjectURL(url);
+        lastError = error;
       }
     }
-    return await rasterize(plainMarkup, width, height);
+    throw lastError ?? new Error("The picture could not be created");
   } finally {
     root.unmount();
     container.remove();

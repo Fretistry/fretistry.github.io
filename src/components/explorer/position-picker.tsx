@@ -1,9 +1,7 @@
 "use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { shapeColor } from "@/components/fretboard/shape-colors";
 import { useI18n } from "@/components/i18n/i18n-provider";
-import { Button } from "@/components/ui/button";
 import type { PositionChoice } from "@/lib/share";
 import { positionStartFret, type PositionSystem, type ScalePosition } from "@/lib/theory";
 import { cn } from "@/lib/utils";
@@ -14,7 +12,7 @@ interface PositionPickerProps {
   system: PositionChoice;
   available: PositionSystem[];
   positions: ScalePosition[];
-  /** Indices of the shown positions (several CAGED shapes / boxes at once; one for 3-per-string). */
+  /** Indices of the shown positions (any CAGED shapes / boxes, also none; one for 3-per-string). */
   selected: number[];
   /** The tuning gives the 5 boxes CAGED names (standard-type tunings): label them "CAGED", C-A-G-E-D. */
   caged: boolean;
@@ -25,9 +23,10 @@ const pill =
   "flex h-8 min-w-8 items-center justify-center rounded-lg px-2 text-sm font-semibold tabular-nums ring-1 transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50";
 
 /**
- * Choose between the whole neck, the 5 CAGED shapes (or numbered boxes) — any
- * combination at once, each in its own colour — or the 3-notes-per-string
- * patterns (one at a time).
+ * Choose between the whole neck, the 5 CAGED shapes (or numbered boxes) —
+ * switched on and off freely, each in its own colour — or the
+ * 3-notes-per-string patterns (one at a time). The buttons always stay in
+ * the same place; only their colour changes.
  */
 export function PositionPicker({ system, available, positions, selected, caged, onChange }: PositionPickerProps) {
   const t = useI18n().ui.positions;
@@ -36,16 +35,23 @@ export function PositionPicker({ system, available, positions, selected, caged, 
   const allShown = multi && count > 0 && selected.length === count;
   const single = selected.length === 1 ? positions[selected[0]] : null;
   const startFret = single ? positionStartFret(single) : null;
-  const step = (delta: number) => onChange({ positionIndices: [(selected[0] + delta + count) % count] });
 
   const toggle = (index: number) => {
     if (!multi) return onChange({ positionIndices: [index] });
-    if (selected.includes(index)) {
-      if (selected.length > 1) onChange({ positionIndices: selected.filter((i) => i !== index) });
-    } else {
-      onChange({ positionIndices: [...selected, index].sort((a, b) => a - b) });
-    }
+    onChange({
+      positionIndices: selected.includes(index)
+        ? selected.filter((i) => i !== index)
+        : [...selected, index].sort((a, b) => a - b),
+    });
   };
+
+  const detail = single
+    ? `${single.cagedShape ? `${t.shape(single.cagedShape)} · ` : ""}${
+        startFret === 0 ? t.openPosition : startFret !== null ? t.fromFret(startFret) : ""
+      }${single.occurrences.length > 1 ? ` ${t.repeats}` : ""}`
+    : selected.length === 0
+      ? t.noneShown
+      : t.multiple(selected.length);
 
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5">
@@ -53,7 +59,8 @@ export function PositionPicker({ system, available, positions, selected, caged, 
         <SegmentedControl
           ariaLabel={t.shapes}
           value={system}
-          onChange={(positionSystem) => onChange({ positionSystem })}
+          // Switching to another kind of shape starts with its first shape (C, or pattern 1).
+          onChange={(positionSystem) => onChange({ positionSystem, positionIndices: [0] })}
           options={[
             { value: "all", label: t.wholeNeck, title: t.wholeNeckTitle },
             caged
@@ -65,12 +72,7 @@ export function PositionPicker({ system, available, positions, selected, caged, 
       </ToolbarGroup>
 
       {system !== "all" && count > 0 && (
-        <div className="flex flex-wrap items-center gap-1.5">
-          {single && (
-            <Button variant="ghost" size="icon-sm" aria-label={t.previous} onClick={() => step(-1)}>
-              <ChevronLeft />
-            </Button>
-          )}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
           <div role={multi ? "group" : "radiogroup"} aria-label={t.position} className="flex flex-wrap gap-1">
             {positions.map((p) => {
               const active = selected.includes(p.index);
@@ -108,10 +110,10 @@ export function PositionPicker({ system, available, positions, selected, caged, 
                 type="button"
                 aria-pressed={allShown}
                 title={t.allTitle}
-                onClick={() => onChange({ positionIndices: allShown ? [0] : positions.map((p) => p.index) })}
+                onClick={() => onChange({ positionIndices: allShown ? [] : positions.map((p) => p.index) })}
                 className={cn(
                   pill,
-                  "px-2.5 font-medium",
+                  "ml-1 px-2.5 font-medium",
                   allShown ? "bg-foreground text-background ring-foreground" : "bg-card text-foreground/80 ring-border hover:bg-accent",
                 )}
               >
@@ -119,18 +121,7 @@ export function PositionPicker({ system, available, positions, selected, caged, 
               </button>
             )}
           </div>
-          {single && (
-            <Button variant="ghost" size="icon-sm" aria-label={t.next} onClick={() => step(1)}>
-              <ChevronRight />
-            </Button>
-          )}
-          <span className="text-xs text-muted-foreground">
-            {single
-              ? `${single.cagedShape ? `${t.shape(single.cagedShape)} · ` : ""}${
-                  startFret === 0 ? t.openPosition : startFret !== null ? t.fromFret(startFret) : ""
-                }${single.occurrences.length > 1 ? ` ${t.repeats}` : ""}`
-              : t.multiple(selected.length)}
-          </span>
+          <span className="text-xs text-muted-foreground">{detail}</span>
         </div>
       )}
     </div>

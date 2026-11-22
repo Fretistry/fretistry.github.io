@@ -31,6 +31,8 @@ interface FretboardProps {
   leftHanded: boolean;
   /** The scale positions (CAGED shapes / boxes) to shade, each in its own colour. */
   positionAreas?: PositionArea[] | null;
+  /** Keep the shape-letter lane even when no shape is shown (so the neck doesn't jump while toggling shapes). */
+  reserveLabelLane?: boolean;
   onNoteActivate: (note: FretboardNote) => void;
   /** Told whether the horizontal neck is wider than the screen (so a "scroll sideways" hint can be shown). */
   onOverflowChange?: (overflowing: boolean) => void;
@@ -73,6 +75,7 @@ export function Fretboard({
   orientation,
   leftHanded,
   positionAreas,
+  reserveLabelLane = false,
   onNoteActivate,
   onOverflowChange,
 }: FretboardProps) {
@@ -102,7 +105,7 @@ export function Fretboard({
   const scale = vertical ? 1 : Math.min(MAX_SCALE, Math.max(1, containerWidth / WIDE_NECK));
   const labelSize = Math.round(LABEL_SIZE * scale);
   // Room for the shape letters (C, A, G, E, D) beside the highest string when shapes are shown.
-  const labelLane = positionAreas?.some((a) => a.label) ? Math.round(LABEL_LANE * scale) : 0;
+  const labelLane = reserveLabelLane || positionAreas?.some((a) => a.label) ? Math.round(LABEL_LANE * scale) : 0;
 
   const geometry = useMemo(() => {
     if (vertical) {

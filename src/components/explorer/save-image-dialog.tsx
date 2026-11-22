@@ -1,8 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Download, LoaderCircle, Moon, Share, Sun } from "lucide-react";
-import { renderFretboardImage, type FretboardImageInput, type ImageBackground } from "@/components/fretboard/fretboard-image";
+import { Download, Info, LoaderCircle, Moon, Share, Sun } from "lucide-react";
+import {
+  pictureToPng,
+  renderFretboardPicture,
+  type FretboardImageInput,
+  type ImageBackground,
+  type RenderedPicture,
+} from "@/components/fretboard/fretboard-image";
 import { useI18n } from "@/components/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -18,7 +24,7 @@ interface SaveImageDialogProps {
 }
 
 type Rendered =
-  | { input: FretboardImageInput; background: ImageBackground; blob: Blob; url: string }
+  | { input: FretboardImageInput; background: ImageBackground; picture: RenderedPicture }
   | { input: FretboardImageInput; background: ImageBackground; failed: true };
 
 function loadBackground(): ImageBackground {
@@ -29,15 +35,29 @@ function loadBackground(): ImageBackground {
   }
 }
 
+function saveFile(blob: Blob, name: string) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = name;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10_000);
+}
+
 /**
- * "Save as image" (from the Share menu): shows a preview of the fretboard
- * picture and lets you download it (or share it to Photos/WhatsApp on phones).
+ * "Save as image" (from the Share menu): a preview of the fretboard picture,
+ * downloaded as a PNG — or, when the browser's privacy protection scrambles
+ * PNG creation (Firefox anti-fingerprinting), as an equally sharp SVG file.
+ * On phones it can also be shared to Photos, WhatsApp and so on.
  */
 export function SaveImageDialog({ open, onOpenChange, input, fileName }: SaveImageDialogProps) {
   const t = useI18n().ui.image;
   const [background, setBackground] = useState<ImageBackground>(loadBackground);
   const [rendered, setRendered] = useState<Rendered | null>(null);
   const [canShare, setCanShare] = useState(false);
+  const [savedAsSvg, setSavedAsSvg] = useState(false);
   const lastUrl = useRef<string | null>(null);
 
   // Render whenever the dialog is open and the picture is out of date.
@@ -45,18 +65,22 @@ export function SaveImageDialog({ open, onOpenChange, input, fileName }: SaveIma
     if (!open) return;
     if (rendered && rendered.input === input && rendered.background === background) return;
     let cancelled = false;
-    renderFretboardImage(input, background).then(
-      (blob) => {
-        if (cancelled) return;
+    renderFretboardPicture(input, background).then(
+      (picture) => {
+        if (cancelled) {
+          URL.revokeObjectURL(picture.svgUrl);
+          return;
+        }
         if (lastUrl.current) URL.revokeObjectURL(lastUrl.current);
-        const url = URL.createObjectURL(blob);
-        lastUrl.current = url;
-        setRendered({ input, background, blob, url });
-        const file = new File([blob], fileName, { type: "image/png" });
+        lastUrl.current = picture.svgUrl;
+        setRendered({ input, background, picture });
+        setSavedAsSvg(false);
+        const file = picture.png ? new File([picture.png], fileName, { type: "image/png" }) : null;
         setCanShare(
-          window.matchMedia("(pointer: coarse)").matches &&
+          Boolean(file) &&
+            window.matchMedia("(pointer: coarse)").matches &&
             typeof navigator.canShare === "function" &&
-            navigator.canShare({ files: [file] }),
+            navigator.canShare({ files: [file!] }),
         );
       },
       (error: unknown) => {
@@ -74,7 +98,7 @@ export function SaveImageDialog({ open, onOpenChange, input, fileName }: SaveIma
   }, []);
 
   const current = rendered && rendered.input === input && rendered.background === background ? rendered : null;
-  const image = current && "url" in current ? current : null;
+  const picture = current && "picture" in current ? current.picture : null;
   const failed = Boolean(current && "failed" in current);
 
   const chooseBackground = (next: ImageBackground) => {
@@ -86,22 +110,24 @@ export function SaveImageDialog({ open, onOpenChange, input, fileName }: SaveIma
     }
   };
 
-  const download = () => {
-    if (!image) return;
-    const link = document.createElement("a");
-    link.href = image.url;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+  const download = async () => {
+    if (!picture) return;
+    // Made right here, inside the click, when it wasn't possible earlier (Firefox only allows it on a click).
+    const png = picture.png ?? (await pictureToPng(picture));
+    if (png) {
+      saveFile(png, fileName);
+    } else {
+      saveFile(picture.svg, fileName.replace(/\.png$/, ".svg"));
+      setSavedAsSvg(true);
+    }
   };
 
   const share = async () => {
-    if (!image) return;
+    if (!picture?.png) return;
     try {
-      await navigator.share({ files: [new File([image.blob], fileName, { type: "image/png" })], title: input.title });
+      await navigator.share({ files: [new File([picture.png], fileName, { type: "image/png" })], title: input.title });
     } catch (error) {
-      if ((error as DOMException)?.name !== "AbortError") download();
+      if ((error as DOMException)?.name !== "AbortError") void download();
     }
   };
 
@@ -114,9 +140,10 @@ export function SaveImageDialog({ open, onOpenChange, input, fileName }: SaveIma
         </DialogHeader>
 
         <div className="grid min-h-40 place-items-center overflow-hidden rounded-lg border border-border/70 bg-muted/40">
-          {image ? (
+          {picture ? (
+            // The preview shows the SVG picture itself: it never depends on canvas read-back.
             // eslint-disable-next-line @next/next/no-img-element -- a local blob: URL, not an optimisable asset
-            <img src={image.url} alt={t.previewAlt(input.title)} className="block h-auto max-h-[55vh] w-full object-contain" />
+            <img src={picture.svgUrl} alt={t.previewAlt(input.title)} className="block h-auto max-h-[55vh] w-full object-contain" />
           ) : failed ? (
             <p className="px-4 py-10 text-center text-sm text-muted-foreground">{t.failed}</p>
           ) : (
@@ -140,13 +167,20 @@ export function SaveImageDialog({ open, onOpenChange, input, fileName }: SaveIma
           <span className="text-xs text-muted-foreground">{background === "light" ? `(${t.lightHint})` : ""}</span>
         </div>
 
+        {savedAsSvg && (
+          <p className="flex gap-2 rounded-lg border border-border/70 bg-muted/50 px-3 py-2 text-sm text-foreground/85" role="status">
+            <Info className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+            {t.savedAsSvg}
+          </p>
+        )}
+
         <DialogFooter>
           {canShare && (
-            <Button variant="outline" onClick={share} disabled={!image}>
+            <Button variant="outline" onClick={share} disabled={!picture}>
               <Share /> {t.share}
             </Button>
           )}
-          <Button onClick={download} disabled={!image}>
+          <Button onClick={download} disabled={!picture}>
             <Download /> {t.download}
           </Button>
         </DialogFooter>
