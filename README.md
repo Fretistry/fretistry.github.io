@@ -216,6 +216,7 @@ Then open <http://localhost:3000>.
 **GitHub Pages (set up):** every push to the `main` branch runs `.github/workflows/deploy.yml`. It installs everything, runs the tests, builds the static website and publishes it. If a test fails, nothing is published.
 
 - One-time setting on GitHub: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+- `public/google82b35d0c829c3e2b.html` proves to Google Search Console that the site is yours. Keep it: if it disappears, Search Console loses access.
 - The address and sub-folder are detected automatically, e.g. `https://yourname.github.io/fretistry/`. This includes a custom domain if you add one later.
 - Progress and history: the repository's **Actions** tab.
 
