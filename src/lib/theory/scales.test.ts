@@ -141,7 +141,10 @@ describe("enharmonic spelling", () => {
   it("respells single notes in non-7-note scales (Eb blues uses A, not Bbb)", () => {
     const s = spell("Eb", "blues");
     expect(names(s)).toBe("Eb Gb Ab A Bb Db");
-    expect(formula(s)).toBe("1 b3 4 #4 5 b7");
+    // The blue note keeps its name from the formula: ♭5 in every key, also when it is written A.
+    expect(formula(s)).toBe("1 b3 4 b5 5 b7");
+    expect(formula(spell("A", "blues"))).toBe("1 b3 4 b5 5 b7");
+    expect(formula(spell("Ab", "blues"))).toBe("1 b3 4 b5 5 b7");
     expect(s.notices.some((n) => n.kind === "respelled-note")).toBe(true);
   });
 

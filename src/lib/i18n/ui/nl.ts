@@ -125,7 +125,7 @@ export const nl: UiMessages = {
     degrees: "Nummers",
     none: "Geen",
     notesTitle: "Notennamen",
-    intervalsTitle: "Intervallen vanaf de grondtoon (G, ♭3, 5…)",
+    intervalsTitle: "Intervallen vanaf de grondtoon (1, ♭3, 5…)",
     degreesTitle: "Nummer van elke noot in de toonladder (1, 2, 3…)",
     noneTitle: "Geen labels",
     whichNotes: "Welke noten tonen",
@@ -253,6 +253,8 @@ export const nl: UiMessages = {
     stepCaption: (half, whole) =>
       `Elk vakje is één fret op één snaar (getallen = halve tonen boven de grondtoon). ${half} = halve toon (1 fret), ${whole} = hele toon (2 frets).`,
     showMe: "Toon",
+    opensAs: (title) => `Opent als ${title}: dezelfde noten, alleen anders geschreven.`,
+    viewAs: (note) => `Toon als ${note}`,
     noRelatives: "Nog geen naaste verwanten bij de toonladders in deze app.",
     modesTitle: (parent) => `De 7 modi van ${parent}`,
     modesSubtitle: "Dezelfde zeven noten, een andere grondtoon. Elke modus begint op de volgende noot van de toonladder.",
@@ -274,7 +276,7 @@ export const nl: UiMessages = {
     stackedAs: "Opbouw",
     show: "Toon",
     chordsTip: "Tip: “Toon” markeert het akkoord op de hals hierboven. Zet de akkoordbalk op “Septiemen” voor de versies met vier noten.",
-    chordsParentTip: (parent, scale) => `Deze akkoorden komen uit de moedertoonladder, ${parent} — ${scale} past over al deze akkoorden.`,
+    chordsParentTip: (parent, scale) => `Deze akkoorden komen uit de moedertoonladder, ${parent}: elke noot van ${scale} hoort bij die toonsoort.`,
   },
   metronome: {
     title: "Metronoom",
@@ -308,6 +310,11 @@ export const nl: UiMessages = {
   startHere: {
     title: "Begin hier",
     hint: "Populaire eerste toonladders, elk in één vorm. Tik op de ☆ naast de naam van een toonladder om die hier te bewaren.",
+    box: (n) => `box ${n}`,
+    shapeInfo: [
+      "Eén vorm is veel makkelijker te leren dan de hele hals. Dit is een goede eerste vorm voor deze toonladder: tik erop om alleen die vorm te tonen, en speel hem rustig van de laagste noot omhoog en weer terug.",
+      "Tik op de ☆ naast de naam van een toonladder om je favorieten hier te bewaren.",
+    ],
   },
   info: {
     labelsTitle: "Wat betekenen de labels?",

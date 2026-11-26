@@ -48,6 +48,7 @@ import {
   mod12,
   pitchClassOf,
   positionKey,
+  positionStartFret,
   hasCagedShapes,
   positionSystemsFor,
   scaleChords,
@@ -62,7 +63,7 @@ import {
 import { AppHeader } from "./app-header";
 import { ChordBar } from "./chord-bar";
 import { DisplayToolbar } from "./display-toolbar";
-import { FavouriteButton, FavouritesBar, StartHereBar } from "./favourites";
+import { FavouriteButton, FavouritesBar, StartHereBar, StarterShapeBar } from "./favourites";
 import { Legend } from "./legend";
 import { PositionPicker } from "./position-picker";
 import { SiteFooter } from "./privacy-note";
@@ -92,6 +93,10 @@ function publicSiteLabel(): string | null {
     return null;
   }
 }
+
+/** Scales whose CAGED shapes most lessons number as "boxes" 1–5 (box 1 = the E shape). */
+const PENTATONIC_SCALES = new Set(["minor-pentatonic", "blues"]);
+const PENTATONIC_BOX: Record<string, number> = { E: 1, D: 2, C: 3, A: 4, G: 5 };
 
 /** Every spot within the fret span each shape covers on each string (also spots between its notes). */
 function shapeSpanKeys(positions: readonly ScalePosition[]): Set<string> {
@@ -220,6 +225,7 @@ function ExplorerApp() {
         ? {
             rootPitchClass: pitchClassOf(activeChord.root),
             tones: new Map(activeChord.tones.map((t) => [pitchClassOf(t.note), t.interval])),
+            names: new Map(activeChord.tones.map((t) => [pitchClassOf(t.note), t.note])),
           }
         : null,
     [activeChord],
@@ -425,6 +431,33 @@ function ExplorerApp() {
     return () => observer.disconnect();
   }, [pinBars]);
 
+  // ── Bring the neck into view ─────────────────────────────────────────────
+  // After a tap whose result shows on the neck (Start here, a shape, Play scale, Train, a chord's
+  // "Show"), scroll just enough to show it — on phones the neck starts below the controls. On a
+  // vertical neck (taller than the screen) it aims at the chosen shape. Nothing moves when the
+  // result is already in view.
+  const neckRef = useRef<HTMLDivElement>(null);
+  const revealNeck = useCallback(() => {
+    window.setTimeout(() => {
+      const neck = neckRef.current;
+      if (!neck) return;
+      const headerBottom = document.querySelector("header")?.getBoundingClientRect().bottom ?? 56;
+      const bars = pinBars ? (barsRef.current?.offsetHeight ?? 0) : 0;
+      const neckRect = neck.getBoundingClientRect();
+      const areas =
+        orientation === "vertical" ? [...neck.querySelectorAll("[data-shape-area]")].map((a) => a.getBoundingClientRect()) : [];
+      const target = areas.length > 0 ? areas.reduce((a, b) => (b.top < a.top ? b : a)) : neckRect;
+      // Below the header, the pinned bars and (inside a vertical neck) the pinned string names.
+      const top = headerBottom + bars + (target === neckRect ? 0 : 32) + 8;
+      const bottom = window.innerHeight - 8;
+      const visible = Math.min(target.bottom, bottom) - Math.max(target.top, top);
+      if (visible >= Math.min(target.height, bottom - top) * 0.9) return;
+      const delta = target.top < top ? target.top - top : Math.min(target.top - top, target.bottom - bottom);
+      const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.scrollBy({ top: delta, behavior: smooth ? "smooth" : "auto" });
+    }, 60);
+  }, [orientation, pinBars]);
+
   // ── "Start here": first scales for someone new (until there are favourites) ──
   const isStartingPoint = useCallback(
     (point: StartingPoint) =>
@@ -434,16 +467,49 @@ function ExplorerApp() {
     [settings.rootName, settings.scaleId, caged, positionSystem, positionIndices],
   );
   const goToStartingPoint = useCallback(
-    (point: StartingPoint) =>
+    (point: StartingPoint) => {
       update({
         rootName: point.rootName,
         scaleId: point.scaleId,
         positionSystem: caged ? "boxes" : "all",
         positionIndices: caged ? [cagedIndex(point.shape)] : [0],
         chordDegree: null,
-      }),
-    [update, caged],
+      });
+      revealNeck();
+    },
+    [update, caged, revealNeck],
   );
+
+  // On a scale's own page (reached from a search, a link or a bookmark) the visitor already chose
+  // the scale, so "Start here" offers one good first shape for it instead of four other scales.
+  const [landedOnHome] = useState(() => parseScalePagePath(window.location.pathname, BASE_PATH) === null);
+  const starterShape = useMemo(() => {
+    if (!caged) return null;
+    const boxes = scalePositions(spelled, tuning, "boxes");
+    const start = (p: ScalePosition) => positionStartFret(p) ?? Infinity;
+    // Root on the low E string (the E shape: box 1 of the pentatonic), else root on the A string.
+    const playable = (letter: string) => boxes.find((p) => p.cagedShape === letter && start(p) <= 8);
+    return playable("E") ?? playable("A") ?? [...boxes].sort((a, b) => start(a) - start(b))[0] ?? null;
+  }, [caged, spelled, tuning]);
+  const starterLabel = useMemo(() => {
+    if (!starterShape?.cagedShape) return null;
+    const startFret = positionStartFret(starterShape);
+    const box = PENTATONIC_SCALES.has(settings.scaleId) ? PENTATONIC_BOX[starterShape.cagedShape] : undefined;
+    return [
+      ui.positions.shape(starterShape.cagedShape),
+      box ? ui.startHere.box(box) : null,
+      startFret === 0 ? ui.positions.openPosition : startFret !== null ? ui.positions.fromFret(startFret) : null,
+    ]
+      .filter(Boolean)
+      .join(" · ");
+  }, [starterShape, settings.scaleId, ui]);
+  const starterActive =
+    starterShape !== null && positionSystem === "boxes" && positionIndices.length === 1 && positionIndices[0] === starterShape.index;
+  const goToStarterShape = useCallback(() => {
+    if (!starterShape) return;
+    update({ positionSystem: "boxes", positionIndices: [starterShape.index], chordDegree: null });
+    revealNeck();
+  }, [starterShape, update, revealNeck]);
 
   // ── "Save image": the picture shows exactly what is on the neck now ──────
   const { tuningName } = i18n;
@@ -555,18 +621,24 @@ function ExplorerApp() {
               onCustomChange={(customTuning) => update({ tuningId: CUSTOM_TUNING_ID, customTuning })}
             />
           </Field>
-          <div className="col-span-2 border-t border-border/50 pt-3 lg:col-span-3">
-            {favourites.favourites.length > 0 ? (
-              <FavouritesBar
-                favourites={favourites.favourites}
-                current={currentFavourite}
-                onSelect={({ rootName, scaleId }) => update({ rootName, scaleId })}
-                onRemove={favourites.remove}
-              />
-            ) : (
-              <StartHereBar caged={caged} isCurrent={isStartingPoint} onSelect={goToStartingPoint} />
-            )}
-          </div>
+          {/* Favourites once there are any; before that "Start here" (four first scales on the home
+              page, one first shape for this scale on a scale's own page) */}
+          {(favourites.favourites.length > 0 || landedOnHome || starterLabel) && (
+            <div className="col-span-2 border-t border-border/50 pt-3 lg:col-span-3">
+              {favourites.favourites.length > 0 ? (
+                <FavouritesBar
+                  favourites={favourites.favourites}
+                  current={currentFavourite}
+                  onSelect={({ rootName, scaleId }) => update({ rootName, scaleId })}
+                  onRemove={favourites.remove}
+                />
+              ) : landedOnHome ? (
+                <StartHereBar caged={caged} isCurrent={isStartingPoint} onSelect={goToStartingPoint} />
+              ) : (
+                starterLabel && <StarterShapeBar label={starterLabel} active={starterActive} onSelect={goToStarterShape} />
+              )}
+            </div>
+          )}
         </section>
 
         {/* Fretboard */}
@@ -592,7 +664,14 @@ function ExplorerApp() {
                   className="rounded-full"
                   aria-pressed={training}
                   title={ui.trainer.buttonTitle}
-                  onClick={training ? stopTrainer : startTrainer}
+                  onClick={
+                    training
+                      ? stopTrainer
+                      : () => {
+                          startTrainer();
+                          revealNeck();
+                        }
+                  }
                 >
                   <Target />
                   {ui.trainer.button}
@@ -604,7 +683,10 @@ function ExplorerApp() {
             playDisabled={training}
             isPlaying={scalePlayer.isPlaying}
             playingIndex={scalePlayer.playingIndex}
-            onPlay={playScale}
+            onPlay={() => {
+              playScale();
+              revealNeck();
+            }}
             onStop={stopScale}
           />
           <DisplayToolbar settings={settings} fretRange={fretRange} onChange={update} />
@@ -615,7 +697,10 @@ function ExplorerApp() {
               positions={positions}
               selected={positionIndices}
               caged={caged}
-              onChange={update}
+              onChange={(patch) => {
+                update(patch);
+                if (patch.positionSystem !== "all" && (patch.positionIndices?.length ?? 0) > 0) revealNeck();
+              }}
             />
             {!training && (
               <ChordBar
@@ -656,6 +741,7 @@ function ExplorerApp() {
               )}
             </div>
           )}
+          <div ref={neckRef}>
           <Fretboard
             notes={board}
             markers={neckMarkers}
@@ -670,6 +756,7 @@ function ExplorerApp() {
             onNoteActivate={handleActivate}
             onOverflowChange={setNeckOverflows}
           />
+          </div>
           <div className="flex min-h-9 flex-wrap items-center justify-between gap-2">
             <Legend
               showOutside={settings.visibility === "all"}
@@ -709,7 +796,7 @@ function ExplorerApp() {
             update({ chordDegree });
             const chord = chordSet.chords[chordDegree];
             if (chord) playChord(chord);
-            window.scrollTo({ top: 0, behavior: "smooth" });
+            revealNeck();
           }}
         />
       </main>

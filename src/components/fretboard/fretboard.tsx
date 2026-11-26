@@ -383,6 +383,8 @@ export function FretboardArt({
         return (
           <polygon
             key={`pos-${key}`}
+            // lets the page scroll a chosen shape into view
+            data-shape-area=""
             className="pointer-events-none"
             points={points.map((p) => `${p.x},${p.y}`).join(" ")}
             fill={area.color}

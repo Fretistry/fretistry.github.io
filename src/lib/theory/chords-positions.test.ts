@@ -64,12 +64,30 @@ describe("chords in the key", () => {
     expect(scaleChords(spell("F#", "major"), "triad", SCALES).chords[6].symbol).toBe("E♯dim");
   });
 
-  it("uses the parent scale for pentatonic and blues scales", () => {
+  it("uses the parent scale for pentatonic scales", () => {
     const pent = scaleChords(spell("A", "minor-pentatonic"), "triad", SCALES);
     expect(pent.basis).toBe("parent");
     expect(pent.source.scale.id).toBe("natural-minor");
     expect(scaleChords(spell("C", "major-pentatonic"), "triad", SCALES).source.scale.id).toBe("major");
-    expect(scaleChords(spell("E", "blues"), "triad", SCALES).source.scale.id).toBe("natural-minor");
+    expect(pent.note).not.toContain("fits over all");
+  });
+
+  it("gives blues scales the three chords of a 12-bar blues", () => {
+    const e = scaleChords(spell("E", "blues"), "seventh", SCALES);
+    expect(e.basis).toBe("blues");
+    expect(e.chords.map((c) => c.symbol)).toEqual(["E7", "A7", "B7"]);
+    expect(e.chords.map((c) => c.numeral)).toEqual(["I7", "IV7", "V7"]);
+    expect(e.chords.map((c) => c.degreeIndex)).toEqual([0, 1, 2]);
+    expect(e.note).toContain("E7, A7 and B7");
+    // The 3rd of E7 (G♯) is not in E blues; the chord still names it correctly.
+    expect(e.chords[0].tones.map((t) => noteToAscii(t.note))).toEqual(["E", "G#", "B", "D"]);
+    expect(e.chords[0].tones[1].scaleIndex).toBeNull();
+    const triads = scaleChords(spell("Eb", "blues"), "triad", SCALES);
+    expect(triads.chords.map((c) => c.symbol)).toEqual(["E♭", "A♭", "B♭"]);
+    expect(scaleChords(spell("E", "major-blues"), "seventh", SCALES).chords.map((c) => c.symbol)).toEqual(["E7", "A7", "B7"]);
+    expect(scaleChords(spell("F#", "blues"), "seventh", SCALES).chords[0].tones.map((t) => noteToAscii(t.note))).toEqual([
+      "F#", "A#", "C#", "E",
+    ]);
   });
 
   it("builds augmented and diminished chords from symmetric scales", () => {
@@ -78,6 +96,58 @@ describe("chords in the key", () => {
     expect(wt.chords.every((c) => c.type?.id === "aug")).toBe(true);
     const dim = scaleChords(spell("C", "diminished"), "seventh", SCALES);
     expect(dim.chords.every((c) => c.type?.id === "dim7")).toBe(true);
+  });
+
+  it("spells chords of symmetric scales in thirds from their own root", () => {
+    const tones = (c: { tones: { note: Parameters<typeof noteToAscii>[0] }[] }) => c.tones.map((t) => noteToAscii(t.note)).join(" ");
+    // C whole-half diminished: C D Eb F Gb Ab A B
+    const dim = scaleChords(spell("C", "diminished"), "triad", SCALES).chords;
+    expect(dim.map((c) => `${c.symbol} = ${tones(c)}`)).toEqual([
+      "Cdim = C Eb Gb",
+      "Ddim = D F Ab",
+      "D♯dim = D# F# A",
+      "Fdim = F Ab Cb",
+      "F♯dim = F# A C",
+      "G♯dim = G# B D",
+      "Adim = A C Eb",
+      "Bdim = B D F",
+    ]);
+    // Every tone is a 3rd above the previous one, with the right interval names.
+    for (const chord of dim) expect(chord.tones.map((t) => t.interval.short)).toEqual(["1", "b3", "b5"]);
+    const dim7 = scaleChords(spell("C", "diminished"), "seventh", SCALES).chords;
+    expect(tones(dim7[0])).toBe("C Eb Gb Bbb"); // the 𝄫7 is the textbook spelling of a diminished 7th
+    expect(dim7[0].tones.map((t) => t.interval.short)).toEqual(["1", "b3", "b5", "bb7"]);
+    expect(tones(dim7[5])).toBe("G# B D F");
+    // G half-whole diminished: Gdim = G Bb Db (not G A# C#)
+    const halfWhole = scaleChords(spell("G", "diminished-half-whole"), "triad", SCALES).chords;
+    expect(tones(halfWhole[0])).toBe("G Bb Db");
+    // C whole tone: Daug = D F# A# (not D F# Bb), and no double sharps
+    const wt = scaleChords(spell("C", "whole-tone"), "triad", SCALES).chords;
+    expect(wt.map((c) => `${c.symbol} = ${tones(c)}`)).toEqual([
+      "Caug = C E G#",
+      "Daug = D F# A#",
+      "Eaug = E G# B#",
+      "G♭aug = Gb Bb D",
+      "A♭aug = Ab C E",
+      "B♭aug = Bb D F#",
+    ]);
+    for (const chord of wt) expect(chord.tones.map((t) => t.interval.short)).toEqual(["1", "3", "#5"]);
+    expect(describeChordStack(wt[1])).toBe("D → F♯ (major 3rd) → A♯ (major 3rd)");
+  });
+
+  it("never needs a double sharp or flat in symmetric-scale chords except the 𝄫7 of a dim7", () => {
+    for (const root of ROOT_NAMES) {
+      for (const id of ["whole-tone", "diminished", "diminished-half-whole"]) {
+        for (const size of ["triad", "seventh"] as const) {
+          for (const chord of scaleChords(spellScale(rootNote(root), getScale(id)), size, SCALES).chords) {
+            chord.tones.forEach((t, i) => {
+              const allowed = chord.type?.id === "dim7" && i === 3 ? 2 : 1;
+              expect(Math.abs(t.note.accidental), `${root} ${id} ${chord.symbol}`).toBeLessThanOrEqual(allowed);
+            });
+          }
+        }
+      }
+    }
   });
 
   it("identifies chords from intervals and explains the stack", () => {

@@ -269,7 +269,7 @@ export function createFrenchTheory(format: NoteFormat): TheoryLanguage {
     whyRoot: (note) => `${b(note)} est la tonique — la note « maison » sur laquelle la gamme est construite et dont elle porte le nom.`,
     whyHead: ({ note, intervalName: name, semitones, root }) => `${b(note)} — ${lowerFirst(name)}, ${halfSteps(semitones)} au-dessus de ${root}.`,
     whyRespelled: ({ original, note }) =>
-      `À strictement parler, c’est un autre degré (${original}), mais on l’écrit ${note} pour éviter un double dièse ou un double bémol — même son, plus facile à lire.`,
+      `À strictement parler, cette note est ${original}, mais on l’écrit ${note} pour éviter un double dièse ou un double bémol — même son, plus facile à lire.`,
     whyNatural: ({ degree, letter, semitones, letterPerDegree }) =>
       letterPerDegree
         ? `Le ${ordinal(degree)} degré utilise ${word.the} ${letter}, et ${letter} naturel se trouve exactement ${halfSteps(semitones)} plus haut — ni dièse ni bémol.`
@@ -342,13 +342,20 @@ export function createFrenchTheory(format: NoteFormat): TheoryLanguage {
     respelledNote: ({ label, used, original }) =>
       `La ${label} s’écrit ${b(used)} au lieu de ${original} pour éviter un double dièse ou un double bémol.`,
 
-    chordBasis: ({ basis, noteCount, parentName, scaleTitle, wholeTone }) => {
+    chordBasis: ({ basis, noteCount, parentName, scaleTitle, wholeTone, chordList, majorBlues }) => {
       if (basis === "scale") return "Chaque accord se construit en empilant une note sur deux de la gamme (des tierces) à partir d’une note de la gamme.";
       if (basis === "symmetric")
         return wholeTone
           ? "Empiler une note sur deux d’une gamme par tons donne toujours une triade augmentée — chaque accord a la même forme, un ton plus haut à chaque fois."
           : "Empiler une note sur deux de la gamme diminuée donne des accords diminués — la même forme se répète toutes les 3 cases.";
-      return `Une gamme de ${noteCount} notes en a trop peu pour empiler des tierces : voici donc les accords de sa gamme mère, ${parentName}. ${upperFirst(scaleTitle)} fonctionne sur tous ces accords.`;
+      if (basis === "blues")
+        return (
+          `Un blues de 12 mesures utilise trois accords : I, IV et V, généralement joués en accords de septième de dominante (ici ${chordList}). ` +
+          (majorBlues
+            ? `${upperFirst(scaleTitle)} sonne le mieux sur l’accord I ; sur IV et V, beaucoup de guitaristes déplacent la gamme avec l’accord ou passent au blues mineur.`
+            : `${upperFirst(scaleTitle)} est le son classique sur les trois : la ♭3 de la gamme qui frotte contre la tierce majeure de l’accord I fait une grande partie du son blues.`)
+        );
+      return `Une gamme de ${noteCount} notes en a trop peu pour empiler des tierces : voici donc les accords de sa gamme mère, ${parentName}, la tonalité d’où vient ${scaleTitle}.`;
     },
   };
 }

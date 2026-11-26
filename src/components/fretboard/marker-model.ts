@@ -14,6 +14,8 @@ export interface ChordDisplay {
   rootPitchClass: number;
   /** Interval above the chord root for every chord tone, keyed by pitch class. */
   tones: ReadonlyMap<number, Interval>;
+  /** How each chord tone is written in the chord, keyed by pitch class (it can differ from the scale's spelling). */
+  names?: ReadonlyMap<number, SpelledNote>;
 }
 
 /** Language-dependent text used for labels and screen readers. */
@@ -87,10 +89,10 @@ export function markerLabel(note: FretboardNote, labelMode: LabelMode, text: Mar
   }
 }
 
-function chordLabel(note: FretboardNote, interval: Interval, labelMode: LabelMode, text: MarkerText): string | null {
+function chordLabel(note: FretboardNote, interval: Interval, chord: ChordDisplay, labelMode: LabelMode, text: MarkerText): string | null {
   switch (labelMode) {
     case "note":
-      return text.note(note.note);
+      return text.note(chord.names?.get(note.pitchClass) ?? note.note);
     case "interval":
       return intervalDisplayLabel(interval, text.rootLabel);
     case "degree":
@@ -124,7 +126,7 @@ export function computeMarker(note: FretboardNote, options: MarkerOptions): Mark
       variant = isChordRoot ? "root" : "scale";
       visible = options.visibility !== "roots" || isChordRoot;
       dimmed = visible && !inPosition;
-      label = chordLabel(note, chordInterval, options.labelMode, text);
+      label = chordLabel(note, chordInterval, options.chord, options.labelMode, text);
     } else {
       // Not part of the chord: keep the rest of the scale as faint context.
       visible = options.visibility === "all" || (options.visibility === "scale" && note.inScale);

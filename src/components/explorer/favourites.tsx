@@ -10,6 +10,7 @@ import { sameFavourite, type Favourite } from "@/lib/favourites";
 import { START_HERE, type StartingPoint } from "@/lib/start-here";
 import { spellScale } from "@/lib/theory";
 import { cn } from "@/lib/utils";
+import { InfoTip } from "./info-tip";
 
 /** The star next to the scale name: adds the current root + scale to the favourites, or removes it. */
 export function FavouriteButton({ active, onToggle }: { active: boolean; onToggle: () => void }) {
@@ -79,6 +80,35 @@ export function StartHereBar({
         })}
       </ul>
       <span className="text-xs text-muted-foreground">{ui.startHere.hint}</span>
+    </div>
+  );
+}
+
+/**
+ * "Start here" on a scale's own page: the visitor already chose the scale (often straight from a
+ * search), so instead of four other scales this offers one good first shape for *this* scale —
+ * a single slim row, so the neck stays close to the top of the screen.
+ */
+export function StarterShapeBar({ label, active, onSelect }: { label: string; active: boolean; onSelect: () => void }) {
+  const { ui } = useI18n();
+  return (
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
+      <p className="mr-1 flex items-center gap-1 text-[11px] font-medium tracking-wider text-muted-foreground uppercase">
+        <Sparkles className="size-3.5 text-primary" aria-hidden="true" />
+        {ui.startHere.title}
+      </p>
+      <button
+        type="button"
+        onClick={onSelect}
+        aria-pressed={active}
+        className={cn(
+          "flex h-8 items-center rounded-full px-3 text-sm font-medium ring-1 transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+          active ? "bg-foreground/10 text-foreground ring-foreground/50" : "bg-card text-foreground/85 ring-border/70 hover:bg-accent",
+        )}
+      >
+        {label}
+      </button>
+      <InfoTip label={ui.startHere.title} paragraphs={ui.startHere.shapeInfo} />
     </div>
   );
 }

@@ -269,7 +269,7 @@ export function createSpanishTheory(format: NoteFormat): TheoryLanguage {
     whyHead: ({ note, intervalName: name, semitones, root }) =>
       `${b(note)} — ${lowerFirst(name)}, ${halfSteps(semitones)} por encima de ${root}.`,
     whyRespelled: ({ original, note }) =>
-      `En sentido estricto es otro grado (${original}), pero se escribe ${note} para evitar un doble sostenido o un doble bemol: mismo sonido, más fácil de leer.`,
+      `En sentido estricto esta nota es ${original}, pero se escribe ${note} para evitar un doble sostenido o un doble bemol: mismo sonido, más fácil de leer.`,
     whyNatural: ({ degree, letter, semitones, letterPerDegree }) =>
       letterPerDegree
         ? `El ${ordinal(degree)} grado usa ${word.the} ${letter}, y ${letter} natural está exactamente ${halfSteps(semitones)} por encima: no hace falta sostenido ni bemol.`
@@ -342,13 +342,20 @@ export function createSpanishTheory(format: NoteFormat): TheoryLanguage {
     respelledNote: ({ label, used, original }) =>
       `La ${label} se escribe ${b(used)} en lugar de ${original} para evitar un doble sostenido o un doble bemol.`,
 
-    chordBasis: ({ basis, noteCount, parentName, scaleTitle, wholeTone }) => {
+    chordBasis: ({ basis, noteCount, parentName, scaleTitle, wholeTone, chordList, majorBlues }) => {
       if (basis === "scale") return "Cada acorde se forma apilando notas alternas de la escala (terceras) sobre una nota de la escala.";
       if (basis === "symmetric")
         return wholeTone
           ? "Apilar notas alternas de una escala de tonos enteros siempre da una tríada aumentada: todos los acordes tienen la misma forma, un tono más arriba cada vez."
           : "Apilar notas alternas de la escala disminuida da acordes disminuidos: la misma forma se repite cada 3 trastes.";
-      return `Una escala de ${noteCount} notas tiene muy pocas notas para apilar terceras, así que estos son los acordes de su escala madre, ${parentName}. ${upperFirst(scaleTitle)} funciona sobre todos ellos.`;
+      if (basis === "blues")
+        return (
+          `Un blues de 12 compases usa tres acordes: I, IV y V, normalmente tocados como acordes de séptima de dominante (aquí ${chordList}). ` +
+          (majorBlues
+            ? `${upperFirst(scaleTitle)} suena mejor sobre el acorde I; sobre IV y V muchos guitarristas mueven la escala con el acorde o cambian al blues menor.`
+            : `${upperFirst(scaleTitle)} es el sonido clásico sobre los tres: la ♭3 de la escala rozando con la tercera mayor del acorde I es gran parte del sonido del blues.`)
+        );
+      return `Una escala de ${noteCount} notas tiene muy pocas notas para apilar terceras, así que estos son los acordes de su escala madre, ${parentName}: la tonalidad de la que viene ${scaleTitle}.`;
     },
   };
 }

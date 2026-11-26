@@ -115,8 +115,9 @@ function accidentalBalance(notes: readonly { note: SpelledNote }[]): number {
 /**
  * Respells any double-sharp/double-flat note using the neighbouring letter.
  * Used for scales that don't need one-letter-per-degree (pentatonic, blues,
- * symmetric scales). The interval label is re-derived from the new spelling so
- * the label always matches the written note (e.g. E♭ blues → A natural is a ♯4).
+ * symmetric scales). The note keeps its role in the scale's formula, so labels
+ * are the same in every key: E♭ blues writes A instead of B𝄫, and it is still
+ * called the ♭5 (the blue note), just like E♭ in A blues.
  */
 function respellDoubleAccidentals(
   root: SpelledNote,
@@ -131,9 +132,8 @@ function respellDoubleAccidentals(
       .sort((a, b) => Math.abs(a.note.accidental) - Math.abs(b.note.accidental));
     const best = candidates[0];
     if (!best) return n;
-    const interval = intervalFromDegree(n.semitones, best.degree);
-    notices.push({ kind: "respelled-note", original: n.note, used: best.note, interval });
-    return { ...n, note: best.note, degree: interval.degree, interval };
+    notices.push({ kind: "respelled-note", original: n.note, used: best.note, interval: n.interval });
+    return { ...n, note: best.note, degree: ((best.degree - 1 + 7) % 7) + 1 };
   });
   return { notes: result, notices };
 }

@@ -202,7 +202,8 @@ export function createDutchTheory(format: NoteFormat): TheoryLanguage {
     usage: text.usage,
     title: (root, name) => `${root} ${lowerFirst(name)}`,
     intervalName,
-    rootLabel: "G",
+    // "1", not "G" (grondtoon): G is also a note name.
+    rootLabel: "1",
     ordinal,
     halfSteps,
     frets,
@@ -253,7 +254,7 @@ export function createDutchTheory(format: NoteFormat): TheoryLanguage {
     whyRoot: (note) => `${b(note)} is de grondtoon — de thuisnoot waarop de toonladder gebouwd is en waarnaar ze genoemd wordt.`,
     whyHead: ({ note, intervalName: name, semitones, root }) => `${b(note)} — ${name.toLowerCase()}, ${halfSteps(semitones)} boven ${root}.`,
     whyRespelled: ({ original, note }) =>
-      `Strikt genomen is het een andere trap (${original}), maar ze wordt ${note} geschreven om een dubbelkruis of dubbelmol te vermijden — zelfde klank, makkelijker te lezen.`,
+      `Strikt genomen is deze noot ${original}, maar ze wordt ${note} geschreven om een dubbelkruis of dubbelmol te vermijden — zelfde klank, makkelijker te lezen.`,
     whyNatural: ({ degree, letter, semitones, letterPerDegree }) =>
       letterPerDegree
         ? `Trap ${degree} gebruikt de ${word.one} ${letter}, en ${letter} zonder voorteken ligt precies ${halfSteps(semitones)} hoger — geen kruis of mol nodig.`
@@ -326,13 +327,20 @@ export function createDutchTheory(format: NoteFormat): TheoryLanguage {
     respelledNote: ({ label, used, original }) =>
       `De ${label} wordt geschreven als ${b(used)} in plaats van ${original}, om een dubbelkruis of dubbelmol te vermijden.`,
 
-    chordBasis: ({ basis, noteCount, parentName, scaleTitle, wholeTone }) => {
+    chordBasis: ({ basis, noteCount, parentName, scaleTitle, wholeTone, chordList, majorBlues }) => {
       if (basis === "scale") return "Elk akkoord ontstaat door om de andere noot van de toonladder (tertsen) op een toonladdernoot te stapelen.";
       if (basis === "symmetric")
         return wholeTone
           ? "Om de andere noot van een heletoonsladder stapelen geeft altijd een overmatige drieklank — elk akkoord heeft dezelfde vorm, telkens een hele toon hoger."
           : "Om de andere noot van de verminderde toonladder stapelen geeft verminderde akkoorden — dezelfde vorm herhaalt zich elke 3 frets.";
-      return `Een toonladder van ${noteCount} noten heeft te weinig noten om tertsen te stapelen, dus dit zijn de akkoorden van haar moedertoonladder, ${parentName}. ${upperFirst(scaleTitle)} past over al deze akkoorden.`;
+      if (basis === "blues")
+        return (
+          `Een 12-maten blues gebruikt drie akkoorden: I, IV en V, meestal gespeeld als dominant-septiemakkoorden (hier ${chordList}). ` +
+          (majorBlues
+            ? `${upperFirst(scaleTitle)} klinkt het mooist over het I-akkoord; over IV en V schuiven veel spelers de toonladder mee met het akkoord of stappen ze over op de mineur blues.`
+            : `${upperFirst(scaleTitle)} is dé klassieke klank over alle drie: de ♭3 van de toonladder schuurt tegen de grote terts van het I-akkoord, en dat is een groot deel van de bluesklank.`)
+        );
+      return `Een toonladder van ${noteCount} noten heeft te weinig noten om tertsen te stapelen, dus dit zijn de akkoorden van haar moedertoonladder, ${parentName}: de toonsoort waar ${scaleTitle} uit voortkomt.`;
     },
   };
 }

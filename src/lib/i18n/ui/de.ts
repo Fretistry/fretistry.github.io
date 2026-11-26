@@ -123,7 +123,7 @@ export const de: UiMessages = {
     degrees: "Nummern",
     none: "Keine",
     notesTitle: "Notennamen",
-    intervalsTitle: "Intervalle vom Grundton (G, ♭3, 5 …)",
+    intervalsTitle: "Intervalle vom Grundton (1, ♭3, 5 …)",
     degreesTitle: "Nummer jedes Tons in der Tonleiter (1, 2, 3…)",
     noneTitle: "Keine Beschriftung",
     whichNotes: "Welche Töne zeigen",
@@ -251,6 +251,8 @@ export const de: UiMessages = {
     stepCaption: (half, whole) =>
       `Jedes Kästchen ist ein Bund auf einer Saite (Zahlen = Halbtöne über dem Grundton). ${half} = Halbton (1 Bund), ${whole} = Ganzton (2 Bünde).`,
     showMe: "Zeigen",
+    opensAs: (title) => `Öffnet als ${title}: dieselben Töne, nur anders geschrieben.`,
+    viewAs: (note) => `Als ${note} zeigen`,
     noRelatives: "Unter den Tonleitern dieser App gibt es noch keine nahen Verwandten.",
     modesTitle: (parent) => `Die 7 Modi von ${parent}`,
     modesSubtitle: "Dieselben sieben Töne, ein anderer Grundton. Jeder Modus beginnt auf dem nächsten Ton der Tonleiter.",
@@ -272,7 +274,7 @@ export const de: UiMessages = {
     stackedAs: "Aufbau",
     show: "Zeigen",
     chordsTip: "Tipp: „Zeigen“ hebt den Akkord oben auf dem Griffbrett hervor. Stelle die Akkordleiste auf „Septakkorde“ für die vierstimmigen Versionen.",
-    chordsParentTip: (parent, scale) => `Diese Akkorde stammen aus der Muttertonleiter ${parent} — ${scale} passt über alle.`,
+    chordsParentTip: (parent, scale) => `Diese Akkorde stammen aus der Muttertonleiter ${parent}: Jeder Ton von ${scale} gehört zu dieser Tonart.`,
   },
   metronome: {
     title: "Metronom",
@@ -306,6 +308,11 @@ export const de: UiMessages = {
   startHere: {
     title: "Hier anfangen",
     hint: "Beliebte erste Tonleitern, jeweils in einer Form. Tippe auf den ☆ neben dem Namen einer Tonleiter, um sie stattdessen hier zu behalten.",
+    box: (n) => `Box ${n}`,
+    shapeInfo: [
+      "Eine Form ist viel leichter zu lernen als das ganze Griffbrett. Das ist eine gute erste Form für diese Tonleiter: Tippe darauf, um nur diese Form zu zeigen, und spiele sie langsam vom tiefsten Ton hinauf und wieder zurück.",
+      "Tippe auf den ☆ neben dem Namen einer Tonleiter, um deine Lieblingstonleitern stattdessen hier zu behalten.",
+    ],
   },
   info: {
     labelsTitle: "Was bedeuten die Beschriftungen?",

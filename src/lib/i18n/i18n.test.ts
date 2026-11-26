@@ -133,7 +133,8 @@ describe("music terminology", () => {
   it("writes step patterns with local symbols", () => {
     const steps = (locale: Locale) => explainScale(spell("C", "major"), SCALES, bundle(locale).theory).stepSummary;
     expect(steps("nl")).toBe("1 – 1 – ½ – 1 – 1 – 1 – ½");
-    expect(steps("de")).toBe("G – G – H – G – G – G – H");
+    // GT/HT, because G and H are also German note names
+    expect(steps("de")).toBe("GT – GT – HT – GT – GT – GT – HT");
     expect(steps("fr")).toBe("T – T – ½ – T – T – T – ½");
     expect(steps("es")).toBe("T – T – S – T – T – T – S");
   });

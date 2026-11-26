@@ -13,7 +13,7 @@ import { BPM_MAX, BPM_MIN, tempoMarking, type ScheduledTick, type Subdivision } 
 import { useDrone } from "@/hooks/use-drone";
 import { cn } from "@/lib/utils";
 import { DroneControls, DroneSettingsPanel } from "./drone-controls";
-import { useSharedMetronome } from "./metronome-provider";
+import { useMetronomeTick, useSharedMetronome } from "./metronome-provider";
 
 const PRESETS = [60, 80, 100, 120, 140];
 
@@ -38,8 +38,13 @@ function MetronomeIcon({ angle, beatSeconds, className }: { angle: number; beatS
   );
 }
 
-/** Large beat lights: easy to catch from the corner of your eye while looking at the neck. */
-function BeatLights({ beatsPerBar, current, accent }: { beatsPerBar: number; current: ScheduledTick | null; accent: boolean }) {
+/**
+ * Large beat lights: easy to catch from the corner of your eye while looking at the neck.
+ * They follow the clicks themselves, so the rest of the bar doesn't redraw on every click.
+ */
+function BeatLights({ beatsPerBar, running, accent }: { beatsPerBar: number; running: boolean; accent: boolean }) {
+  const tick = useMetronomeTick();
+  const current = running ? tick : null;
   return (
     <div className="flex items-center gap-1 sm:gap-2" aria-hidden="true">
       {Array.from({ length: beatsPerBar }, (_, beat) => {
@@ -83,7 +88,8 @@ function usePendulum(running: boolean, current: ScheduledTick | null) {
  * stays visible even when the bar is hidden.
  */
 export function MetronomeHeaderButton({ barVisible, onToggleBar }: { barVisible: boolean; onToggleBar: () => void }) {
-  const { settings, running, current } = useSharedMetronome();
+  const { settings, running } = useSharedMetronome();
+  const current = useMetronomeTick();
   const t = useI18n().ui.metronome;
   const angle = usePendulum(running, current);
   const label = barVisible ? t.hideBar : t.showBar;
@@ -218,7 +224,7 @@ export function MetronomeBar({
   onClose: () => void;
   className?: string;
 }) {
-  const { settings, update, running, toggle, tap, current } = useSharedMetronome();
+  const { settings, update, running, toggle, tap } = useSharedMetronome();
   const drone = useDrone(rootPitchClass);
   const { ui } = useI18n();
   const t = ui.metronome;
@@ -266,7 +272,7 @@ export function MetronomeBar({
           {t.tap}
         </Button>
         <div className="flex flex-1 justify-center sm:px-1">
-          <BeatLights beatsPerBar={settings.beatsPerBar} current={running ? current : null} accent={settings.accent} />
+          <BeatLights beatsPerBar={settings.beatsPerBar} running={running} accent={settings.accent} />
         </div>
       </div>
 

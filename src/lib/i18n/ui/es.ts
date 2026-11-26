@@ -251,6 +251,8 @@ export const es: UiMessages = {
     stepCaption: (half, whole) =>
       `Cada casilla es un traste en una sola cuerda (números = semitonos por encima de la tónica). ${half} = semitono (1 traste), ${whole} = tono (2 trastes).`,
     showMe: "Ver",
+    opensAs: (title) => `Se abre como ${title}: las mismas notas, escritas de otra forma.`,
+    viewAs: (note) => `Ver como ${note}`,
     noRelatives: "Todavía no hay parientes cercanos entre las escalas de esta aplicación.",
     modesTitle: (parent) => `Los 7 modos de ${parent}`,
     modesSubtitle: "Las mismas siete notas, otra tónica. Cada modo empieza en la siguiente nota de la escala.",
@@ -272,7 +274,7 @@ export const es: UiMessages = {
     stackedAs: "Construcción",
     show: "Ver",
     chordsTip: "Consejo: «Ver» resalta el acorde en el mástil de arriba. Cambia la barra de acordes a «Cuatríadas» para ver las versiones de cuatro notas.",
-    chordsParentTip: (parent, scale) => `Estos acordes vienen de la escala madre, ${parent}; ${scale} funciona sobre todos ellos.`,
+    chordsParentTip: (parent, scale) => `Estos acordes vienen de la escala madre, ${parent}: todas las notas de ${scale} pertenecen a esa tonalidad.`,
   },
   metronome: {
     title: "Metrónomo",
@@ -306,6 +308,11 @@ export const es: UiMessages = {
   startHere: {
     title: "Empieza aquí",
     hint: "Escalas populares para empezar, cada una en una forma. Toca la ☆ junto al nombre de una escala para guardarla aquí.",
+    box: (n) => `caja ${n}`,
+    shapeInfo: [
+      "Una sola forma es mucho más fácil de aprender que todo el mástil. Esta es una buena primera forma para esta escala: tócala para ver solo esa forma y luego tócala despacio desde la nota más grave hacia arriba y de vuelta.",
+      "Toca la ☆ junto al nombre de una escala para guardar aquí tus escalas favoritas.",
+    ],
   },
   info: {
     labelsTitle: "¿Qué significan las etiquetas?",

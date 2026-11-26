@@ -163,16 +163,17 @@ export function createGermanTheory(format: NoteFormat): TheoryLanguage {
   const joinList = listJoiner("und");
   const step = (semitones: number) => {
     switch (semitones) {
+      // GT/HT, not G/H: G and H are also note names in German.
       case 1:
-        return { symbol: "H", name: "Halbton" };
+        return { symbol: "HT", name: "Halbton" };
       case 2:
-        return { symbol: "G", name: "Ganzton" };
+        return { symbol: "GT", name: "Ganzton" };
       case 3:
-        return { symbol: "G+H", name: "anderthalb Töne" };
+        return { symbol: "GT+HT", name: "anderthalb Töne" };
       case 4:
-        return { symbol: "2G", name: "zwei Ganztöne" };
+        return { symbol: "2 GT", name: "zwei Ganztöne" };
       default:
-        return { symbol: `${semitones}H`, name: `${semitones} Halbtöne` };
+        return { symbol: `${semitones} HT`, name: `${semitones} Halbtöne` };
     }
   };
   const intervalName = ({ degree, quality }: { degree: number; quality: IntervalQuality }) =>
@@ -202,7 +203,8 @@ export function createGermanTheory(format: NoteFormat): TheoryLanguage {
     usage: text.usage,
     title: hyphenate,
     intervalName,
-    rootLabel: "G",
+    // "1", not "G" (Grundton): G is also a note name.
+    rootLabel: "1",
     ordinal,
     halfSteps,
     frets,
@@ -224,7 +226,7 @@ export function createGermanTheory(format: NoteFormat): TheoryLanguage {
           (parts.length > 2 ? `, dann ${parts.slice(1, -1).join(", ")}` : "") +
           ` und zum Schluss ${parts[parts.length - 1]}.`,
         `Das ergibt das Muster ${b(summary)}. Jede Tonleiter vom Typ ${scaleName} verwendet dieses Muster — nur der Anfangston ändert sich.`,
-        "Auf der Gitarre sieht man das sofort: Auf einer Saite ist ein Halbton (H) der nächste Bund, ein Ganzton (G) überspringt einen Bund.",
+        "Auf der Gitarre sieht man das sofort: Auf einer Saite ist ein Halbton (HT) der nächste Bund, ein Ganzton (GT) überspringt einen Bund.",
       ];
     },
     characterHeading: (q) => (q === "major" ? "Warum sie nach Dur klingt" : q === "minor" ? "Warum sie nach Moll klingt" : "Dur oder Moll?"),
@@ -254,7 +256,7 @@ export function createGermanTheory(format: NoteFormat): TheoryLanguage {
     whyRoot: (note) => `${b(note)} ist der Grundton — der Heimatton, auf dem die Tonleiter aufgebaut ist und nach dem sie benannt wird.`,
     whyHead: ({ note, intervalName: name, semitones, root }) => `${b(note)} — ${name}, ${halfSteps(semitones)} über ${root}.`,
     whyRespelled: ({ original, note }) =>
-      `Streng genommen ist es eine andere Stufe (${original}), aber der Ton wird ${note} geschrieben, um ein Doppelkreuz oder Doppel-♭ zu vermeiden — gleicher Klang, leichter zu lesen.`,
+      `Streng genommen heißt dieser Ton ${original}, aber er wird ${note} geschrieben, um ein Doppelkreuz oder Doppel-♭ zu vermeiden — gleicher Klang, leichter zu lesen.`,
     whyNatural: ({ degree, letter, semitones, letterPerDegree }) =>
       letterPerDegree
         ? `Stufe ${degree} verwendet ${word.acc} ${letter}, und ${letter} ohne Vorzeichen liegt genau ${halfSteps(semitones)} höher — kein ♯ oder ♭ nötig.`
@@ -327,13 +329,20 @@ export function createGermanTheory(format: NoteFormat): TheoryLanguage {
     respelledNote: ({ label, used, original }) =>
       `Die ${label} wird als ${b(used)} statt ${original} notiert, um ein Doppelkreuz oder Doppel-♭ zu vermeiden.`,
 
-    chordBasis: ({ basis, noteCount, parentName, scaleTitle, wholeTone }) => {
+    chordBasis: ({ basis, noteCount, parentName, scaleTitle, wholeTone, chordList, majorBlues }) => {
       if (basis === "scale") return "Jeder Akkord entsteht, indem man auf einem Tonleiterton jeden zweiten Ton der Tonleiter (Terzen) schichtet.";
       if (basis === "symmetric")
         return wholeTone
           ? "Schichtet man jeden zweiten Ton einer Ganztonleiter, entsteht immer ein übermäßiger Dreiklang — jeder Akkord hat dieselbe Form, jeweils einen Ganzton höher."
           : "Schichtet man jeden zweiten Ton der verminderten Tonleiter, entstehen verminderte Akkorde — dieselbe Form wiederholt sich alle 3 Bünde.";
-      return `Eine Tonleiter mit ${noteCount} Tönen hat zu wenige Töne, um Terzen zu schichten, daher sind dies die Akkorde ihrer Muttertonleiter ${parentName}. ${scaleTitle} passt über alle diese Akkorde.`;
+      if (basis === "blues")
+        return (
+          `Ein 12-taktiger Blues verwendet drei Akkorde: I, IV und V, meist als Dominantseptakkorde gespielt (hier ${chordList}). ` +
+          (majorBlues
+            ? `${scaleTitle} klingt über dem I-Akkord am schönsten; über IV und V verschieben viele die Tonleiter mit dem Akkord oder wechseln zur (Moll-)Blues-Tonleiter.`
+            : `${scaleTitle} ist der klassische Sound über allen dreien: Die ♭3 der Tonleiter reibt sich an der großen Terz des I-Akkords — ein großer Teil des Blues-Sounds.`)
+        );
+      return `Eine Tonleiter mit ${noteCount} Tönen hat zu wenige Töne, um Terzen zu schichten, daher sind dies die Akkorde ihrer Muttertonleiter ${parentName} — der Tonart, aus der ${scaleTitle} stammt.`;
     },
   };
 }

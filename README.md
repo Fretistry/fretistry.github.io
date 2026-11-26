@@ -85,13 +85,19 @@ Then open <http://localhost:3000>.
 - Triads or 7th chords built on every scale degree, with Roman numerals (I, ii, iii, IV, V, vi, vii°; ♭III, ♭VII… for minor keys).
 - Tap a chord to highlight its notes. The chord's root is amber, the other chord tones are teal, and labels switch to the chord's own intervals (R, 3, 5, ♭7). The scale's own root keeps an amber ring. Combine it with a position to see the chord inside one box.
 - A one-line summary shows the chord's name, numeral and notes. The ⓘ buttons explain triads, 7ths and Roman numerals, how the chord is stacked, and why pentatonic scales borrow their chords.
-- Pentatonic and blues scales use the chords of their parent scale. Whole-tone and diminished scales give their symmetric chords.
+- Pentatonic scales use the chords of their parent scale (the key they come from).
+- **Blues and major blues** show the three chords of a 12-bar blues: I, IV and V (in 7ths mode the dominant 7ths, e.g. E7, A7, B7 in E), with a line on how the scale works over them. Picking one shows its notes with their own spelling, also the ones outside the scale (the G♯ of E7).
+- **Whole-tone and diminished scales** give their symmetric chords, each spelled in thirds from its own root, without double sharps or flats (G♯dim = G♯ B D, Daug = D F♯ A♯; a diminished 7th keeps its textbook 𝄫7, Cdim7 = C E♭ G♭ B𝄫).
 - The theory panel has a **Chords** tab explaining how the chords are stacked and how to read the numerals.
 
 **Starting point and selections**
 
 - A fresh visit always starts on **C Major**, unless you open a shared link.
-- **Start here:** until you have favourites of your own, a row of popular first scales sits under the controls: A minor pentatonic (box 1, E shape), E minor pentatonic in open position, C major (C shape) and A blues. One tap shows the scale in that one shape instead of the whole neck.
+- **Start here:** until you have favourites of your own, a row sits under the controls.
+  - On the **home page** it offers popular first scales: A minor pentatonic (box 1, E shape), E minor pentatonic in open position, C major (C shape) and A blues.
+  - On a **scale's own page** (often reached from a search) the scale is already chosen, so it's one slim chip with a good first shape for that scale, e.g. "E shape · box 1 · from the 5th fret": the shape with its root on the low E string, or on the A string when that sits too high. Pentatonic and blues shapes also get their usual box number. The ⓘ explains it.
+  - One tap shows the scale in that one shape instead of the whole neck.
+- **The neck comes into view:** after Start here, picking a shape, Play scale, Train or a chord's "Show", the page scrolls just far enough to show the result (on a vertical neck: the chosen shape). Nothing moves when it's already in view, and with "reduce motion" turned on it jumps instead of gliding.
 - Your preferences are remembered: tuning, labels, view options, sound, metronome and drone settings (and whether their bar is shown), and whether the theory panel is folded.
 - A highlighted chord belongs to one key, so it is cleared when you change the root or scale.
 - Position choices (e.g. "box 2" or "3 per string") carry over to the new key.
@@ -128,7 +134,8 @@ Then open <http://localhost:3000>.
 - It's shown on every screen; its × or the metronome icon in the header hides it (and the icon brings it back). With a vertical neck it stays pinned under the header as you scroll down the neck (string names pinned just below it). On phones the drone gets its own row, and Tap tempo and the × move into Settings.
 - Tempo from 30 to 260 BPM, set with a slider, ± buttons, quick presets or **tap tempo**. The Italian tempo name is shown too (Andante, Allegro…).
 - Beats per bar (2–7), clicks per beat (beats, 8ths, triplets, 16ths), an accent on beat one, and its own volume.
-- Sample-accurate timing: clicks are scheduled on the audio clock, so they stay steady even when the computer is busy, and keep going in a background tab.
+- Sample-accurate timing: clicks are booked 0.3 s ahead on the audio clock, so they stay steady even when a slower phone is busy (say, redrawing the neck after a key change), and keep going in a background tab. Stop silences clicks that were already booked.
+- Light on the phone: only the beat lights and the header icon redraw on each click, not the rest of the page.
 - It keeps running while you explore. Even with the bar hidden, the header icon's pendulum swings and flashes on every beat. Your metronome settings are remembered.
 
 **Drone** (in the same bar)
@@ -150,7 +157,7 @@ Then open <http://localhost:3000>.
 - Notes, formula, intervals, the W/H step pattern, how the scale is built, and why it sounds major or minor.
 - **Why these notes?** explains the spelling, e.g. "E♭ major has A♭, not G♯".
 - **Chords** in the key, with Roman numerals.
-- **Relationships:** modes (with a 7-mode table for the major-scale modes, and links such as "Phrygian Dominant is the 5th mode of Harmonic Minor"), relative and parallel keys, close cousins, subsets and symmetry. "Show me" buttons jump to each related scale.
+- **Relationships:** modes (with a 7-mode table for the major-scale modes, and links such as "Phrygian Dominant is the 5th mode of Harmonic Minor"), relative and parallel keys, close cousins, subsets and symmetry. "Show me" buttons jump to each related scale. The root picker has 12 spellings (C♯ but not D♭, E♭ but not D♯), so when a related scale can't open in its own spelling the card says so ("Opens as E♭ Natural Minor: the same notes, spelled the other way") and the modes table says "View as A♭".
 
 **Favourite scales**
 
@@ -311,7 +318,7 @@ Add one line to `src/lib/data/tunings.ts`, e.g. `tuning("open-f", "Open F", "C2 
 
 ## Tests
 
-`npm test` runs 477 automated checks, including:
+`npm test` runs 480 automated checks, including:
 
 - **Required cases:** C Major, A Natural Minor, A Minor Pentatonic, E Minor Pentatonic, Drop D, and custom tunings.
 - **Spelling:** every root × every scale for correct pitches and spelling.
@@ -321,7 +328,8 @@ Add one line to `src/lib/data/tunings.ts`, e.g. `tuning("open-f", "Open F", "C2 
   - Neighbouring shapes get near-complementary colours that differ from the root and scale-note colours.
   - Links with several shapes round-trip, and old single-shape links still open correctly.
   - A sweep over every tuning × root × scale × position checks that each note is valid, in the scale and never duplicated.
-- **Chords:** diatonic triads and 7ths with Roman numerals in major, minor and harmonic minor keys, and every chord identified for every root and scale.
+- **Chords:** diatonic triads and 7ths with Roman numerals in major, minor and harmonic minor keys, and every chord identified for every root and scale. Blues scales get I7–IV7–V7. Whole-tone and diminished chords are spelled in thirds with the right interval names, and a sweep over every root checks they never need a double sharp or flat (apart from the 𝄫7 of a diminished 7th).
+- **The blue note** is called ♭5 in every key, also where it's written as A (E♭ blues) to avoid B𝄫.
 - **Shareable links:** round-tripping every field (including 7-string tunings), rejecting invalid links, and ignoring old practice-mode links.
 - **Scale pages:** every key × scale gets its own address that reads back to exactly that key and scale (no two alike, "c-sharp-…" never mistaken for "c"), one page per language, addresses recognised in a sub-folder too, and only the extras after the "?". Page titles carry the word for "scale" and the sharps/flats written out per language ("E flat", "Es-Dur", "mi bémol", "fa sostenido"), and name the requested key when the spelling switched.
 - **Saved pictures:** readable, safe file names in every language, and picture markup that Firefox accepts (no duplicate namespace).
@@ -338,7 +346,7 @@ Add one line to `src/lib/data/tunings.ts`, e.g. `tuning("open-f", "Open F", "C2 
 - **Start here:** every suggestion is a real scale in a real CAGED shape, in the familiar place on the neck.
 - **Same pitch:** exact-pitch rings, also outside the chosen shape, kept apart from the same note in other octaves.
 - **Selection rules:** C Major start, a chord cleared on key change, positions kept, and the metronome bar's default.
-- **Languages:** every interface text exists in all five languages, every scale is translated, German H/B and do-re-mi names are correct, and a sweep over every language × note-name system × root × scale checks that no text comes out broken.
+- **Languages:** every interface text exists in all five languages, every scale is translated, German H/B and do-re-mi names are correct, step patterns use local symbols (German GT/HT, since G and H are note names), and a sweep over every language × note-name system × root × scale checks that no text comes out broken.
 
 ---
 

@@ -256,6 +256,8 @@ export const en = {
     stepCaption: (half: string, whole: string) =>
       `Each box is one fret on a single string (numbers = half steps above the root). ${half} = half step (1 fret), ${whole} = whole step (2 frets).`,
     showMe: "Show me",
+    opensAs: (title: string) => `Opens as ${title}: the same notes, spelled the other way.`,
+    viewAs: (note: string) => `View as ${note}`,
     noRelatives: "No close relatives among the scales in this app yet.",
     modesTitle: (parent: string) => `The 7 modes of ${parent}`,
     modesSubtitle: "Same seven notes, different home note. Each mode starts on the next note of the scale.",
@@ -277,7 +279,7 @@ export const en = {
     stackedAs: "Stacked as",
     show: "Show",
     chordsTip: "Tip: “Show” highlights the chord on the fretboard above. Switch the chord bar to “7ths” to see the four-note versions.",
-    chordsParentTip: (parent: string, scale: string) => `These chords come from the parent scale, ${parent} — ${scale} fits over all of them.`,
+    chordsParentTip: (parent: string, scale: string) => `These chords come from the parent scale, ${parent}: every note of ${scale} belongs to that key.`,
   },
   metronome: {
     title: "Metronome",
@@ -311,6 +313,12 @@ export const en = {
   startHere: {
     title: "Start here",
     hint: "Popular first scales, each in one shape. Tap the ☆ next to a scale’s name to keep it here instead.",
+    /** Pentatonic "boxes" are numbered in most lessons: box 1 is the E shape. */
+    box: (n: number) => `box ${n}`,
+    shapeInfo: [
+      "One shape is much easier to learn than the whole neck. This is a good first shape for this scale: tap it to show only that shape, then play it slowly from the lowest note up and back down.",
+      "Tap the ☆ next to a scale’s name to keep your favourite scales here instead.",
+    ],
   },
   info: {
     labelsTitle: "What do the labels mean?",

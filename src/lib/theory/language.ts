@@ -126,7 +126,16 @@ export interface TheoryLanguage {
   respelledNote(p: { label: string; used: string; original: string }): string;
 
   // ── Chords ─────────────────────────────────────────────────────────────────
-  chordBasis(p: { basis: "scale" | "parent" | "symmetric"; noteCount: number; parentName: string; scaleTitle: string; wholeTone: boolean }): string;
+  chordBasis(p: {
+    basis: "scale" | "parent" | "symmetric" | "blues";
+    noteCount: number;
+    parentName: string;
+    scaleTitle: string;
+    wholeTone: boolean;
+    /** Blues only: the I7, IV7 and V7 chords, e.g. "E7, A7 and B7". */
+    chordList: string;
+    majorBlues: boolean;
+  }): string;
 }
 
 /** Builds "A, B and C"-style lists with a language's word for "and". */
@@ -262,7 +271,7 @@ export function createEnglishTheory(format: NoteFormat = DEFAULT_FORMAT): Theory
     whyRoot: (note) => `${b(note)} is the root — the home note the scale is built on and named after.`,
     whyHead: ({ note, intervalName: name, semitones, root }) => `${b(note)} — ${name}, ${halfSteps(semitones)} above ${root}.`,
     whyRespelled: ({ original, note }) =>
-      `Strictly it is a different degree (${original}), but it is written ${note} to avoid a double sharp or flat — same sound, easier to read.`,
+      `Strictly this note is ${original}, but it is written ${note} to avoid a double sharp or flat — same sound, easier to read.`,
     whyNatural: ({ degree, letter, semitones, letterPerDegree }) =>
       letterPerDegree
         ? `Degree ${degree} uses the ${letterWord} ${letter}, and plain ${letter} is exactly ${halfSteps(semitones)} up — no sharp or flat needed.`
@@ -336,13 +345,20 @@ export function createEnglishTheory(format: NoteFormat = DEFAULT_FORMAT): Theory
     respelledNote: ({ label, used, original }) =>
       `The ${label} is written ${b(used)} instead of ${original} to avoid a double sharp or flat.`,
 
-    chordBasis: ({ basis, noteCount, parentName, scaleTitle, wholeTone }) => {
+    chordBasis: ({ basis, noteCount, parentName, scaleTitle, wholeTone, chordList, majorBlues }) => {
       if (basis === "scale") return "Each chord is built by stacking every other note of the scale (thirds) on top of a scale note.";
       if (basis === "symmetric")
         return wholeTone
           ? "Stacking every other note of a whole-tone scale always gives an augmented triad — every chord is the same shape, moved up a whole step."
           : "Stacking every other note of the diminished scale gives diminished chords — the same shape repeats every 3 frets.";
-      return `A ${noteCount}-note scale is too sparse to stack thirds, so these are the chords of its parent scale, ${parentName}. The ${scaleTitle} scale fits over all of them.`;
+      if (basis === "blues")
+        return (
+          `A 12-bar blues uses three chords: I, IV and V, usually played as dominant 7th chords (here ${chordList}). ` +
+          (majorBlues
+            ? `The ${scaleTitle} scale sounds sweetest over the I chord; over IV and V many players move it along with the chord or switch to the minor blues scale.`
+            : `The ${scaleTitle} scale is the classic sound over all three: its ♭3 rubbing against the major 3rd of the I chord is a big part of the blues sound.`)
+        );
+      return `A ${noteCount}-note scale is too sparse to stack thirds, so these are the chords of its parent scale, ${parentName}: the key the ${scaleTitle} scale comes from.`;
     },
   };
 }

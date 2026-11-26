@@ -253,6 +253,8 @@ export const fr: UiMessages = {
     stepCaption: (half, whole) =>
       `Chaque case représente une case sur une seule corde (chiffres = demi-tons au-dessus de la tonique). ${half} = demi-ton (1 case), ${whole} = ton (2 cases).`,
     showMe: "Voir",
+    opensAs: (title) => `S’ouvre en ${title} : les mêmes notes, écrites autrement.`,
+    viewAs: (note) => `Voir en ${note}`,
     noRelatives: "Pas encore de parent proche parmi les gammes de cette application.",
     modesTitle: (parent) => `Les 7 modes de ${parent}`,
     modesSubtitle: "Les mêmes sept notes, une autre tonique. Chaque mode commence sur la note suivante de la gamme.",
@@ -274,7 +276,7 @@ export const fr: UiMessages = {
     stackedAs: "Construction",
     show: "Voir",
     chordsTip: "Astuce : « Voir » met l’accord en évidence sur le manche ci-dessus. Passez la barre d’accords sur « Septièmes » pour les versions à quatre notes.",
-    chordsParentTip: (parent, scale) => `Ces accords viennent de la gamme mère, ${parent} — ${scale} fonctionne sur chacun d’eux.`,
+    chordsParentTip: (parent, scale) => `Ces accords viennent de la gamme mère, ${parent} : toutes les notes de ${scale} appartiennent à cette tonalité.`,
   },
   metronome: {
     title: "Métronome",
@@ -308,6 +310,11 @@ export const fr: UiMessages = {
   startHere: {
     title: "Pour commencer",
     hint: "Des premières gammes populaires, chacune dans une forme. Touchez le ☆ à côté du nom d’une gamme pour la garder ici à la place.",
+    box: (n) => `box ${n}`,
+    shapeInfo: [
+      "Une seule forme est bien plus facile à apprendre que tout le manche. Voici une bonne première forme pour cette gamme : touchez-la pour n’afficher qu’elle, puis jouez-la lentement de la note la plus grave vers l’aigu, et retour.",
+      "Touchez le ☆ à côté du nom d’une gamme pour garder vos gammes préférées ici à la place.",
+    ],
   },
   info: {
     labelsTitle: "Que signifient les étiquettes ?",
