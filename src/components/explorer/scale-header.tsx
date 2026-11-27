@@ -56,11 +56,20 @@ export function ScaleHeader({
               className="rounded-full"
             >
               {isPlaying ? <Square className="fill-current" /> : <Play className="fill-current" />}
-              {isPlaying ? t.stop : t.playScale}
+              {/* Both labels share one grid cell, so the button keeps its width when Play turns into Stop.
+                  Phones get a short "Play" so Play, Share and Train fit on one row in every language. */}
+              <span className="grid">
+                <span className={cn("col-start-1 row-start-1", isPlaying && "invisible")}>
+                  <span className="sm:hidden">{t.playShort}</span>
+                  <span className="max-sm:hidden">{t.playScale}</span>
+                </span>
+                <span className={cn("col-start-1 row-start-1", !isPlaying && "invisible")}>{t.stop}</span>
+              </span>
             </Button>
             {actions}
           </div>
-          <p className="mt-0.5 max-w-2xl text-sm text-muted-foreground">{e.mood}</p>
+          {/* the mood line is also in Music theory; phones skip it here to keep the neck close */}
+          <p className="mt-0.5 max-w-2xl text-sm text-muted-foreground max-sm:hidden">{e.mood}</p>
         </div>
 
         <ol className="flex flex-wrap gap-1 sm:gap-1.5" aria-label={t.scaleNotes}>

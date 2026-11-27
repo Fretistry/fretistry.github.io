@@ -75,7 +75,9 @@ export function ShareMenu({ title, imageInput, imageFileName }: ShareMenuProps) 
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button variant="outline" size="sm" className="rounded-full">
-            <Share2 /> {t.share}
+            <Share2 />
+            <span className="sm:hidden">{t.shareShort}</span>
+            <span className="max-sm:hidden">{t.share}</span>
           </Button>
         </PopoverTrigger>
         <PopoverContent align="start" className="w-60 p-1">

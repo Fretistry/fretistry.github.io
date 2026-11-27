@@ -18,25 +18,36 @@ type DroneApi = ReturnType<typeof useDrone>;
  */
 export function DroneControls({ drone, rootName, className }: { drone: DroneApi; rootName: string; className?: string }) {
   const t = useI18n().ui.drone;
-  const { settings, update, running, toggle } = drone;
+  const { running, toggle } = drone;
   return (
     <div role="group" aria-label={t.title} className={cn("flex flex-wrap items-center gap-1 sm:gap-1.5", className)}>
       {/* ▶ / ■ like the metronome's button, so it's clear this starts something */}
       <Button
         variant={running ? "default" : "outline"}
         size="sm"
-        className="rounded-full"
+        className="rounded-full max-sm:px-2 max-sm:text-xs"
         aria-pressed={running}
         title={running ? t.stop : t.start}
         onClick={toggle}
       >
         {running ? <Square className="fill-current" /> : <Play className="fill-current" />}
         {t.title}
-        {/* the note it plays (phones: in the ⓘ, so the drone fits on one row) */}
+        {/* the note it plays (phones: in the ⓘ, so metronome and drone fit on one row) */}
         <span className="hidden font-normal opacity-80 sm:inline">· {rootName}</span>
       </Button>
+      {/* phones: sound, fifth and ⓘ are in the bar's Settings, so the whole bar is one row */}
+      <DroneSoundOptions drone={drone} rootName={rootName} className="max-sm:hidden" />
+    </div>
+  );
+}
+
+/** Pad or harmonium, the optional fifth, and what a drone is (ⓘ). */
+export function DroneSoundOptions({ drone, rootName, className }: { drone: DroneApi; rootName: string; className?: string }) {
+  const t = useI18n().ui.drone;
+  const { settings, update } = drone;
+  return (
+    <div className={cn("flex flex-wrap items-center gap-1 sm:gap-1.5", className)}>
       <SegmentedControl<DroneSound>
-        className="max-sm:[&>button]:px-2 max-sm:[&>button]:text-xs"
         ariaLabel={t.sound}
         value={settings.sound}
         onChange={(sound) => update({ sound })}
@@ -52,13 +63,11 @@ export function DroneControls({ drone, rootName, className }: { drone: DroneApi;
         title={t.fifthTitle}
         onClick={() => update({ fifth: !settings.fifth })}
         className={cn(
-          "h-7 rounded-lg px-2 text-[0.8rem] font-medium whitespace-nowrap ring-1 transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+          "h-7 rounded-lg px-2 text-[0.8rem] font-medium whitespace-nowrap ring-1 transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 pointer-coarse:h-9",
           settings.fifth ? "bg-foreground text-background ring-foreground" : "bg-card text-muted-foreground ring-border hover:text-foreground",
         )}
       >
-        {/* phones: "+5" (as in power chords, A5), so the drone fits on one row in every language */}
-        <span className="sm:hidden">+5</span>
-        <span className="hidden sm:inline">{t.fifth}</span>
+        {t.fifth}
       </button>
       <InfoTip label={t.infoTitle} paragraphs={t.info(rootName)} />
     </div>

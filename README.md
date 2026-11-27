@@ -53,6 +53,9 @@ Then open <http://localhost:3000>.
 - Show all notes, scale notes only, or roots only.
 - **Fret range:** 0–12, 0–15 (about as far as most acoustic guitars comfortably go), 0–22 (many electrics), 0–24, or the upper octave 12–24. Phones start on 0–12, larger screens on 0–24; once you pick one yourself, it's remembered.
 - On phones these three sit behind one **Display** button, so the neck starts on the first screen.
+- **Phone layout, top to bottom:** one row with the key (an amber button that opens the 12 notes), the scale and the tuning (just its name); the scale's title with **Play**, **Share** and **Train**; its notes; **Display ▾** and **Chords ▾**; Shapes and "Start here"; the one-row metronome bar; then the neck, which starts on the first screen. The mood line is in Music theory there.
+- **Laptops and tablets:** Shapes, "Start here" and the chords share lines, so the whole neck fits on a 1366×800 laptop and a 1024×768 tablet.
+- **Touch screens** get taller buttons (36 px instead of 28), easier to hit with a guitar on your lap; with a mouse they stay compact.
 - **Left-handed view:** the whole neck is mirrored.
 - **Vertical neck on phones:** the nut is at the top and you scroll down the neck, with the string names pinned below the header.
 - **Tapping a note** plays it and rings it on the neck. On computers and tablets a strip under the neck adds the name, role in the scale, interval, string and fret, the role in a highlighted chord, and a Play button. Phones keep the neck clear: no panel slides over it.
@@ -89,13 +92,14 @@ Then open <http://localhost:3000>.
 - **Blues and major blues** show the three chords of a 12-bar blues: I, IV and V (in 7ths mode the dominant 7ths, e.g. E7, A7, B7 in E), with a line on how the scale works over them. Picking one shows its notes with their own spelling, also the ones outside the scale (the G♯ of E7).
 - **Whole-tone and diminished scales** give their symmetric chords, each spelled in thirds from its own root, without double sharps or flats (G♯dim = G♯ B D, Daug = D F♯ A♯; a diminished 7th keeps its textbook 𝄫7, Cdim7 = C E♭ G♭ B𝄫).
 - The theory panel has a **Chords** tab explaining how the chords are stacked and how to read the numerals.
+- **On phones** the chords sit behind a **Chords ▾** button next to Display (it names the chosen chord). Picking one closes the menu and brings the neck into view; the chosen chord's one-line summary (with Play and ×) stays right above the neck.
 
 **Starting point and selections**
 
 - A fresh visit always starts on **C Major**, unless you open a shared link.
-- **Start here:** until you have favourites of your own, a row sits under the controls.
-  - On the **home page** it offers popular first scales: A minor pentatonic (box 1, E shape), E minor pentatonic in open position, C major (C shape) and A blues.
-  - On a **scale's own page** (often reached from a search) the scale is already chosen, so it's one slim chip with a good first shape for that scale, e.g. "E shape · box 1 · from the 5th fret": the shape with its root on the low E string, or on the A string when that sits too high. Pentatonic and blues shapes also get their usual box number. The ⓘ explains it.
+- **Start here:** until you have favourites of your own.
+  - On the **home page** a row under the controls offers popular first scales: A minor pentatonic (box 1, E shape), E minor pentatonic in open position, C major (C shape) and A blues.
+  - On a **scale's own page** (often reached from a search) the scale is already chosen, so next to the Shapes picker there's one slim chip with a good first shape for that scale, e.g. "E shape · box 1 · from the 5th fret": the shape with its root on the low E string, or on the A string when that sits too high. Pentatonic and blues shapes also get their usual box number. The ⓘ explains it.
   - One tap shows the scale in that one shape instead of the whole neck.
 - **The neck comes into view:** after Start here, picking a shape, Play scale, Train or a chord's "Show", the page scrolls just far enough to show the result (on a vertical neck: the chosen shape). Nothing moves when it's already in view, and with "reduce motion" turned on it jumps instead of gliding.
 - Your preferences are remembered: tuning, labels, view options, sound, metronome and drone settings (and whether their bar is shown), and whether the theory panel is folded.
@@ -131,7 +135,8 @@ Then open <http://localhost:3000>.
 **Metronome**
 
 - **Docked at the neck:** a slim bar sits right above the fretboard with the metronome (**▶ Metronome**, the tempo with ± buttons, tap tempo and big **beat lights**, so the beat stays in view while you play) and the drone (**▶ Drone · A**; on phones just **▶ Drone**). Each start button names what it starts. The **Settings** button holds the rest.
-- It's shown on every screen; its × or the metronome icon in the header hides it (and the icon brings it back). With a vertical neck it stays pinned under the header as you scroll down the neck (string names pinned just below it). On phones the drone gets its own row, and Tap tempo and the × move into Settings.
+- It's shown on every screen; its × or the metronome icon in the header hides it (and the icon brings it back). With a vertical neck it stays pinned under the header as you scroll down the neck (string names pinned just below it).
+- **On phones it's one row:** ▶ Metronome, − tempo +, ▶ Drone and the Settings button. While the metronome runs, small beat lights take the place of "BPM" under the tempo. The drone's sound (Pad / Harmonium), +5th and its ⓘ, Tap tempo and the × are in Settings. Below laptop width (1280 px) Tap tempo is in Settings too, so the bar stays on one line on tablets.
 - Tempo from 30 to 260 BPM, set with a slider, ± buttons, quick presets or **tap tempo**. The Italian tempo name is shown too (Andante, Allegro…).
 - Beats per bar (2–7), clicks per beat (beats, 8ths, triplets, 16ths), an accent on beat one, and its own volume.
 - Sample-accurate timing: clicks are booked 0.3 s ahead on the audio clock, so they stay steady even when a slower phone is busy (say, redrawing the neck after a key change), and keep going in a background tab. Stop silences clicks that were already booked.
@@ -141,7 +146,7 @@ Then open <http://localhost:3000>.
 **Drone** (in the same bar)
 
 - A note that keeps sounding under your playing: the root of the current key, so you hear what every note does against it (the ♭3 sad, the 3 happy, the 7 pulling up to the root). Change key and it glides to the new root.
-- Two sounds: **Pad** (a warm, slowly moving synth sound) and **Harmonium** (a steady, singing reed organ), both with a soft room around them. **+5th** (on phones **+5**, as in power chords) adds the fifth for a fuller sound.
+- Two sounds: **Pad** (a warm, slowly moving synth sound) and **Harmonium** (a steady, singing reed organ), both with a soft room around them. **+5th** adds the fifth for a fuller sound. (On phones both are in the bar's Settings.)
 - The ⓘ next to it explains what a drone is and how to practise with it.
 - Its volume is in **Settings**, separate from the metronome and the note sounds. Closing the bar stops the drone. Sound, fifth and volume are remembered.
 
@@ -198,7 +203,8 @@ Then open <http://localhost:3000>.
 
 **Phones and tablets (iOS and Android)**
 
-- Responsive layout with large touch targets, no accidental zooming, and support for notches and rounded screen corners.
+- Responsive layout with larger buttons on touch screens, no accidental zooming, and support for notches and rounded screen corners.
+- **Quick to start:** the page shows the scale as real text at once; the app's code is listed in the page itself, so it downloads together with the rest, and the text doesn't jump when the app takes over.
 - **Large monitors:** from about 1760 pixels wide, the whole interface grows a little and uses more of the screen (up to 2240 px wide on a 2560 monitor). The neck grows with it: taller strings, bigger notes and labels.
 - **Installable as an app:** use Android "Install app" or iPhone "Share → Add to Home Screen". It opens full-screen with its own icon.
 - After the first visit, the published site keeps working offline. An offline helper (a "service worker") is installed in production builds only, never during local development.

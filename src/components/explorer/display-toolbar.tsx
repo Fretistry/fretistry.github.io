@@ -68,7 +68,8 @@ export function DisplayToolbar({ settings, fretRange, onChange }: DisplayToolbar
       <div className="hidden sm:block">
         <DisplayControls settings={settings} fretRange={fretRange} onChange={onChange} />
       </div>
-      <div className="sm:hidden">
+      {/* min-w-0: next to "Chords" on phones, the caption shortens ("…") instead of pushing Chords to a new line */}
+      <div className="min-w-0 sm:hidden">
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="max-w-full bg-card dark:bg-card">

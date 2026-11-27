@@ -35,7 +35,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   return <h3 className="mb-2 text-sm font-semibold tracking-tight text-foreground">{children}</h3>;
 }
 
-const TAB = "shrink-0 px-2.5 dark:data-active:bg-accent dark:data-active:border-border";
+const TAB = "shrink-0 px-2.5 dark:data-active:bg-accent dark:data-active:border-border max-sm:min-h-9";
 
 /**
  * The root picker offers 12 spellings (C♯ but not D♭, E♭ but not D♯…), so a link to "D♯ Natural Minor"
@@ -79,7 +79,7 @@ export function TheoryPanel({
             onClick={() => onCollapsedChange(!collapsed)}
             aria-expanded={!collapsed}
             aria-controls="theory-content"
-            className="-ml-1.5 flex items-center gap-2 rounded-md px-1.5 py-1 outline-none hover:bg-accent/60 focus-visible:ring-3 focus-visible:ring-ring/50"
+            className="-ml-1.5 flex items-center gap-2 rounded-md px-1.5 py-1 outline-none hover:bg-accent/60 focus-visible:ring-3 focus-visible:ring-ring/50 pointer-coarse:min-h-9"
           >
             <BookOpen className="size-4 text-primary" />
             <span className="text-sm font-semibold">{t.title}</span>
@@ -87,10 +87,11 @@ export function TheoryPanel({
             <span className="sr-only">{t.toggle(collapsed)}</span>
           </button>
           <div
-            className="no-scrollbar -mx-1 max-w-full overflow-x-auto overflow-y-hidden px-1 py-0.5"
+            className="no-scrollbar -mx-1 max-w-full overflow-x-auto overflow-y-hidden px-1 py-0.5 max-sm:w-full"
             onClick={() => collapsed && onCollapsedChange(false)}
           >
-            <TabsList>
+            {/* phones: a 2×2 grid, so no tab is cut off (German "Verwandtschaft" is long) */}
+            <TabsList className="max-sm:grid max-sm:h-auto max-sm:w-full max-sm:grid-cols-2">
               <TabsTrigger value="overview" className={TAB}>
                 {t.overview}
               </TabsTrigger>

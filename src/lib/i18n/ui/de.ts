@@ -77,6 +77,7 @@ export const de: UiMessages = {
   },
   scaleHeader: {
     playScale: "Tonleiter abspielen",
+    playShort: "Abspielen",
     stop: "Stopp",
     soundOffHint: "Schalte den Notenklang ein (Lautsprecher oben rechts), um die Tonleiter zu hören",
     scaleNotes: "Töne der Tonleiter",
@@ -84,6 +85,7 @@ export const de: UiMessages = {
   },
   share: {
     share: "Teilen & speichern",
+    shareShort: "Teilen",
     copied: "Link kopiert",
     copyLink: "Link kopieren",
     shareLink: "Link teilen…",

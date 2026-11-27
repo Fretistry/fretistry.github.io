@@ -25,7 +25,10 @@ export function ScaleSelect({ value, onChange }: ScaleSelectProps) {
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger aria-label={ui.controls.scale} className="h-9! w-full bg-card font-medium dark:bg-card">
-        <SelectValue placeholder={ui.controls.chooseScale} />
+        {/* long names end in "…" instead of being cut off */}
+        <span className="min-w-0 truncate">
+          <SelectValue placeholder={ui.controls.chooseScale} />
+        </span>
       </SelectTrigger>
       <SelectContent position="popper" className="max-h-[min(70vh,520px)]">
         {SCALE_CATEGORIES.map((cat, i) => (

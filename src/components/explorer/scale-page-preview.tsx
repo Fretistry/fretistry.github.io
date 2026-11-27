@@ -37,13 +37,20 @@ export function ScalePagePreview({ page }: { page: ScalePage }) {
   return (
     <div className="flex min-h-screen flex-col" aria-busy="true">
       <div className="h-14 border-b border-border/60" />
-      <main className="mx-auto w-full max-w-[1600px] min-[1760px]:max-w-[112rem] flex-1 space-y-5 px-4 py-5 sm:px-6 sm:py-6">
-        <div className="h-24 animate-pulse rounded-2xl bg-muted/50" />
-        <section className="space-y-4 rounded-2xl border border-border/70 bg-card/60 p-3 sm:p-5">
+      <main className="mx-auto w-full max-w-[1600px] min-[1760px]:max-w-[112rem] flex-1 space-y-5 px-4 py-5 sm:px-6 sm:py-6 lg:py-4">
+        {/* As tall as the app's key/scale/tuning card on each screen size, so nothing jumps when the app takes over */}
+        <div className="h-[62px] animate-pulse rounded-2xl bg-muted/50 sm:h-[164px] lg:h-[84px]" />
+        <section className="space-y-4 rounded-2xl border border-border/70 bg-card/60 p-3 sm:p-5 lg:space-y-3 lg:p-4">
           <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
             <div className="min-w-0">
-              <h1 className="text-2xl font-semibold tracking-tight sm:text-[28px]">{e.title}</h1>
-              <p className="mt-0.5 max-w-2xl text-sm text-muted-foreground">{e.mood}</p>
+              <h1 className="flex min-h-9 items-center text-2xl font-semibold tracking-tight sm:text-[28px]">{e.title}</h1>
+              {/* phones: where Play, Share and Train will be (the app shows the mood line only on larger screens) */}
+              <div aria-hidden="true" className="mt-1 flex gap-3 sm:hidden">
+                <span className="h-9 w-20 rounded-full bg-muted/50" />
+                <span className="h-9 w-28 rounded-full bg-muted/50" />
+                <span className="h-9 w-20 rounded-full bg-muted/50" />
+              </div>
+              <p className="mt-0.5 max-w-2xl text-sm text-muted-foreground max-sm:hidden">{e.mood}</p>
             </div>
             <ol className="flex flex-wrap gap-1 sm:gap-1.5" aria-label={ui.scaleHeader.scaleNotes}>
               {e.intervalRows.map((row) => (

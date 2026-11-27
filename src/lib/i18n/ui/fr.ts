@@ -79,6 +79,7 @@ export const fr: UiMessages = {
   },
   scaleHeader: {
     playScale: "Jouer la gamme",
+    playShort: "Jouer",
     stop: "Arrêter",
     soundOffHint: "Activez le son des notes (haut-parleur en haut à droite) pour entendre la gamme",
     scaleNotes: "Notes de la gamme",
@@ -86,6 +87,7 @@ export const fr: UiMessages = {
   },
   share: {
     share: "Partager & enregistrer",
+    shareShort: "Partager",
     copied: "Lien copié",
     copyLink: "Copier le lien",
     shareLink: "Partager le lien…",

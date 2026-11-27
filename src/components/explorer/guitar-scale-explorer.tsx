@@ -55,13 +55,14 @@ import {
   scalePositions,
   shapePath,
   spellScale,
+  type ChordSize,
   type FretboardNote,
   type ScaleChord,
   type ScalePosition,
   type Tuning,
 } from "@/lib/theory";
 import { AppHeader } from "./app-header";
-import { ChordBar } from "./chord-bar";
+import { ChordBar, ChordSummary, ChordsButton } from "./chord-bar";
 import { DisplayToolbar } from "./display-toolbar";
 import { FavouriteButton, FavouritesBar, StartHereBar, StarterShapeBar } from "./favourites";
 import { Legend } from "./legend";
@@ -77,7 +78,8 @@ import { TuningSelect } from "./tuning-select";
 function Field({ label, children, className }: { label: string; children: React.ReactNode; className?: string }) {
   return (
     <div className={className}>
-      <p className="mb-1.5 text-[11px] font-medium tracking-wider text-muted-foreground uppercase">{label}</p>
+      {/* phones: key, scale and tuning share one row without labels (still read out by screen readers) */}
+      <p className="mb-1.5 text-[11px] font-medium tracking-wider text-muted-foreground uppercase max-sm:sr-only">{label}</p>
       {children}
     </div>
   );
@@ -510,6 +512,22 @@ function ExplorerApp() {
     update({ positionSystem: "boxes", positionIndices: [starterShape.index], chordDegree: null });
     revealNeck();
   }, [starterShape, update, revealNeck]);
+  // Like the home page's suggestions: until there are favourites, and not while training.
+  const showStarter = !landedOnHome && favourites.favourites.length === 0 && !training;
+
+  const chordBarProps = {
+    chordSet,
+    size: settings.chordSize,
+    selected: activeChord,
+    soundEnabled,
+    onSizeChange: (chordSize: ChordSize) => update({ chordSize }),
+    onSelect: (chordDegree: number | null) => {
+      update({ chordDegree });
+      // phones: the chord list is a menu above the neck; show the neck once a chord is picked
+      if (chordDegree !== null && isPhone) revealNeck();
+    },
+    onPlay: playChord,
+  };
 
   // ── "Save image": the picture shows exactly what is on the neck now ──────
   const { tuningName } = i18n;
@@ -601,13 +619,13 @@ function ExplorerApp() {
         onToggleMetronomeBar={toggleMetronomeBar}
       />
 
-      <main className="mx-auto w-full max-w-[1600px] min-[1760px]:max-w-[112rem] flex-1 space-y-5 px-[max(1rem,env(safe-area-inset-left))] py-5 sm:px-6 sm:py-6">
+      <main className="mx-auto w-full max-w-[1600px] min-[1760px]:max-w-[112rem] flex-1 space-y-5 px-[max(1rem,env(safe-area-inset-left))] py-5 sm:px-6 sm:py-6 lg:py-4">
         {/* Main controls */}
         <section
           aria-label={`${ui.controls.rootNote} · ${ui.controls.scale} · ${ui.controls.tuning}`}
-          className="grid grid-cols-2 gap-x-3 gap-y-3 rounded-2xl border border-border/70 bg-surface p-3 sm:gap-4 sm:p-4 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)_minmax(0,1.1fr)]"
+          className="grid grid-cols-[auto_minmax(0,1fr)_minmax(0,auto)] gap-x-2 gap-y-3 rounded-2xl border border-border/70 bg-surface p-3 sm:grid-cols-2 sm:gap-4 sm:p-4 lg:p-3 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)_minmax(0,1.1fr)]"
         >
-          <Field label={ui.controls.rootNote} className="col-span-2 lg:col-span-1">
+          <Field label={ui.controls.rootNote} className="sm:col-span-2 lg:col-span-1">
             <RootNotePicker value={settings.rootName} onChange={(rootName) => update({ rootName })} />
           </Field>
           <Field label={ui.controls.scale} className="min-w-0">
@@ -621,10 +639,10 @@ function ExplorerApp() {
               onCustomChange={(customTuning) => update({ tuningId: CUSTOM_TUNING_ID, customTuning })}
             />
           </Field>
-          {/* Favourites once there are any; before that "Start here" (four first scales on the home
-              page, one first shape for this scale on a scale's own page) */}
-          {(favourites.favourites.length > 0 || landedOnHome || starterLabel) && (
-            <div className="col-span-2 border-t border-border/50 pt-3 lg:col-span-3">
+          {/* Favourites once there are any; before that, on the home page, four first scales to try.
+              (On a scale's own page "Start here" offers a first shape, next to the Shapes picker.) */}
+          {(favourites.favourites.length > 0 || landedOnHome) && (
+            <div className="col-span-full border-t border-border/50 pt-3">
               {favourites.favourites.length > 0 ? (
                 <FavouritesBar
                   favourites={favourites.favourites}
@@ -632,10 +650,8 @@ function ExplorerApp() {
                   onSelect={({ rootName, scaleId }) => update({ rootName, scaleId })}
                   onRemove={favourites.remove}
                 />
-              ) : landedOnHome ? (
-                <StartHereBar caged={caged} isCurrent={isStartingPoint} onSelect={goToStartingPoint} />
               ) : (
-                starterLabel && <StarterShapeBar label={starterLabel} active={starterActive} onSelect={goToStarterShape} />
+                <StartHereBar caged={caged} isCurrent={isStartingPoint} onSelect={goToStartingPoint} />
               )}
             </div>
           )}
@@ -644,7 +660,8 @@ function ExplorerApp() {
         {/* Fretboard */}
         <section
           aria-label={ui.fretboard.section}
-          className="space-y-4 rounded-2xl border border-border/70 bg-card/60 p-3 sm:p-5"
+          // slightly tighter on tablets and laptops, so the whole neck fits on a 768–800 px tall screen
+          className="space-y-4 rounded-2xl border border-border/70 bg-card/60 p-3 sm:p-5 lg:space-y-3 lg:p-4"
           style={pinBars ? ({ "--neck-sticky-offset": `${barsHeight}px` } as React.CSSProperties) : undefined}
         >
           <ScaleHeader
@@ -689,29 +706,41 @@ function ExplorerApp() {
             }}
             onStop={stopScale}
           />
-          <DisplayToolbar settings={settings} fretRange={fretRange} onChange={update} />
-          <div className="space-y-3 border-t border-border/50 pt-3">
-            <PositionPicker
-              system={positionSystem}
-              available={availableSystems}
-              positions={positions}
-              selected={positionIndices}
-              caged={caged}
-              onChange={(patch) => {
-                update(patch);
-                if (patch.positionSystem !== "all" && (patch.positionIndices?.length ?? 0) > 0) revealNeck();
-              }}
-            />
+          {/* Phones: [Display ▾] [Chords ▾] side by side; larger screens: the row of display options */}
+          <div className="flex items-center gap-2 sm:block">
+            <DisplayToolbar settings={settings} fretRange={fretRange} onChange={update} />
             {!training && (
-              <ChordBar
-                chordSet={chordSet}
-                size={settings.chordSize}
-                selected={activeChord}
-                soundEnabled={soundEnabled}
-                onSizeChange={(chordSize) => update({ chordSize })}
-                onSelect={(chordDegree) => update({ chordDegree })}
-                onPlay={playChord}
+              <div className="shrink-0 sm:hidden">
+                <ChordsButton {...chordBarProps} />
+              </div>
+            )}
+          </div>
+          <div className="space-y-3 border-t border-border/50 pt-3">
+            {/* Shapes, "Start here" (a first shape for this scale) and — on larger screens — the chords,
+                sharing lines where they fit, so the whole neck fits on a laptop screen */}
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+              <PositionPicker
+                system={positionSystem}
+                available={availableSystems}
+                positions={positions}
+                selected={positionIndices}
+                caged={caged}
+                onChange={(patch) => {
+                  update(patch);
+                  if (patch.positionSystem !== "all" && (patch.positionIndices?.length ?? 0) > 0) revealNeck();
+                }}
               />
+              {showStarter && starterLabel && (
+                <StarterShapeBar label={starterLabel} active={starterActive} onSelect={goToStarterShape} />
+              )}
+              {!training && (
+                <div className="max-sm:hidden">
+                  <ChordBar {...chordBarProps} />
+                </div>
+              )}
+            </div>
+            {!training && activeChord && (
+              <ChordSummary chord={activeChord} soundEnabled={soundEnabled} onPlay={playChord} onClear={() => update({ chordDegree: null })} />
             )}
           </div>
           {showBars && (

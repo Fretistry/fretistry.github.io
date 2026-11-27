@@ -21,7 +21,7 @@ interface PositionPickerProps {
 }
 
 const pill =
-  "flex h-8 min-w-8 items-center justify-center rounded-lg px-2 text-sm font-semibold tabular-nums ring-1 transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50";
+  "flex h-8 min-w-8 items-center justify-center rounded-lg px-2 text-sm font-semibold tabular-nums ring-1 transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 pointer-coarse:h-9 pointer-coarse:min-w-9";
 
 /**
  * Choose between the whole neck, the 5 CAGED shapes (or numbered boxes) —

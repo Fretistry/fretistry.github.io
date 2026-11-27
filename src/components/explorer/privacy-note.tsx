@@ -23,7 +23,9 @@ export function SiteFooter({ creator }: { creator: string }) {
   return (
     <footer className="border-t border-border/60 px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] text-center text-xs text-muted-foreground">
       <p className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1">
-        <span>Fretistry · {ui.footer.madeBy(creator)} ·</span>
+        {/* phones: two lines ("Fretistry · Made by …" / "All scales · Privacy"), so no line ends in a "·" */}
+        <span className="max-sm:basis-full">Fretistry · {ui.footer.madeBy(creator)}</span>
+        <span className="max-sm:hidden">·</span>
         {/* the overview of every scale in every key (also how search engines find all scale pages) */}
         <a href={`${BASE_PATH}${scaleIndexPath(locale)}`} className="rounded-md px-1 py-0.5 underline-offset-2 hover:text-foreground hover:underline">
           {ui.seo.allScales}

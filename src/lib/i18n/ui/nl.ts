@@ -79,6 +79,7 @@ export const nl: UiMessages = {
   },
   scaleHeader: {
     playScale: "Speel toonladder",
+    playShort: "Speel",
     stop: "Stop",
     soundOffHint: "Zet het notengeluid aan (luidsprekericoon rechtsboven) om de toonladder te horen",
     scaleNotes: "Noten van de toonladder",
@@ -86,6 +87,7 @@ export const nl: UiMessages = {
   },
   share: {
     share: "Delen & bewaren",
+    shareShort: "Delen & bewaren",
     copied: "Link gekopieerd",
     copyLink: "Link kopiëren",
     shareLink: "Link delen…",

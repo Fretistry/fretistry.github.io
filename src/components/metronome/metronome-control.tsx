@@ -12,7 +12,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { BPM_MAX, BPM_MIN, tempoMarking, type ScheduledTick, type Subdivision } from "@/lib/audio/metronome";
 import { useDrone } from "@/hooks/use-drone";
 import { cn } from "@/lib/utils";
-import { DroneControls, DroneSettingsPanel } from "./drone-controls";
+import { DroneControls, DroneSettingsPanel, DroneSoundOptions } from "./drone-controls";
 import { useMetronomeTick, useSharedMetronome } from "./metronome-provider";
 
 const PRESETS = [60, 80, 100, 120, 140];
@@ -67,6 +67,24 @@ function BeatLights({ beatsPerBar, running, accent }: { beatsPerBar: number; run
         );
       })}
     </div>
+  );
+}
+
+/** Phones: small beat lights under the tempo, in place of "BPM", while the metronome runs. */
+function MiniBeatLights({ beatsPerBar, accent }: { beatsPerBar: number; accent: boolean }) {
+  const tick = useMetronomeTick();
+  return (
+    <span className="flex items-center justify-center gap-0.5 pt-1 sm:hidden" aria-hidden="true">
+      {Array.from({ length: beatsPerBar }, (_, beat) => (
+        <span
+          key={beat}
+          className={cn(
+            "size-1.5 rounded-full transition-colors duration-75",
+            tick?.beat === beat ? (beat === 0 && accent ? "bg-note-root" : "bg-note-scale") : "bg-muted-foreground/30",
+          )}
+        />
+      ))}
+    </span>
   );
 }
 
@@ -233,7 +251,7 @@ export function MetronomeBar({
       role="group"
       aria-label={t.barTitle}
       className={cn(
-        "flex flex-wrap items-center gap-x-1 gap-y-1.5 rounded-xl border border-border/70 bg-card/95 px-2 py-1.5 backdrop-blur-sm sm:gap-x-3",
+        "flex flex-wrap items-center gap-x-0.5 gap-y-1.5 rounded-xl border border-border/70 bg-card/95 px-1.5 py-1.5 backdrop-blur-sm sm:gap-x-3 sm:px-2",
         className,
       )}
     >
@@ -245,42 +263,45 @@ export function MetronomeBar({
           variant={running ? "default" : "outline"}
           aria-label={running ? t.stop : t.start}
           title={running ? t.stop : t.start}
-          className="rounded-full"
+          className="rounded-full max-sm:px-2 max-sm:text-xs"
         >
           {running ? <Square className="fill-current" /> : <Play className="fill-current" />}
           {t.title}
         </Button>
         <div className="flex items-center gap-0.5">
-          <Button variant="ghost" size="icon-sm" aria-label={t.slower} onClick={() => update({ bpm: settings.bpm - (settings.bpm > 100 ? 5 : 2) })}>
+          {/* phones: narrow but tall (28×36), so the whole bar fits on one row */}
+          <Button variant="ghost" size="icon-sm" className="max-sm:w-7!" aria-label={t.slower} onClick={() => update({ bpm: settings.bpm - (settings.bpm > 100 ? 5 : 2) })}>
             <Minus />
           </Button>
           {/* phones: "BPM" small under the number, so the row stays narrow */}
           <p
-            className="flex min-w-[2.25rem] flex-col items-center leading-none sm:block sm:min-w-[4.5rem] sm:text-center sm:leading-tight"
+            className="flex min-w-8 flex-col items-center leading-none sm:block sm:min-w-[4.5rem] sm:text-center sm:leading-tight"
             aria-live="off"
           >
             <span className="text-lg font-semibold tabular-nums">{settings.bpm}</span>
-            <span className="text-[9px] text-muted-foreground sm:ml-1 sm:text-xs">BPM</span>
+            {/* phones: while running, small beat lights take the place of "BPM" (the bar is one row there) */}
+            <span className={cn("text-[9px] text-muted-foreground sm:ml-1 sm:text-xs", running && "max-sm:hidden")}>BPM</span>
+            {running && <MiniBeatLights beatsPerBar={settings.beatsPerBar} accent={settings.accent} />}
             <span className="hidden text-[11px] text-muted-foreground italic md:block">{tempoMarking(settings.bpm)}</span>
           </p>
-          <Button variant="ghost" size="icon-sm" aria-label={t.faster} onClick={() => update({ bpm: settings.bpm + (settings.bpm >= 100 ? 5 : 2) })}>
+          <Button variant="ghost" size="icon-sm" className="max-sm:w-7!" aria-label={t.faster} onClick={() => update({ bpm: settings.bpm + (settings.bpm >= 100 ? 5 : 2) })}>
             <Plus />
           </Button>
         </div>
-        {/* On phones Tap tempo sits in Settings, so the metronome fits on one row */}
-        <Button variant="outline" size="xs" onClick={tap} title={t.tapTitle} className="hidden sm:inline-flex">
+        {/* Below laptop width Tap tempo sits in Settings, so the bar stays on one row */}
+        <Button variant="outline" size="xs" onClick={tap} title={t.tapTitle} className="hidden xl:inline-flex">
           {t.tap}
         </Button>
-        <div className="flex flex-1 justify-center sm:px-1">
+        <div className="flex flex-1 justify-center max-sm:hidden sm:px-1">
           <BeatLights beatsPerBar={settings.beatsPerBar} running={running} accent={settings.accent} />
         </div>
       </div>
 
-      {/* Settings (+ close): on phones at the end of the metronome row, on larger screens at the very end */}
-      <div className="flex items-center gap-1 sm:order-last">
+      {/* Settings (+ close) at the very end */}
+      <div className="order-last flex items-center gap-1">
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" aria-label={t.more} title={t.more} className="max-sm:w-7 max-sm:px-0">
+            <Button variant="outline" size="sm" aria-label={t.more} title={t.more} className="max-sm:w-7! max-sm:px-0">
               <SlidersHorizontal />
               <span className="hidden sm:inline">{t.settings}</span>
             </Button>
@@ -288,12 +309,14 @@ export function MetronomeBar({
           <PopoverContent align="end" collisionPadding={8}
             className="max-h-[calc(var(--radix-popover-content-available-height)-0.5rem)] w-[min(20rem,calc(100vw-1.5rem))] overflow-y-auto">
             <p className="mb-3 text-sm font-semibold">{t.title}</p>
-            <Button variant="outline" size="sm" onClick={tap} title={t.tapTitle} className="mb-4 w-full sm:hidden">
+            <Button variant="outline" size="sm" onClick={tap} title={t.tapTitle} className="mb-4 w-full xl:hidden">
               {t.tap}
             </Button>
             <MetronomeSettingsPanel />
             <div className="mt-4 border-t border-border/60 pt-3">
               <p className="mb-3 text-sm font-semibold">{ui.drone.title}</p>
+              {/* phones: the drone's sound and fifth live here (the bar itself is one row) */}
+              <DroneSoundOptions drone={drone} rootName={rootName} className="mb-3 sm:hidden" />
               <DroneSettingsPanel drone={drone} />
             </div>
             {/* phones: the × lives here, so the metronome row stays one line */}
@@ -307,8 +330,8 @@ export function MetronomeBar({
         </Button>
       </div>
 
-      {/* Drone (its own row on phones) */}
-      <DroneControls drone={drone} rootName={rootName} className="max-sm:basis-full sm:border-l sm:border-border/60 sm:pl-3" />
+      {/* Drone (on phones just its start button, in the same row) */}
+      <DroneControls drone={drone} rootName={rootName} className="sm:border-l sm:border-border/60 sm:pl-3" />
     </div>
   );
 }

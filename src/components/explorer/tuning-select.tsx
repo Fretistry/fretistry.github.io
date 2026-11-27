@@ -51,20 +51,33 @@ function useGroupedPresets() {
   }));
 }
 
+/** Menu entry that opens the editor for the current custom tuning (it never becomes the selected value). */
+const EDIT_CUSTOM = "__edit-custom__";
+
 export function TuningSelect({ tuningId, activeTuning, onPresetChange, onCustomChange }: TuningSelectProps) {
   const { ui, note, tuningName } = useI18n();
   const groups = useGroupedPresets();
+  const [editing, setEditing] = useState(false);
   const stringNames = (t: Tuning) => t.strings.map((p) => note(p.note)).join(" ");
   return (
     <div className="flex w-full gap-1.5">
       <Select
         value={tuningId}
-        onValueChange={(id) => (id === CUSTOM_TUNING_ID ? onCustomChange([...activeTuning.strings]) : onPresetChange(id))}
+        onValueChange={(id) => {
+          // "Custom…" opens the editor straight away (on phones that's the only way in).
+          if (id === EDIT_CUSTOM) return setEditing(true);
+          if (id === CUSTOM_TUNING_ID) {
+            onCustomChange([...activeTuning.strings]);
+            return setEditing(true);
+          }
+          onPresetChange(id);
+        }}
       >
         <SelectTrigger aria-label={ui.controls.tuning} className="h-9! min-w-0 flex-1 bg-card dark:bg-card">
           <SelectValue>
-            <span className="font-medium">{tuningName(activeTuning)}</span>
-            <span className="ml-1.5 truncate font-mono text-xs text-muted-foreground">{stringNames(activeTuning)}</span>
+            <span className="truncate font-medium">{tuningName(activeTuning)}</span>
+            {/* phones: just the name, so key, scale and tuning fit on one row */}
+            <span className="ml-1.5 truncate font-mono text-xs text-muted-foreground max-sm:hidden">{stringNames(activeTuning)}</span>
           </SelectValue>
         </SelectTrigger>
         <SelectContent position="popper">
@@ -86,18 +99,32 @@ export function TuningSelect({ tuningId, activeTuning, onPresetChange, onCustomC
           <SelectItem value={CUSTOM_TUNING_ID}>
             <span className="font-medium">{ui.controls.customOption}</span>
           </SelectItem>
+          {tuningId === CUSTOM_TUNING_ID && (
+            <SelectItem value={EDIT_CUSTOM}>
+              <span className="font-medium">{ui.controls.customizeTuning}…</span>
+            </SelectItem>
+          )}
         </SelectContent>
       </Select>
-      <CustomTuningDialog activeTuning={activeTuning} onChange={onCustomChange} />
+      <CustomTuningDialog activeTuning={activeTuning} onChange={onCustomChange} open={editing} onOpenChange={setEditing} />
     </div>
   );
 }
 
-function CustomTuningDialog({ activeTuning, onChange }: { activeTuning: Tuning; onChange: (s: Pitch[]) => void }) {
+function CustomTuningDialog({
+  activeTuning,
+  onChange,
+  open,
+  onOpenChange: setOpen,
+}: {
+  activeTuning: Tuning;
+  onChange: (s: Pitch[]) => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
   const { ui, note, pitch: formatPitch, tuningName } = useI18n();
   const t = ui.tuningDialog;
   const groups = useGroupedPresets();
-  const [open, setOpen] = useState(false);
   const strings = activeTuning.strings;
   const count = strings.length;
 
@@ -118,7 +145,8 @@ function CustomTuningDialog({ activeTuning, onChange }: { activeTuning: Tuning; 
           size="icon-lg"
           aria-label={ui.controls.customizeTuning}
           title={ui.controls.customizeTuning}
-          className="bg-card dark:bg-card"
+          // phones: reached through "Custom…" in the tuning menu instead
+          className="bg-card max-sm:hidden dark:bg-card"
         >
           <SlidersHorizontal />
         </Button>

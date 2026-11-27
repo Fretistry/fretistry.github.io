@@ -45,7 +45,7 @@ export function SegmentedControl<T extends string>({
           title={o.title}
           aria-label={o.title ?? (typeof o.label === "string" ? o.label : o.value)}
           className={cn(
-            "rounded-md! px-2.5 text-muted-foreground transition-colors hover:bg-transparent hover:text-foreground",
+            "rounded-md! px-2.5 text-muted-foreground transition-colors hover:bg-transparent hover:text-foreground pointer-coarse:h-9",
             "data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm dark:data-[state=on]:bg-accent",
           )}
         >

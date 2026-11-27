@@ -82,6 +82,8 @@ export const en = {
   },
   scaleHeader: {
     playScale: "Play scale",
+    /** Phones: short, so Play, Share and Train fit on one row. */
+    playShort: "Play",
     stop: "Stop",
     soundOffHint: "Turn note sounds on (speaker icon, top right) to hear the scale",
     scaleNotes: "Scale notes",
@@ -89,6 +91,8 @@ export const en = {
   },
   share: {
     share: "Share & save",
+    /** Phones (where the full name doesn't fit next to Play and Train). */
+    shareShort: "Share & save",
     copied: "Link copied",
     copyLink: "Copy link",
     shareLink: "Share link…",

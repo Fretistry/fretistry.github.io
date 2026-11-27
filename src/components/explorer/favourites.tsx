@@ -68,7 +68,7 @@ export function StartHereBar({
                 onClick={() => onSelect(point)}
                 aria-current={active ? "true" : undefined}
                 className={cn(
-                  "flex h-8 items-center gap-1.5 rounded-full px-3 text-sm font-medium ring-1 transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                  "flex h-8 items-center gap-1.5 rounded-full px-3 text-sm font-medium ring-1 transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 pointer-coarse:h-9",
                   active ? "bg-foreground/10 text-foreground ring-foreground/50" : "bg-card text-foreground/85 ring-border/70 hover:bg-accent",
                 )}
               >
@@ -102,7 +102,7 @@ export function StarterShapeBar({ label, active, onSelect }: { label: string; ac
         onClick={onSelect}
         aria-pressed={active}
         className={cn(
-          "flex h-8 items-center rounded-full px-3 text-sm font-medium ring-1 transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+          "flex h-8 items-center rounded-full px-3 text-sm font-medium ring-1 transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 pointer-coarse:h-9",
           active ? "bg-foreground/10 text-foreground ring-foreground/50" : "bg-card text-foreground/85 ring-border/70 hover:bg-accent",
         )}
       >
@@ -144,7 +144,7 @@ export function FavouritesBar({ favourites, current, onSelect, onRemove }: Favou
             <li
               key={`${f.rootName}|${f.scaleId}`}
               className={cn(
-                "flex h-8 items-center rounded-full ring-1 transition-colors",
+                "flex h-8 items-center rounded-full ring-1 transition-colors pointer-coarse:h-9",
                 active ? "bg-foreground/10 ring-foreground/50" : "bg-card ring-border/70 hover:bg-accent",
               )}
             >

@@ -77,6 +77,7 @@ export const es: UiMessages = {
   },
   scaleHeader: {
     playScale: "Tocar la escala",
+    playShort: "Tocar",
     stop: "Parar",
     soundOffHint: "Activa el sonido de las notas (altavoz arriba a la derecha) para oír la escala",
     scaleNotes: "Notas de la escala",
@@ -84,6 +85,7 @@ export const es: UiMessages = {
   },
   share: {
     share: "Compartir y guardar",
+    shareShort: "Compartir",
     copied: "Enlace copiado",
     copyLink: "Copiar enlace",
     shareLink: "Compartir enlace…",

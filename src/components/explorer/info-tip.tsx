@@ -18,7 +18,7 @@ export function InfoTip({ label, paragraphs }: { label: string; paragraphs: read
           <Info />
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="start" className="w-[min(21rem,calc(100vw-1.5rem))] space-y-2 text-sm leading-relaxed text-foreground/85">
+      <PopoverContent align="start" collisionPadding={12} className="w-[min(21rem,calc(100vw-1.5rem))] space-y-2 text-sm leading-relaxed text-foreground/85">
         {paragraphs.map((p) => (
           <p key={p}>
             <RichText text={p} />
