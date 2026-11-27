@@ -6,6 +6,10 @@ import type { FretboardImageInput } from "@/components/fretboard/fretboard-image
 import { useI18n } from "@/components/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useSharedMetronome } from "@/components/metronome/metronome-provider";
+import { droneStatus } from "@/hooks/use-drone";
+import { droneLinkValue } from "@/lib/audio/drone";
+import { withPractice } from "@/lib/share";
 import { SaveImageDialog } from "./save-image-dialog";
 
 interface ShareMenuProps {
@@ -49,6 +53,7 @@ function MenuItem({
 export function ShareMenu({ title, imageInput, imageFileName }: ShareMenuProps) {
   const { ui } = useI18n();
   const t = ui.share;
+  const metronome = useSharedMetronome();
   const [open, setOpen] = useState(false);
   const [imageOpen, setImageOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -60,7 +65,11 @@ export function ShareMenu({ title, imageInput, imageFileName }: ShareMenuProps) 
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
   const shareLink = async () => {
-    const url = window.location.href;
+    // Shared while practising? The link also carries the tempo and drone sound that are playing.
+    const url = withPractice(window.location.href, {
+      bpm: metronome.running ? metronome.settings.bpm : null,
+      drone: droneStatus.running ? droneLinkValue(droneStatus.settings) : null,
+    });
     if (nativeShare) {
       setOpen(false);
       try {

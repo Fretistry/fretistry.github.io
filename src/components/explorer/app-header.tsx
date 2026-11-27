@@ -26,6 +26,8 @@ interface AppHeaderProps {
   onSettingsChange: (patch: Partial<ExplorerSettings>) => void;
   metronomeBarVisible: boolean;
   onToggleMetronomeBar: () => void;
+  /** Opens the list of keyboard shortcuts. */
+  onShowShortcuts: () => void;
 }
 
 export function AppHeader({
@@ -35,6 +37,7 @@ export function AppHeader({
   onSettingsChange,
   metronomeBarVisible,
   onToggleMetronomeBar,
+  onShowShortcuts,
 }: AppHeaderProps) {
   return (
     <header className="sticky top-0 z-30 border-b border-border/60 bg-background/80 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
@@ -49,7 +52,7 @@ export function AppHeader({
         <div className="ml-auto flex items-center gap-0.5 sm:gap-2">
           <MetronomeHeaderButton barVisible={metronomeBarVisible} onToggleBar={onToggleMetronomeBar} />
           <SoundToggle enabled={soundEnabled} onChange={onSoundChange} />
-          <SettingsMenu settings={settings} onChange={onSettingsChange} />
+          <SettingsMenu settings={settings} onChange={onSettingsChange} onShowShortcuts={onShowShortcuts} />
         </div>
       </div>
     </header>
@@ -109,7 +112,15 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
  * is drawn (left-handed, direction, fret numbers, spacing) and the theme.
  * They are remembered on this device and never part of shared links.
  */
-function SettingsMenu({ settings, onChange }: { settings: ExplorerSettings; onChange: (patch: Partial<ExplorerSettings>) => void }) {
+function SettingsMenu({
+  settings,
+  onChange,
+  onShowShortcuts,
+}: {
+  settings: ExplorerSettings;
+  onChange: (patch: Partial<ExplorerSettings>) => void;
+  onShowShortcuts: () => void;
+}) {
   const { ui, locale, setLocale, naming, setNaming } = useI18n();
   const v = ui.view;
   const [theme, setTheme] = useState<Theme>(() => getCurrentTheme());
@@ -225,6 +236,13 @@ function SettingsMenu({ settings, onChange }: { settings: ExplorerSettings; onCh
             <p>{ui.settings.note}</p>
             {/* worth knowing, but easy to miss: it works offline, and every scale in every key has its own page */}
             <p>{ui.settings.offline}</p>
+            {/* keyboards only (touch screens have none) */}
+            <p className="pointer-coarse:hidden">
+              <button type="button" onClick={onShowShortcuts} className="font-medium text-foreground underline underline-offset-2 hover:text-primary">
+                {ui.shortcuts.title}
+              </button>{" "}
+              <kbd className="rounded border border-border bg-muted px-1 font-mono">?</kbd>
+            </p>
             <p>
               <a href={`${BASE_PATH}${scaleIndexPath(locale)}`} className="font-medium text-foreground underline underline-offset-2 hover:text-primary">
                 {ui.seo.allScales}

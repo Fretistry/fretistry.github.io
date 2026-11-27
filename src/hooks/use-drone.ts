@@ -1,17 +1,27 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { DronePlayer, parseDroneSettings, type DroneSettings } from "@/lib/audio/drone";
+import { DronePlayer, parseDroneLink, parseDroneSettings, type DroneSettings } from "@/lib/audio/drone";
 
 const STORAGE_KEY = "fretistry-drone";
 
 function loadSettings(): DroneSettings {
+  let saved: DroneSettings;
   try {
-    return parseDroneSettings(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}"));
+    saved = parseDroneSettings(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}"));
   } catch {
-    return parseDroneSettings({});
+    saved = parseDroneSettings({});
+  }
+  // a shared lesson link can choose the drone's sound ("?drone=pad5"); it still starts with ▶
+  try {
+    return { ...saved, ...parseDroneLink(new URLSearchParams(window.location.search).get("drone")) };
+  } catch {
+    return saved;
   }
 }
+
+/** Whether the drone plays right now and with which sound (for the Share menu's lesson link). */
+export const droneStatus: { running: boolean; settings: DroneSettings } = { running: false, settings: parseDroneSettings({}) };
 
 /**
  * Drone on/off and its settings (remembered on this device). While it plays it
@@ -39,6 +49,15 @@ export function useDrone(rootPitchClass: number) {
   }, [running, rootPitchClass, settings]);
 
   useEffect(() => () => player.current?.stop(), []);
+
+  // What the drone is doing, for lesson links (read when you share, so no re-render is needed).
+  useEffect(() => {
+    droneStatus.running = running;
+    droneStatus.settings = settings;
+    return () => {
+      droneStatus.running = false;
+    };
+  }, [running, settings]);
 
   const update = useCallback((patch: Partial<DroneSettings>) => setSettings((s) => ({ ...s, ...patch })), []);
 

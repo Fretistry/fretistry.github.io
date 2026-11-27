@@ -70,6 +70,7 @@ Then open <http://localhost:3000>.
 **CAGED shapes and scale positions**
 
 - **CAGED:** the 5 shapes of each scale, in the order guitarists learn them: **C – A – G – E – D**. They're available in standard tuning (and E♭, D or C standard).
+- **Stay in this area when changing key** (a switch under the shapes, while one shape is shown): a new key or scale shows the shape nearest the frets you were on, instead of the same letter somewhere else. D Dorian's C shape at fret 2 → G Dorian's shape at fret 2, so you can run one area of the neck through every key.
 - **Box numbers:** for the minor pentatonic and blues, shapes also carry the box number most lessons use: box 1 is the E shape (at the 5th fret in A), then D, C, A and G are boxes 2–5. The line under the buttons reads e.g. "E shape · box 1 · from the 5th fret", and with one shape shown it adds "tap another letter to see how the shapes connect".
   - 7-note scales give the standard CAGED scale patterns, and an automated test checks all five C major shapes against the usual diagrams.
   - Pentatonic scales give the 5 pentatonic boxes, named by the same shapes (the familiar "box 1" at the 5th fret of A minor pentatonic is the E shape).
@@ -124,6 +125,7 @@ Then open <http://localhost:3000>.
 - The address bar always describes what you're looking at: the page is the key and scale (in the current language), and anything else follows after the "?", e.g. `/en/a-dorian/?tuning=drop-d&pos=boxes2&chord=4`. Standard tuning and the plain view need nothing after the "?". Reloading or sharing opens exactly that view.
 - A plain visit to the home page keeps its address until you change something.
 - Older links (`?root=A&scale=dorian&…`, or with `mode=practice`) still open normally.
+- **Lesson links:** shared while the metronome or drone plays, the link also carries the tempo and drone sound (`…?bpm=80&drone=pad5`). Opening it sets them up; nothing starts by itself (browsers only allow sound after a tap).
 - The **Share & save** menu has two choices, each with a line saying what you get: **Copy link** ("Opens exactly this view"; on phones: **Share link…**, which opens the share sheet) and **Save as image…** ("A picture of the neck · dark, or white for printing").
 - **Settings** also says that Fretistry works offline and can be added to a phone's home screen, and links to the overview of all scales.
 - Personal preferences (theme, labels, left-handed, sound) stay on your own device.
@@ -142,6 +144,15 @@ Then open <http://localhost:3000>.
 - **On phones it's one row:** ▶ Metronome, − tempo +, ▶ Drone and the Settings button. While the metronome runs, small beat lights take the place of "BPM" under the tempo. The drone's sound (Pad / Harmonium), +5th and its ⓘ, Tap tempo and the × are in Settings. Below laptop width (1280 px) Tap tempo is in Settings too, so the bar stays on one line on tablets.
 - Tempo from 30 to 260 BPM, set with a slider, ± buttons, quick presets or **tap tempo**. The Italian tempo name is shown too (Andante, Allegro…).
 - Beats per bar (2–7), clicks per beat (beats, 8ths, triplets, 16ths), an accent on beat one, and its own volume.
+- **Type a tempo** in Settings (the number is selected when you tap it, so typing replaces it).
+- **Click on 2 and 4 only:** beats 1 and 3 stay silent, like a drummer's backbeat (the jazz way to practise).
+- **Silent bars:** 1, 2 or 4 bars with clicks, then as many silent bars: keep the time yourself and see if you land together. The beat lights keep going.
+
+**Keyboard shortcuts** (for practising with the guitar in your hands; **?** or Settings shows the list)
+
+- **Space** metronome · **D** drone · **P** play the scale · **← →** key down/up a half step · **N** next key in the cycle of 4ths · **R** random key · **1–7** a shape (in the minor pentatonic and blues, 1 is box 1) and **0** the whole neck · **+ −** tempo.
+- They're off while you type in a field or a menu is open, and Space and the arrows are left to a button you tabbed to.
+- **Next in 4ths** and **Random key** are also buttons next to "Root note" (on phones: in the key's pop-up).
 - Sample-accurate timing: clicks are booked 0.3 s ahead on the audio clock, so they stay steady even when a slower phone is busy (say, redrawing the neck after a key change), and keep going in a background tab. Stop silences clicks that were already booked.
 - Light on the phone: only the beat lights and the header icon redraw on each click, not the rest of the page.
 - It keeps running while you explore. Even with the bar hidden, the header icon's pendulum swings and flashes on every beat. Your metronome settings are remembered.
@@ -191,7 +202,7 @@ Then open <http://localhost:3000>.
   - **Major:** Major (Ionian), Major Pentatonic, Lydian, Mixolydian
   - **Minor:** Natural Minor (Aeolian), Harmonic Minor, Melodic Minor, Minor Pentatonic, Dorian, Phrygian, Locrian
   - **Blues:** Blues (minor), Major Blues
-  - **Jazz & symmetric:** Lydian Dominant, Altered (Super Locrian), Whole Tone, Diminished (whole-half), Diminished (half-whole)
+  - **Jazz & symmetric:** Lydian Dominant, Altered (Super Locrian), Whole Tone, Diminished (whole-half), Diminished (half-whole). Altered and half-whole diminished also say which chord they're played over and name their notes the jazz way: "C7alt: 1 ♭9 ♯9 3 ♭5 ♯5 ♭7", "G7♭9: 1 ♭9 ♯9 3 ♯11 5 13 ♭7".
   - **World & exotic:** Phrygian Dominant (Spanish), Hungarian Minor, Double Harmonic Major, Hirajoshi
 - 15 tunings in three groups, plus a custom tuning editor:
   - **Standard & drop:** Standard, E♭ Standard (half step down), D Standard, C Standard, Drop D, Drop C, Drop B
@@ -329,7 +340,7 @@ Add one line to `src/lib/data/tunings.ts`, e.g. `tuning("open-f", "Open F", "C2 
 
 ## Tests
 
-`npm test` runs 482 automated checks, including:
+`npm test` runs 491 automated checks, including:
 
 - **Required cases:** C Major, A Natural Minor, A Minor Pentatonic, E Minor Pentatonic, Drop D, and custom tunings.
 - **Spelling:** every root × every scale for correct pitches and spelling.
@@ -349,7 +360,8 @@ Add one line to `src/lib/data/tunings.ts`, e.g. `tuning("open-f", "Open F", "C2 
 - **Chord view:** the scale's root stays marked while a chord is highlighted.
 - **Display logic:** filters, chord highlighting and positions.
 - **Sound:** every synthesized note must be within 5 cents of its true pitch.
-- **Metronome:** exact click spacing, accents and subdivisions, seamless tempo changes, tap tempo, a clean stop, and knowing when the next beat falls (so Play scale can start on it).
+- **Metronome:** exact click spacing, accents and subdivisions, seamless tempo changes, tap tempo, a clean stop, and knowing when the next beat falls (so Play scale can start on it). Bars are counted; the backbeat silences beats 1 and 3, and silent bars come in the chosen pattern.
+- **Lesson links and key steps:** the tempo and drone sound go into a shared link only when they play, and read back correctly; the cycle of 4ths visits all 12 keys; "stay in this area" finds G Mixolydian's E shape where D Dorian's C shape was; the jazz names describe exactly the scale's pitches.
 - **Drone:** the root in the right register for every key, the fifth only when asked, safe reading of saved settings, and a room sound that fades to silence.
 - **Fret ranges:** the five ranges in order, never past the end of the neck, 12 frets on phones by default, and older saved settings moved over correctly.
 - **Play scale on the neck:** the chosen shape where it fits in the visible frets, nearest the nut, played up and back down with the top note once.

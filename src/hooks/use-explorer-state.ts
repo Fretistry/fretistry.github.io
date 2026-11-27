@@ -44,6 +44,8 @@ export interface ExplorerSettings {
   orientation: Orientation;
   /** Music theory panel folded away. */
   theoryCollapsed: boolean;
+  /** On a key change, show the shape nearest the frets you were on (instead of the same shape letter). */
+  keepArea: boolean;
   /** The metronome & drone bar at the neck: "auto" (= shown) until hidden with its × or the header button. */
   metronomeBar: MetronomeBarSetting;
 }
@@ -87,6 +89,7 @@ export const DEFAULT_SETTINGS: ExplorerSettings = {
   leftHanded: false,
   orientation: "auto",
   theoryCollapsed: false,
+  keepArea: false,
   metronomeBar: "auto",
 };
 
@@ -108,6 +111,7 @@ const PREFERENCE_KEYS = [
   "leftHanded",
   "orientation",
   "theoryCollapsed",
+  "keepArea",
   "metronomeBar",
 ] as const satisfies readonly (keyof ExplorerSettings)[];
 
@@ -161,6 +165,7 @@ export function settingsFromSaved(data: Record<string, unknown>): ExplorerSettin
       leftHanded: bool(data.leftHanded, false),
       orientation: oneOf(data.orientation, ["auto", "horizontal", "vertical"], DEFAULT_SETTINGS.orientation),
       theoryCollapsed: bool(data.theoryCollapsed, false),
+      keepArea: bool(data.keepArea, false),
       metronomeBar: oneOf(data.metronomeBar, ["auto", "shown", "hidden"], DEFAULT_SETTINGS.metronomeBar),
     };
   } catch {

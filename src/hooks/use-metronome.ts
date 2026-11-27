@@ -46,6 +46,16 @@ function createTickStore(): TickStore & { set: (tick: ScheduledTick | null) => v
   };
 }
 
+/** A lesson link can carry the tempo ("?bpm=80"); it wins over the tempo remembered on this device. */
+function linkTempo(): Partial<MetronomeSettings> {
+  try {
+    const bpm = Number(new URLSearchParams(window.location.search).get("bpm"));
+    return bpm ? { bpm: clampBpm(bpm) } : {};
+  } catch {
+    return {};
+  }
+}
+
 function loadSettings(): MetronomeSettings {
   try {
     const data = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}") as Partial<MetronomeSettings>;
@@ -57,6 +67,12 @@ function loadSettings(): MetronomeSettings {
         : DEFAULT_METRONOME.subdivision,
       accent: typeof data.accent === "boolean" ? data.accent : DEFAULT_METRONOME.accent,
       volume: typeof data.volume === "number" ? Math.min(1, Math.max(0, data.volume)) : DEFAULT_METRONOME.volume,
+      backbeat: typeof data.backbeat === "boolean" ? data.backbeat : DEFAULT_METRONOME.backbeat,
+      gap: ([0, 1, 2, 4] as const).includes(Number(data.gap) as MetronomeSettings["gap"])
+        ? (Number(data.gap) as MetronomeSettings["gap"])
+        : DEFAULT_METRONOME.gap,
+      // a shared lesson link can set the tempo ("?bpm=80")
+      ...linkTempo(),
     };
   } catch {
     return DEFAULT_METRONOME;
@@ -110,7 +126,9 @@ export function useMetronome() {
     runOutput.current = output;
     const instance = new MetronomeScheduler({
       now: () => audio.ctx.currentTime,
-      onSchedule: (tick, s) => playClick(audio.ctx, output, tick.time, tick.kind, s.volume),
+      onSchedule: (tick, s) => {
+        if (!tick.silent) playClick(audio.ctx, output, tick.time, tick.kind, s.volume);
+      },
       lookahead: document.hidden ? HIDDEN_LOOKAHEAD : VISIBLE_LOOKAHEAD,
     });
     scheduler.current = instance;

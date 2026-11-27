@@ -477,7 +477,13 @@ export function explainScale(
     relationships: rel.items,
     modeFamily: rel.modeFamily,
     modeFamilyTitle: rel.modeFamilyTitle,
-    notices: describeNotices(spelled, lang),
+    notices: [
+      ...describeNotices(spelled, lang),
+      // Jazz scales: the chord they're played over, and their notes named from it (C7alt: 1 ♭9 ♯9 3 ♭5 ♯5 ♭7)
+      ...(spelled.scale.playedOver
+        ? [lang.playedOver({ chord: lang.note(spelled.root) + spelled.scale.playedOver.suffix, labels: spelled.scale.playedOver.labels.join(" ") })]
+        : []),
+    ],
     mood: lang.character(spelled.scale),
     usage: lang.usage(spelled.scale),
   };

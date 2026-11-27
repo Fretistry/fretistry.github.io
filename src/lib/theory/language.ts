@@ -126,6 +126,8 @@ export interface TheoryLanguage {
   respelledNote(p: { label: string; used: string; original: string }): string;
 
   // ── Chords ─────────────────────────────────────────────────────────────────
+  /** Jazz scales: "Jazz players use this scale over C7alt and name its notes from that chord: 1 ♭9 ♯9 3 ♭5 ♯5 ♭7." */
+  playedOver(p: { chord: string; labels: string }): string;
   chordBasis(p: {
     basis: "scale" | "parent" | "symmetric" | "blues";
     noteCount: number;
@@ -345,6 +347,8 @@ export function createEnglishTheory(format: NoteFormat = DEFAULT_FORMAT): Theory
     respelledNote: ({ label, used, original }) =>
       `The ${label} is written ${b(used)} instead of ${original} to avoid a double sharp or flat.`,
 
+    playedOver: ({ chord, labels }) =>
+      `Jazz players use this scale over **${chord}** and name its notes from that chord: ${labels}.`,
     chordBasis: ({ basis, noteCount, parentName, scaleTitle, wholeTone, chordList, majorBlues }) => {
       if (basis === "scale") return "Each chord is built by stacking every other note of the scale (thirds) on top of a scale note.";
       if (basis === "symmetric")

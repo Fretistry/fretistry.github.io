@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { shortcutAllowed } from "@/lib/shortcuts";
 import { Minus, Play, Plus, SlidersHorizontal, Square, Volume1, Volume2, X } from "lucide-react";
 import { ToolbarSwitch } from "@/components/explorer/display-toolbar";
 import { SegmentedControl } from "@/components/explorer/segmented-control";
@@ -9,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { BPM_MAX, BPM_MIN, tempoMarking, type ScheduledTick, type Subdivision } from "@/lib/audio/metronome";
+import { BPM_MAX, BPM_MIN, tempoMarking, type MetronomeSettings, type ScheduledTick, type Subdivision } from "@/lib/audio/metronome";
 import { useDrone } from "@/hooks/use-drone";
 import { cn } from "@/lib/utils";
 import { DroneControls, DroneSettingsPanel, DroneSoundOptions } from "./drone-controls";
@@ -143,6 +144,35 @@ export function MetronomeHeaderButton({ barVisible, onToggleBar }: { barVisible:
   );
 }
 
+/** Type a tempo: applied on Enter or when leaving the field (so typing "1", "12", "120" isn't cut short). */
+function TempoInput({ bpm, label, onCommit }: { bpm: number; label: string; onCommit: (bpm: number) => void }) {
+  const [draft, setDraft] = useState<string | null>(null);
+  const commit = () => {
+    const value = Number(draft);
+    if (draft !== null && Number.isFinite(value) && value > 0) onCommit(value);
+    setDraft(null);
+  };
+  return (
+    <input
+      type="number"
+      inputMode="numeric"
+      min={BPM_MIN}
+      max={BPM_MAX}
+      aria-label={label}
+      title={label}
+      value={draft ?? String(bpm)}
+      // the number is selected when you tap into the field, so typing replaces it
+      onFocus={(e) => e.currentTarget.select()}
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={commit}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") e.currentTarget.blur();
+      }}
+      className="h-8 w-16 rounded-md border border-input bg-background px-1.5 text-center text-sm tabular-nums outline-none focus-visible:ring-3 focus-visible:ring-ring/50 pointer-coarse:h-9"
+    />
+  );
+}
+
 /** The less-used metronome settings, behind the bar's Settings button. */
 function MetronomeSettingsPanel() {
   const { settings, update } = useSharedMetronome();
@@ -165,6 +195,7 @@ function MetronomeSettingsPanel() {
         <Button variant="outline" size="icon-sm" aria-label={t.faster} onClick={() => update({ bpm: settings.bpm + 1 })}>
           <Plus />
         </Button>
+        <TempoInput bpm={settings.bpm} label={t.tempoInput} onCommit={(bpm) => update({ bpm })} />
       </div>
       <div className="flex flex-wrap items-center gap-1.5">
         {PRESETS.map((bpm) => (
@@ -205,6 +236,23 @@ function MetronomeSettingsPanel() {
         />
       </div>
       <ToolbarSwitch id="metronome-accent" label={t.accent} checked={settings.accent} onCheckedChange={(accent) => update({ accent })} />
+      <div title={t.backbeatTitle}>
+        <ToolbarSwitch id="metronome-backbeat" label={t.backbeat} checked={settings.backbeat} onCheckedChange={(backbeat) => update({ backbeat })} />
+      </div>
+      <div>
+        <p className="mb-1.5 text-[11px] font-medium tracking-wider text-muted-foreground uppercase">{t.gap}</p>
+        <SegmentedControl
+          ariaLabel={t.gap}
+          value={String(settings.gap)}
+          onChange={(v) => update({ gap: Number(v) as MetronomeSettings["gap"] })}
+          className="w-full"
+          options={[
+            { value: "0", label: t.gapOff },
+            ...[1, 2, 4].map((n) => ({ value: String(n), label: `${n} + ${n}`, title: t.gapTitle(n) })),
+          ]}
+        />
+        <p className="mt-1.5 text-xs text-muted-foreground">{t.gapHint}</p>
+      </div>
       <div className="flex items-center gap-2.5">
         <Volume1 className="size-4 text-muted-foreground" />
         <Slider
@@ -248,6 +296,19 @@ export function MetronomeBar({
   const { settings, update, running, toggle, tap } = useSharedMetronome();
   const drone = useDrone(rootPitchClass);
   const { ui } = useI18n();
+
+  // Keyboard shortcut D: start or stop the drone (the list is under "?")
+  const { toggle: toggleDrone } = drone;
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.key === "d" || e.key === "D") && shortcutAllowed(e)) {
+        e.preventDefault();
+        toggleDrone();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [toggleDrone]);
   const t = ui.metronome;
   return (
     <div

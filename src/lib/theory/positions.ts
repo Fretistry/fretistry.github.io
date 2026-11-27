@@ -233,6 +233,23 @@ export function hasCagedShapes(tuning: Tuning): boolean {
   return extraLowStrings(tuning) !== null;
 }
 
+/**
+ * The position that sits nearest a fret (any of its occurrences, so also the copy 12 frets
+ * higher), for "stay in this area" when changing key. Ties go to the lower one.
+ */
+export function nearestPosition(positions: readonly ScalePosition[], fret: number): number | null {
+  let best: { index: number; distance: number; start: number } | null = null;
+  for (const p of positions) {
+    for (const occurrence of p.occurrences) {
+      if (occurrence.length === 0) continue;
+      const start = Math.min(...occurrence.map((n) => n.fret));
+      const distance = Math.abs(start - fret);
+      if (!best || distance < best.distance || (distance === best.distance && start < best.start)) best = { index: p.index, distance, start };
+    }
+  }
+  return best?.index ?? null;
+}
+
 /** Lowest fret used by the first occurrence — handy for labels like "5th fret". */
 export function positionStartFret(position: ScalePosition): number | null {
   const first = position.occurrences[0];

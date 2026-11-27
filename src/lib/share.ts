@@ -127,3 +127,17 @@ export function parseSearchParams(params: URLSearchParams): Partial<SharedState>
   // Older links may still contain "mode=practice" (practice mode was removed); it is simply ignored.
   return result;
 }
+
+/**
+ * A lesson link: the current address plus the tempo ("bpm=80") and drone sound ("drone=pad5")
+ * when they're playing, so homework like "80 BPM over a drone" travels in one link. Null leaves
+ * that part out (and removes an old one).
+ */
+export function withPractice(url: string, practice: { bpm: number | null; drone: string | null }): string {
+  const u = new URL(url);
+  for (const [key, value] of [["bpm", practice.bpm], ["drone", practice.drone]] as const) {
+    if (value === null) u.searchParams.delete(key);
+    else u.searchParams.set(key, String(value));
+  }
+  return u.toString();
+}

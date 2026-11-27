@@ -342,6 +342,8 @@ export function createFrenchTheory(format: NoteFormat): TheoryLanguage {
     respelledNote: ({ label, used, original }) =>
       `La ${label} s’écrit ${b(used)} au lieu de ${original} pour éviter un double dièse ou un double bémol.`,
 
+    playedOver: ({ chord, labels }) =>
+      `En jazz, on joue cette gamme sur **${chord}** et on nomme ses notes par rapport à cet accord : ${labels}.`,
     chordBasis: ({ basis, noteCount, parentName, scaleTitle, wholeTone, chordList, majorBlues }) => {
       if (basis === "scale") return "Chaque accord se construit en empilant une note sur deux de la gamme (des tierces) à partir d’une note de la gamme.";
       if (basis === "symmetric")

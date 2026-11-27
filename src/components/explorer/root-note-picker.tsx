@@ -10,6 +10,8 @@ import { cn } from "@/lib/utils";
 interface RootNotePickerProps {
   value: RootName;
   onChange: (root: RootName) => void;
+  /** Phones: shown under the 12 notes in the pop-up ("Next in 4ths", "Random key"). */
+  extra?: React.ReactNode;
 }
 
 /**
@@ -17,7 +19,7 @@ interface RootNotePickerProps {
  * current root and opens the same 12 notes (two rows of six), so the key, scale
  * and tuning fit on one row and the neck starts higher up the page.
  */
-export function RootNotePicker({ value, onChange }: RootNotePickerProps) {
+export function RootNotePicker({ value, onChange, extra }: RootNotePickerProps) {
   const { ui, note } = useI18n();
   const [open, setOpen] = useState(false);
   const current = note(rootNote(value));
@@ -48,6 +50,11 @@ export function RootNotePicker({ value, onChange }: RootNotePickerProps) {
               }}
               className="grid-cols-6"
             />
+            {extra && (
+              <div className="mt-2" onClick={() => setOpen(false)}>
+                {extra}
+              </div>
+            )}
           </PopoverContent>
         </Popover>
       </div>

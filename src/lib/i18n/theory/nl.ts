@@ -327,6 +327,8 @@ export function createDutchTheory(format: NoteFormat): TheoryLanguage {
     respelledNote: ({ label, used, original }) =>
       `De ${label} wordt geschreven als ${b(used)} in plaats van ${original}, om een dubbelkruis of dubbelmol te vermijden.`,
 
+    playedOver: ({ chord, labels }) =>
+      `Jazzmuzikanten spelen deze toonladder over **${chord}** en noemen de noten vanuit dat akkoord: ${labels}.`,
     chordBasis: ({ basis, noteCount, parentName, scaleTitle, wholeTone, chordList, majorBlues }) => {
       if (basis === "scale") return "Elk akkoord ontstaat door om de andere noot van de toonladder (tertsen) op een toonladdernoot te stapelen.";
       if (basis === "symmetric")

@@ -174,6 +174,7 @@ export const SCALES: readonly ScaleDefinition[] = [
     degrees: SEVEN_DEGREES,
     character: "Maximum tension — every note that can be altered is, so it pulls hard towards the next chord.",
     usage: "Jazz soloing over dominant chords that resolve (V7 → I). Jazz players think of its notes as ♭9, ♯9, 3, ♭5, ♯5 and ♭7.",
+    playedOver: { suffix: "7alt", labels: ["1", "♭9", "♯9", "3", "♭5", "♯5", "♭7"] },
   },
   {
     id: "whole-tone",
@@ -203,6 +204,7 @@ export const SCALES: readonly ScaleDefinition[] = [
     degrees: [1, 2, 2, 3, 4, 5, 6, 7],
     character: "Spiky and symmetrical — alternating half and whole steps, full of ♭9 and ♯9 colour.",
     usage: "Jazz over dominant 7th(♭9) chords, fusion and metal.",
+    playedOver: { suffix: "7♭9", labels: ["1", "♭9", "♯9", "3", "♯11", "5", "13", "♭7"] },
   },
 
   // ── World & exotic ──────────────────────────────────────────────────────────

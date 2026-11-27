@@ -29,7 +29,7 @@ import { getSharedAudio } from "@/lib/audio/audio-context";
 import { secondsPerTick } from "@/lib/audio/metronome";
 import { ascendingScale, chordVoicing, upAndDown } from "@/lib/audio/sequence";
 import { installWebAudioEngine } from "@/lib/audio/web-audio-engine";
-import { rootNote } from "@/lib/data/roots";
+import { ROOT_NAMES, rootNote, type RootName } from "@/lib/data/roots";
 import { SCALES, getScale } from "@/lib/data/scales";
 import { CUSTOM_TUNING_ID, DEFAULT_TUNING_ID, getTuningPreset, makeCustomTuning } from "@/lib/data/tunings";
 import { isFavourite } from "@/lib/favourites";
@@ -37,7 +37,8 @@ import { imageFileName } from "@/lib/file-name";
 import { alternativeScaleTitle } from "@/lib/i18n/spoken";
 import { parseScalePagePath } from "@/lib/pages";
 import { BASE_PATH, CREATOR, SITE_NAME, SITE_URL } from "@/lib/site";
-import { cagedIndex, pentatonicBox, type StartingPoint } from "@/lib/start-here";
+import { keyBelongsToFocus, nextInFourths, shortcutAllowed, stepRoot } from "@/lib/shortcuts";
+import { cagedIndex, pentatonicBox, shapeOfBox, type StartingPoint } from "@/lib/start-here";
 import { inTrainerArea, pickTarget, trainerTargets } from "@/lib/trainer";
 import { cn } from "@/lib/utils";
 import {
@@ -47,6 +48,7 @@ import {
   intervalDisplayLabel,
   mod12,
   pitchClassOf,
+  nearestPosition,
   positionKey,
   positionStartFret,
   hasCagedShapes,
@@ -71,15 +73,31 @@ import { SiteFooter } from "./privacy-note";
 import { RootNotePicker } from "./root-note-picker";
 import { ScaleHeader } from "./scale-header";
 import { ShareMenu } from "./share-button";
+import { KeySteps, ShortcutsDialog } from "./shortcuts-dialog";
 import { ScaleSelect } from "./scale-select";
 import { TrainerBar } from "./trainer-bar";
 import { TuningSelect } from "./tuning-select";
 
-function Field({ label, children, className }: { label: string; children: React.ReactNode; className?: string }) {
+function Field({
+  label,
+  extra,
+  children,
+  className,
+}: {
+  label: string;
+  /** Small buttons at the end of the label line (larger screens). */
+  extra?: React.ReactNode;
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
     <div className={className}>
       {/* phones: key, scale and tuning share one row without labels (still read out by screen readers) */}
-      <p className="mb-1.5 text-[11px] font-medium tracking-wider text-muted-foreground uppercase max-sm:sr-only">{label}</p>
+      <div className="mb-1.5 flex items-center justify-between gap-2 max-sm:sr-only">
+        <p className="text-[11px] font-medium tracking-wider text-muted-foreground uppercase">{label}</p>
+        {/* negative margins: the buttons don't make the label line taller (the neck stays where it is) */}
+        {extra && <div className="-my-2 max-sm:hidden">{extra}</div>}
+      </div>
       {children}
     </div>
   );
@@ -188,6 +206,22 @@ function ExplorerApp() {
   const activePositions = useMemo(() => positionIndices.map((i) => positions[i]).filter(Boolean), [positionIndices, positions]);
   const activePosition = activePositions[0] ?? null;
   const shapeContext = `${positionSystem}:${positionIndices.join("-")}`;
+
+  // "Stay in this area": with one shape shown, a new key or scale shows the shape nearest the
+  // frets you were on (D Dorian's C shape at frets 2–5 → G Mixolydian's E shape, same frets),
+  // instead of the same shape letter somewhere else on the neck.
+  const withArea = useCallback(
+    (patch: { rootName?: RootName; scaleId?: string }) => {
+      if (!settings.keepArea || positionSystem === "all" || activePositions.length !== 1) return patch;
+      const from = positionStartFret(activePositions[0]);
+      if (from === null) return patch;
+      const next = spellScale(rootNote(patch.rootName ?? settings.rootName), getScale(patch.scaleId ?? settings.scaleId));
+      const system = positionSystem === "3nps" && !positionSystemsFor(next).includes("3nps") ? "boxes" : positionSystem;
+      const index = nearestPosition(scalePositions(next, tuning, system), from);
+      return index === null ? patch : { ...patch, positionIndices: [index] };
+    },
+    [settings.keepArea, settings.rootName, settings.scaleId, positionSystem, activePositions, tuning],
+  );
   // Each CAGED shape / box keeps its own colour (C, A, G, E, D); 3-per-string uses the neutral tint.
   const positionAreas: PositionArea[] | null = useMemo(
     () =>
@@ -534,6 +568,86 @@ function ExplorerApp() {
     });
   }, [spelled, ui, i18n]);
 
+  // ── Next key / random key, and keyboard shortcuts (practising with the guitar in your hands) ──
+  const goNextKey = useCallback(
+    () => update(withArea({ rootName: nextInFourths(ROOT_NAMES, settings.rootName) })),
+    [update, withArea, settings.rootName],
+  );
+  const goRandomKey = useCallback(() => {
+    const others = ROOT_NAMES.filter((r) => r !== settings.rootName);
+    update(withArea({ rootName: others[Math.floor(Math.random() * others.length)] }));
+  }, [update, withArea, settings.rootName]);
+
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  const { toggle: toggleMetronome, update: updateMetronome } = metronome;
+  const bpm = metronomeSettings.bpm;
+  const boxed = pentatonicBox(settings.scaleId, "E") !== null;
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!shortcutAllowed(e)) return;
+      const act = (action: () => void) => {
+        e.preventDefault();
+        action();
+      };
+      const key = e.key;
+      if (key === " " || key === "ArrowLeft" || key === "ArrowRight") {
+        if (keyBelongsToFocus(e)) return; // a tabbed-to button or button group uses these keys itself
+        if (key === " ") return act(toggleMetronome);
+        const step = key === "ArrowRight" ? 1 : -1;
+        return act(() => update(withArea({ rootName: stepRoot(ROOT_NAMES, settings.rootName, step) })));
+      }
+      switch (key.toLowerCase()) {
+        case "n":
+          return act(goNextKey);
+        case "r":
+          return act(goRandomKey);
+        case "p":
+          if (!soundEnabled || training) return;
+          return act(() => (scalePlayer.isPlaying ? stopScale() : playScale()));
+        case "+":
+        case "=":
+          return act(() => updateMetronome({ bpm: bpm + (bpm >= 100 ? 5 : 2) }));
+        case "-":
+        case "_":
+          return act(() => updateMetronome({ bpm: bpm - (bpm > 100 ? 5 : 2) }));
+        case "?":
+          return act(() => setShortcutsOpen(true));
+      }
+      if (/^[0-7]$/.test(key)) {
+        const n = Number(key);
+        if (n === 0) return act(() => update({ positionSystem: "all", positionIndices: [0] }));
+        if (positionSystem === "3nps") {
+          if (n <= positions.length) act(() => update({ positionIndices: [n - 1] }));
+          return;
+        }
+        if (n > 5) return;
+        // pentatonic and blues: "1" is box 1 (the E shape); otherwise the CAGED order (1 = C shape)
+        const shape = boxed && caged ? shapeOfBox(n) : null;
+        act(() => update({ positionSystem: "boxes", positionIndices: [shape ? cagedIndex(shape) : n - 1] }));
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [
+    toggleMetronome,
+    updateMetronome,
+    bpm,
+    update,
+    withArea,
+    settings.rootName,
+    goNextKey,
+    goRandomKey,
+    soundEnabled,
+    training,
+    scalePlayer.isPlaying,
+    stopScale,
+    playScale,
+    positionSystem,
+    positions.length,
+    boxed,
+    caged,
+  ]);
+
   const chordBarProps = {
     chordSet,
     size: settings.chordSize,
@@ -636,6 +750,7 @@ function ExplorerApp() {
         onSettingsChange={update}
         metronomeBarVisible={metronomeBarVisible}
         onToggleMetronomeBar={toggleMetronomeBar}
+        onShowShortcuts={() => setShortcutsOpen(true)}
       />
 
       <main className="mx-auto w-full max-w-[1600px] min-[1760px]:max-w-[112rem] flex-1 space-y-5 px-[max(1rem,env(safe-area-inset-left))] py-5 sm:px-6 sm:py-6 lg:py-4">
@@ -644,11 +759,19 @@ function ExplorerApp() {
           aria-label={`${ui.controls.rootNote} · ${ui.controls.scale} · ${ui.controls.tuning}`}
           className="grid grid-cols-[auto_minmax(0,1fr)_minmax(0,auto)] gap-x-2 gap-y-3 rounded-2xl border border-border/70 bg-surface p-3 sm:grid-cols-2 sm:gap-4 sm:p-4 lg:p-3 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)_minmax(0,1.1fr)]"
         >
-          <Field label={ui.controls.rootNote} className="sm:col-span-2 lg:col-span-1">
-            <RootNotePicker value={settings.rootName} onChange={(rootName) => update({ rootName })} />
+          <Field
+            label={ui.controls.rootNote}
+            extra={<KeySteps onNext={goNextKey} onRandom={goRandomKey} />}
+            className="sm:col-span-2 lg:col-span-1"
+          >
+            <RootNotePicker
+              value={settings.rootName}
+              onChange={(rootName) => update(withArea({ rootName }))}
+              extra={<KeySteps onNext={goNextKey} onRandom={goRandomKey} className="justify-center" />}
+            />
           </Field>
           <Field label={ui.controls.scale} className="min-w-0">
-            <ScaleSelect value={settings.scaleId} onChange={(scaleId) => update({ scaleId })} />
+            <ScaleSelect value={settings.scaleId} onChange={(scaleId) => update(withArea({ scaleId }))} />
           </Field>
           <Field label={ui.controls.tuning} className="min-w-0">
             <TuningSelect
@@ -666,7 +789,7 @@ function ExplorerApp() {
                 <FavouritesBar
                   favourites={favourites.favourites}
                   current={currentFavourite}
-                  onSelect={({ rootName, scaleId }) => update({ rootName, scaleId })}
+                  onSelect={({ rootName, scaleId }) => update(withArea({ rootName, scaleId }))}
                   onRemove={favourites.remove}
                 />
               ) : (
@@ -746,6 +869,8 @@ function ExplorerApp() {
                 selected={positionIndices}
                 caged={caged}
                 scaleId={settings.scaleId}
+                keepArea={settings.keepArea}
+                onKeepAreaChange={(keepArea) => update({ keepArea })}
                 onChange={(patch) => {
                   update(patch);
                   if (patch.positionSystem !== "all" && (patch.positionIndices?.length ?? 0) > 0) revealNeck();
@@ -858,6 +983,7 @@ function ExplorerApp() {
         />
       </main>
 
+      <ShortcutsDialog open={shortcutsOpen} onOpenChange={setShortcutsOpen} />
       <SiteFooter creator={CREATOR} />
     </div>
   );

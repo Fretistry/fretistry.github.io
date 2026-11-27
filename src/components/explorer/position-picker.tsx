@@ -6,7 +6,7 @@ import type { PositionChoice } from "@/lib/share";
 import { pentatonicBox } from "@/lib/start-here";
 import { positionStartFret, type PositionSystem, type ScalePosition } from "@/lib/theory";
 import { cn } from "@/lib/utils";
-import { ToolbarGroup } from "./display-toolbar";
+import { ToolbarGroup, ToolbarSwitch } from "./display-toolbar";
 import { InfoTip } from "./info-tip";
 import { SegmentedControl } from "./segmented-control";
 
@@ -20,6 +20,9 @@ interface PositionPickerProps {
   caged: boolean;
   /** Minor pentatonic and blues shapes also get their usual box number ("E shape · box 1"). */
   scaleId: string;
+  /** "Stay in this area when changing key" (offered while one shape is shown). */
+  keepArea: boolean;
+  onKeepAreaChange: (keepArea: boolean) => void;
   onChange: (patch: { positionSystem?: PositionChoice; positionIndices?: number[] }) => void;
 }
 
@@ -32,7 +35,17 @@ const pill =
  * 3-notes-per-string patterns (one at a time). The buttons always stay in
  * the same place; only their colour changes.
  */
-export function PositionPicker({ system, available, positions, selected, caged, scaleId, onChange }: PositionPickerProps) {
+export function PositionPicker({
+  system,
+  available,
+  positions,
+  selected,
+  caged,
+  scaleId,
+  keepArea,
+  onKeepAreaChange,
+  onChange,
+}: PositionPickerProps) {
   const { ui } = useI18n();
   const t = ui.positions;
   /** "E shape", or "E shape · box 1" for the minor pentatonic and blues. */
@@ -137,6 +150,10 @@ export function PositionPicker({ system, available, positions, selected, caged, 
               {detail}
               {connectHint && <span className="text-muted-foreground/80"> · {connectHint}</span>}
             </span>
+          )}
+          {/* practise one area through many keys: a new key shows the shape nearest these frets */}
+          {single && (
+            <ToolbarSwitch id="keep-area" label={t.keepArea} checked={keepArea} onCheckedChange={onKeepAreaChange} />
           )}
         </div>
       )}

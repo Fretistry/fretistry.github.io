@@ -329,6 +329,8 @@ export function createGermanTheory(format: NoteFormat): TheoryLanguage {
     respelledNote: ({ label, used, original }) =>
       `Die ${label} wird als ${b(used)} statt ${original} notiert, um ein Doppelkreuz oder Doppel-♭ zu vermeiden.`,
 
+    playedOver: ({ chord, labels }) =>
+      `Im Jazz spielt man diese Tonleiter über **${chord}** und benennt ihre Töne von diesem Akkord aus: ${labels}.`,
     chordBasis: ({ basis, noteCount, parentName, scaleTitle, wholeTone, chordList, majorBlues }) => {
       if (basis === "scale") return "Jeder Akkord entsteht, indem man auf einem Tonleiterton jeden zweiten Ton der Tonleiter (Terzen) schichtet.";
       if (basis === "symmetric")

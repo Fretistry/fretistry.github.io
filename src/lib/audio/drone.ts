@@ -32,6 +32,17 @@ export function parseDroneSettings(data: unknown): DroneSettings {
   };
 }
 
+/** The drone part of a lesson link: "pad", "pad5" (with the fifth), "harmonium" or "harmonium5". */
+export function droneLinkValue(settings: Pick<DroneSettings, "sound" | "fifth">): string {
+  return `${settings.sound}${settings.fifth ? "5" : ""}`;
+}
+
+/** Reads the drone part of a lesson link (anything else is ignored). */
+export function parseDroneLink(value: string | null): Partial<DroneSettings> {
+  const match = value?.match(/^(pad|harmonium)(5)?$/);
+  return match ? { sound: match[1] as DroneSound, fifth: Boolean(match[2]) } : {};
+}
+
 /** The drone's root note: between A2 and G♯3, a comfortable register under a guitar. */
 export function droneBaseMidi(rootPitchClass: number): number {
   return 45 + ((((rootPitchClass - 9) % 12) + 12) % 12);

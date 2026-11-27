@@ -84,6 +84,11 @@ export interface ScaleDefinition {
   character: string;
   /** Where you typically hear this scale. */
   usage: string;
+  /**
+   * Jazz scales named from the dominant chord they're played over: the chord's suffix after
+   * the root ("7alt" → C7alt) and the scale's notes as jazz players name them (♭9, ♯9, 3…).
+   */
+  playedOver?: { suffix: string; labels: readonly string[] };
 }
 
 /** A guitar tuning, stored as real pitches from the lowest-pitched string to the highest. */

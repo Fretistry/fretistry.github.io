@@ -20,6 +20,10 @@ export interface MetronomeSettings {
   accent: boolean;
   /** 0–1 */
   volume: number;
+  /** Click only on beats 2 and 4 (beats 1 and 3 stay silent), like a drummer's backbeat. */
+  backbeat: boolean;
+  /** Silent bars: `gap` bars with clicks, then `gap` bars of silence (0 = off). */
+  gap: 0 | 1 | 2 | 4;
 }
 
 export interface ScheduledTick {
@@ -30,6 +34,10 @@ export interface ScheduledTick {
   /** 0-based subdivision within the beat (0 = on the beat). */
   sub: number;
   kind: TickKind;
+  /** 0-based bar number since the start. */
+  bar: number;
+  /** No click is heard (backbeat or a silent bar); the beat lights still show it. */
+  silent: boolean;
 }
 
 export const BPM_MIN = 30;
@@ -41,7 +49,15 @@ export const DEFAULT_METRONOME: MetronomeSettings = {
   subdivision: 1,
   accent: true,
   volume: 0.8,
+  backbeat: false,
+  gap: 0,
 };
+
+/** Whether a click is silent: beats 1 and 3 with the backbeat on, or every click in a silent bar. */
+export function isSilent(tick: Pick<ScheduledTick, "beat" | "sub" | "bar">, settings: Pick<MetronomeSettings, "backbeat" | "gap">): boolean {
+  if (settings.gap > 0 && tick.bar % (2 * settings.gap) >= settings.gap) return true;
+  return settings.backbeat && tick.sub === 0 && tick.beat % 2 === 0;
+}
 
 export function clampBpm(bpm: number): number {
   if (!Number.isFinite(bpm)) return DEFAULT_METRONOME.bpm;
@@ -100,6 +116,7 @@ export class MetronomeScheduler {
   private settings: MetronomeSettings = DEFAULT_METRONOME;
   private nextTime = 0;
   private tickInBar = 0;
+  private bar = 0;
   private queue: ScheduledTick[] = [];
   private running = false;
   /** Time of the most recently booked click that falls on a beat. */
@@ -118,6 +135,7 @@ export class MetronomeScheduler {
     this.settings = settings;
     this.running = true;
     this.tickInBar = 0;
+    this.bar = 0;
     this.queue = [];
     this.beatAnchor = null;
     this.nextTime = this.options.now() + startDelay;
@@ -165,17 +183,22 @@ export class MetronomeScheduler {
     const horizon = this.options.now() + this.lookahead;
     while (this.nextTime < horizon) {
       const s = this.settings;
+      const beat = Math.floor(this.tickInBar / s.subdivision);
+      const sub = this.tickInBar % s.subdivision;
       const tick: ScheduledTick = {
         time: this.nextTime,
-        beat: Math.floor(this.tickInBar / s.subdivision),
-        sub: this.tickInBar % s.subdivision,
+        beat,
+        sub,
         kind: tickKind(this.tickInBar, s),
+        bar: this.bar,
+        silent: isSilent({ beat, sub, bar: this.bar }, s),
       };
       this.queue.push(tick);
       if (tick.sub === 0) this.beatAnchor = tick.time;
       this.options.onSchedule(tick, s);
       this.nextTime += secondsPerTick(s);
       this.tickInBar = (this.tickInBar + 1) % (s.beatsPerBar * s.subdivision);
+      if (this.tickInBar === 0) this.bar++;
     }
   }
 

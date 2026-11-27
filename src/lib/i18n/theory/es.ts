@@ -342,6 +342,8 @@ export function createSpanishTheory(format: NoteFormat): TheoryLanguage {
     respelledNote: ({ label, used, original }) =>
       `La ${label} se escribe ${b(used)} en lugar de ${original} para evitar un doble sostenido o un doble bemol.`,
 
+    playedOver: ({ chord, labels }) =>
+      `En jazz se toca esta escala sobre **${chord}** y sus notas se nombran desde ese acorde: ${labels}.`,
     chordBasis: ({ basis, noteCount, parentName, scaleTitle, wholeTone, chordList, majorBlues }) => {
       if (basis === "scale") return "Cada acorde se forma apilando notas alternas de la escala (terceras) sobre una nota de la escala.";
       if (basis === "symmetric")

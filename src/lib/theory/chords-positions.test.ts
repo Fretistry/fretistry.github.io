@@ -3,11 +3,13 @@ import { ROOT_NAMES, rootNote } from "@/lib/data/roots";
 import { SCALES, getScale } from "@/lib/data/scales";
 import { TUNING_PRESETS, getTuningPreset, makeCustomTuning } from "@/lib/data/tunings";
 import { describeChordStack, identifyChord, scaleChords } from "./chords";
+import { explainScale } from "./explain";
 import { midiOf, mod12, noteToAscii, parseNote, parsePitch, pitchClassOf } from "./notes";
 import {
   extraLowStrings,
   hasCagedShapes,
   isStandardShape,
+  nearestPosition,
   positionSystemsFor,
   scalePositions,
   type PositionNote,
@@ -96,6 +98,33 @@ describe("chords in the key", () => {
     expect(wt.chords.every((c) => c.type?.id === "aug")).toBe(true);
     const dim = scaleChords(spell("C", "diminished"), "seventh", SCALES);
     expect(dim.chords.every((c) => c.type?.id === "dim7")).toBe(true);
+  });
+
+  it("finds the shape in the same area of the neck after a key change", () => {
+    const dDorian = scalePositions(spell("D", "dorian"), standard, "boxes");
+    const cShape = byShape(dDorian, "C");
+    const from = Math.min(...cShape.occurrences[0].map((n) => n.fret));
+    expect(from).toBeLessThanOrEqual(3); // D Dorian's C shape sits low on the neck
+    const gMixo = scalePositions(spell("G", "mixolydian"), standard, "boxes");
+    const nearest = gMixo[nearestPosition(gMixo, from)!];
+    expect(nearest.cagedShape).toBe("E"); // G Mixolydian's E shape is in the same place
+    expect(Math.abs(Math.min(...nearest.occurrences[0].map((n) => n.fret)) - from)).toBeLessThanOrEqual(1);
+    expect(nearestPosition([], 5)).toBeNull();
+  });
+
+  it("names the chord jazz scales are played over, with their jazz note names", () => {
+    const alt = explainScale(spell("C", "altered"), SCALES);
+    expect(alt.notices.join(" ")).toContain("**C7alt** and name its notes from that chord: 1 ♭9 ♯9 3 ♭5 ♯5 ♭7");
+    const hw = explainScale(spell("G", "diminished-half-whole"), SCALES);
+    expect(hw.notices.join(" ")).toContain("**G7♭9**");
+    expect(hw.notices.join(" ")).toContain("1 ♭9 ♯9 3 ♯11 5 13 ♭7");
+    // the jazz names describe the same pitches as the strict spelling
+    const semitones: Record<string, number> = { "1": 0, "♭9": 1, "♯9": 3, "3": 4, "♭5": 6, "♯11": 6, "5": 7, "♯5": 8, "13": 9, "♭7": 10 };
+    for (const id of ["altered", "diminished-half-whole"]) {
+      const scale = getScale(id);
+      expect(scale.playedOver!.labels.map((l) => semitones[l])).toEqual([...scale.intervals]);
+    }
+    expect(explainScale(spell("C", "major"), SCALES).notices).toEqual([]);
   });
 
   it("spells chords of symmetric scales in thirds from their own root", () => {

@@ -38,3 +38,9 @@ export function pentatonicBox(scaleId: string, cagedShape: string | null | undef
   if (!cagedShape || !BOXED_SCALES.has(scaleId)) return null;
   return BOX_OF_SHAPE[cagedShape] ?? null;
 }
+
+/** The shape letter of box `n` (1 = E, 2 = D, 3 = C, 4 = A, 5 = G), for scales numbered in boxes. */
+export function shapeOfBox(n: number): StartingPoint["shape"] | null {
+  const entry = Object.entries(BOX_OF_SHAPE).find(([, box]) => box === n);
+  return entry ? (entry[0] as StartingPoint["shape"]) : null;
+}
