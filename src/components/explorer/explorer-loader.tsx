@@ -1,7 +1,25 @@
 "use client";
 
 import { useSyncExternalStore, type ReactNode } from "react";
+import { initialLocale } from "@/lib/i18n/initial";
+import { loadMessages, messagesSettled, subscribeMessages } from "@/lib/i18n/load";
 import { GuitarScaleExplorer } from "./guitar-scale-explorer";
+
+/**
+ * Only the visitor's language is downloaded. Its texts are requested the moment this code
+ * runs in the browser (while the app is still starting), and the page's text stays on screen
+ * until they're here, so the app never shows up blank or in the wrong language first.
+ */
+const visitLocale = typeof window === "undefined" ? null : initialLocale();
+if (visitLocale) loadMessages(visitLocale).catch(() => undefined);
+
+function useLanguageReady(): boolean {
+  return useSyncExternalStore(
+    subscribeMessages,
+    () => visitLocale === null || messagesSettled(visitLocale),
+    () => false,
+  );
+}
 
 /**
  * The explorer runs entirely in the browser (it reads saved settings from
@@ -26,7 +44,8 @@ function useInBrowser(): boolean {
 
 export function ExplorerLoader({ placeholder }: { placeholder?: ReactNode }) {
   const inBrowser = useInBrowser();
-  if (!inBrowser) return placeholder ?? <ExplorerSkeleton />;
+  const languageReady = useLanguageReady();
+  if (!inBrowser || !languageReady) return placeholder ?? <ExplorerSkeleton />;
   return <GuitarScaleExplorer />;
 }
 

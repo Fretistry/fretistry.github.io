@@ -226,6 +226,7 @@ Then open <http://localhost:3000>.
   - Headings in order: the scale's name (h1), Music theory (h2), its sections (h3). Icon-only buttons have labels.
   - One calm "pressed" look for every selected option (a chord, +5th, a pattern); amber is for root notes only. The custom-tuning button shows a pencil, so it isn't confused with the metronome's Options.
 - **Quick to start:** the page shows the scale as real text at once; the app's code is listed in the page itself, so it downloads together with the rest, and the text doesn't jump when the app takes over.
+- **One language at a time:** the app downloads only the visitor's language (English is always included as the fallback). That language is worked out before the app starts (link, saved choice, page address, or browser) and fetched right away; the page's text stays on screen until it's there, so the app never appears blank or in English first. Picking another language in Settings fetches it then, and the whole interface switches at once. Each new language (Portuguese, Italian…) now only costs the visitors who read it. (Pages built ahead of time, with their titles and text for search engines, still have every language at hand.)
 - **Large monitors:** from about 1760 pixels wide, the whole interface grows a little and uses more of the screen (up to 2240 px wide on a 2560 monitor). The neck grows with it: taller strings, bigger notes and labels.
 - **Installable as an app:** use Android "Install app" or iPhone "Share → Add to Home Screen". It opens full-screen with its own icon.
 - After the first visit, the published site keeps working offline. An offline helper (a "service worker") is installed in production builds only, never during local development. Each release registers it under its own name (`sw.js?v=<commit>`), so it clears the previous release's files instead of letting them pile up.
@@ -287,7 +288,9 @@ src/
     explain.ts        generates all explanation text from the data
     language.ts       the sentences explain.ts uses, in English (other languages implement the same interface)
     note-names.ts     letter, German (H/B) and do-re-mi note naming
-  lib/i18n/         translations
+  lib/i18n/         translations: core.ts (languages, no texts), load.ts (one language at a time,
+                    for the app), index.ts (all languages, for the pages built ahead of time),
+                    ui/ and theory/ (one file per language)
     ui/               interface text: en.ts, nl.ts, de.ts, fr.ts, es.ts
     theory/           theory sentences and scale names/descriptions per language
     index.ts          language detection and the bundle each screen uses (tested)
@@ -346,7 +349,7 @@ Add one line to `src/lib/data/tunings.ts`, e.g. `tuning("open-f", "Open F", "C2 
 
 ## Tests
 
-`npm test` runs 491 automated checks, including:
+`npm test` runs 494 automated checks, including:
 
 - **Required cases:** C Major, A Natural Minor, A Minor Pentatonic, E Minor Pentatonic, Drop D, and custom tunings.
 - **Spelling:** every root × every scale for correct pitches and spelling.
@@ -376,7 +379,7 @@ Add one line to `src/lib/data/tunings.ts`, e.g. `tuning("open-f", "Open F", "C2 
 - **Drone tip:** names the scale's own 3rd and 7th in every language, and falls back to the general text when a scale has neither.
 - **Same pitch:** exact-pitch rings, also outside the chosen shape, kept apart from the same note in other octaves.
 - **Selection rules:** C Major start, a chord cleared on key change, positions kept, and the metronome bar's default.
-- **Languages:** every interface text exists in all five languages, every scale is translated, German H/B and do-re-mi names are correct, step patterns use local symbols (German GT/HT, since G and H are note names), and a sweep over every language × note-name system × root × scale checks that no text comes out broken.
+- **Languages:** every interface text exists in all five languages, every scale is translated, German H/B and do-re-mi names are correct, step patterns use local symbols (German GT/HT, since G and H are note names), and a sweep over every language × note-name system × root × scale checks that no text comes out broken. Loading one language at a time gives exactly the same texts as the pages built ahead of time, English is there from the start, and a language asked for twice is downloaded once.
 
 ---
 

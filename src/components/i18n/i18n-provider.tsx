@@ -1,20 +1,11 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import {
-  createBundle,
-  defaultNamingFor,
-  detectLocale,
-  isLocale,
-  isNoteNaming,
-  type I18nBundle,
-  type Locale,
-} from "@/lib/i18n";
-import { parseScalePagePath } from "@/lib/pages";
-import { BASE_PATH } from "@/lib/site";
+import { assembleBundle, defaultNamingFor, isNoteNaming, type I18nBundle, type Locale } from "@/lib/i18n/core";
+import { LOCALE_KEY, initialLocale } from "@/lib/i18n/initial";
+import { loadMessages, loadedMessages } from "@/lib/i18n/load";
 import type { NoteNaming } from "@/lib/theory";
 
-const LOCALE_KEY = "fretistry-locale";
 const NAMING_KEY = "fretistry-note-naming";
 
 interface I18nContextValue extends I18nBundle {
@@ -43,39 +34,42 @@ function write(key: string, value: string | null): void {
   }
 }
 
-/**
- * Language for this visit: ?lang= in the link, else a language you picked in
- * Settings before, else the page's own language (/nl/…), else the browser's.
- */
-function initialLocale(): Locale {
-  const fromUrl = new URLSearchParams(window.location.search).get("lang");
-  if (isLocale(fromUrl)) return fromUrl;
-  const saved = read(LOCALE_KEY);
-  if (isLocale(saved)) return saved;
-  const page = parseScalePagePath(window.location.pathname, BASE_PATH);
-  if (page) return page.locale;
-  return detectLocale(navigator.languages ?? [navigator.language]);
-}
-
 function initialNaming(): NoteNaming | null {
   const saved = read(NAMING_KEY);
   return isNoteNaming(saved) ? saved : null;
 }
 
+/**
+ * The visit's language. Its texts were fetched before the app started (see ExplorerLoader);
+ * if that failed (offline before it was ever downloaded), the app speaks English.
+ */
+function startLocale(): Locale {
+  const locale = initialLocale();
+  return loadedMessages(locale) ? locale : "en";
+}
+
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(initialLocale);
+  const [locale, setLocaleState] = useState<Locale>(startLocale);
   const [namingOverride, setNamingOverride] = useState<NoteNaming | null>(initialNaming);
   const naming = namingOverride ?? defaultNamingFor(locale);
-  const bundle = useMemo(() => createBundle(locale, naming), [locale, naming]);
+  const bundle = useMemo(() => assembleBundle(locale, naming, loadedMessages(locale) ?? loadedMessages("en")!), [locale, naming]);
 
   // (The page title follows the scale and is set by the explorer.)
   useEffect(() => {
     document.documentElement.lang = locale;
   }, [locale]);
 
+  // A language picked in Settings is fetched first (a fraction of a second), then the whole
+  // interface switches at once, never half in one language and half in another.
   const setLocale = useCallback((next: Locale) => {
-    setLocaleState(next);
     write(LOCALE_KEY, next);
+    if (loadedMessages(next)) return setLocaleState(next);
+    loadMessages(next).then(
+      () => setLocaleState(next),
+      () => {
+        // Couldn't be downloaded (offline): stay in the current language.
+      },
+    );
   }, []);
 
   const setNaming = useCallback((next: NoteNaming | null) => {

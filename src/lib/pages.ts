@@ -1,6 +1,6 @@
 import { ROOT_NAMES, rootNote, type RootName } from "@/lib/data/roots";
 import { SCALES, findScale } from "@/lib/data/scales";
-import { LOCALES, isLocale, type Locale } from "@/lib/i18n";
+import { LOCALES, isLocale, type Locale } from "@/lib/i18n/core";
 import { noteToAscii, pitchClassOf, type SpelledNote } from "@/lib/theory";
 
 /**

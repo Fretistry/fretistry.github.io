@@ -10,7 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type { ExplorerSettings } from "@/hooks/use-explorer-state";
-import { LOCALES, defaultNamingFor, isLocale } from "@/lib/i18n";
+import { LOCALES, defaultNamingFor, isLocale } from "@/lib/i18n/core";
 import { scaleIndexPath } from "@/lib/pages";
 import { BASE_PATH } from "@/lib/site";
 import type { NoteNaming } from "@/lib/theory";

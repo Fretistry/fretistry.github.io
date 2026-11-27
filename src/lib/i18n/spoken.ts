@@ -1,5 +1,5 @@
 import type { SpelledNote, SpelledScale } from "@/lib/theory";
-import type { I18nBundle, Locale } from "./index";
+import type { I18nBundle, Locale } from "./core";
 
 /**
  * Sharps and flats written out the way people type them into a search box:
