@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Check, Languages, Moon, RectangleHorizontal, RectangleVertical, Settings, Smartphone, Sun, Volume2, VolumeX } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Check, Languages, Moon, RectangleHorizontal, RectangleVertical, Settings, Smartphone, Sun, SunMoon, Volume2, VolumeX } from "lucide-react";
 import { FretistryMark, FretistryWordmark } from "@/components/brand/fretistry-mark";
 import { useI18n } from "@/components/i18n/i18n-provider";
 import { MetronomeHeaderButton } from "@/components/metronome/metronome-control";
@@ -14,7 +14,7 @@ import { LOCALES, defaultNamingFor, isLocale } from "@/lib/i18n";
 import { scaleIndexPath } from "@/lib/pages";
 import { BASE_PATH } from "@/lib/site";
 import type { NoteNaming } from "@/lib/theory";
-import { applyTheme, getCurrentTheme, type Theme } from "@/lib/theme";
+import { applyTheme, followDeviceTheme, getThemeChoice, type Theme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 import { ToolbarSwitch } from "./display-toolbar";
 import { SegmentedControl } from "./segmented-control";
@@ -123,7 +123,9 @@ function SettingsMenu({
 }) {
   const { ui, locale, setLocale, naming, setNaming } = useI18n();
   const v = ui.view;
-  const [theme, setTheme] = useState<Theme>(() => getCurrentTheme());
+  const [theme, setTheme] = useState<Theme>(getThemeChoice);
+  // "Auto" follows the device when it switches between light and dark (e.g. at sunset)
+  useEffect(() => followDeviceTheme(), []);
   const namings: { value: NoteNaming; label: string; title: string }[] = [
     { value: "letters", label: ui.settings.letters, title: ui.settings.lettersTitle },
     { value: "german", label: ui.settings.german, title: ui.settings.germanTitle },
@@ -229,6 +231,7 @@ function SettingsMenu({
               options={[
                 { value: "dark", label: <><Moon className="size-3.5" /> {ui.settings.dark}</> },
                 { value: "light", label: <><Sun className="size-3.5" /> {ui.settings.light}</> },
+                { value: "auto", label: <><SunMoon className="size-3.5" /> {ui.settings.auto}</>, title: ui.settings.autoTitle },
               ]}
             />
           </section>

@@ -22,6 +22,8 @@ export const fr: UiMessages = {
     theme: "Thème",
     dark: "Sombre",
     light: "Clair",
+    auto: "Auto",
+    autoTitle: "Suivre le mode clair ou sombre de l’appareil",
     note: "Les préférences sont enregistrées sur cet appareil.",
     offline: "Fonctionne aussi hors ligne. Sur un téléphone, choisissez « Ajouter à l’écran d’accueil » dans le menu du navigateur pour utiliser Fretistry comme une appli.",
   },
@@ -227,6 +229,7 @@ export const fr: UiMessages = {
   },
   fretboard: {
     section: "Manche",
+    skipTo: "Aller au manche",
     aria: (tuning, first, last, leftHanded, vertical) =>
       `Manche de guitare en accordage ${tuning}, cases ${first} à ${last}${leftHanded ? ", gaucher" : ""}${vertical ? ", vertical" : ""}`,
     where: (string, fret) => `corde ${string}, ${fret === 0 ? "à vide" : `case ${fret}`}`,
@@ -321,7 +324,7 @@ export const fr: UiMessages = {
     showBar: "Afficher le métronome et le bourdon au-dessus du manche",
     hideBar: "Masquer la barre du métronome et du bourdon",
     more: "Réglages du métronome et du bourdon",
-    settings: "Réglages",
+    settings: "Options",
     barTitle: "Métronome et bourdon",
   },
   shortcuts: {

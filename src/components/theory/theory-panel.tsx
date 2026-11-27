@@ -74,18 +74,21 @@ export function TheoryPanel({
             !collapsed && "border-b border-border/60",
           )}
         >
-          <button
-            type="button"
-            onClick={() => onCollapsedChange(!collapsed)}
-            aria-expanded={!collapsed}
-            aria-controls="theory-content"
-            className="-ml-1.5 flex items-center gap-2 rounded-md px-1.5 py-1 outline-none hover:bg-accent/60 focus-visible:ring-3 focus-visible:ring-ring/50 pointer-coarse:min-h-9"
-          >
-            <BookOpen className="size-4 text-primary" />
-            <span className="text-sm font-semibold">{t.title}</span>
-            <ChevronDown className={cn("size-4 text-muted-foreground transition-transform duration-200", collapsed && "-rotate-90")} />
-            <span className="sr-only">{t.toggle(collapsed)}</span>
-          </button>
+          {/* a real heading (h2, under the scale's h1), with the fold button inside it */}
+          <h2>
+            <button
+              type="button"
+              onClick={() => onCollapsedChange(!collapsed)}
+              aria-expanded={!collapsed}
+              aria-controls="theory-content"
+              className="-ml-1.5 flex items-center gap-2 rounded-md px-1.5 py-1 outline-none hover:bg-accent/60 focus-visible:ring-3 focus-visible:ring-ring/50 pointer-coarse:min-h-9"
+            >
+              <BookOpen className="size-4 text-primary" />
+              <span className="text-sm font-semibold">{t.title}</span>
+              <ChevronDown className={cn("size-4 text-muted-foreground transition-transform duration-200", collapsed && "-rotate-90")} />
+              <span className="sr-only">{t.toggle(collapsed)}</span>
+            </button>
+          </h2>
           <div
             className="no-scrollbar -mx-1 max-w-full overflow-x-auto overflow-y-hidden px-1 py-0.5 max-sm:w-full"
             onClick={() => collapsed && onCollapsedChange(false)}
@@ -184,7 +187,7 @@ export function TheoryPanel({
                     <span
                       className={cn(
                         "grid h-9 min-w-9 shrink-0 place-items-center rounded-lg px-1.5 text-sm font-semibold",
-                        i === 0 ? "bg-note-root text-note-root-foreground" : "bg-note-scale/15 text-note-scale",
+                        i === 0 ? "bg-note-root text-note-root-foreground" : "bg-note-scale/15 text-note-scale-text",
                       )}
                     >
                       {item.note}
@@ -316,7 +319,7 @@ function IntervalTable({ explanation }: { explanation: ScaleExplanation }) {
           {explanation.intervalRows.map((row) => (
             <tr key={row.index} className={row.index === 0 ? "bg-note-root/8" : undefined}>
               <td className="px-3 py-1.5 text-muted-foreground tabular-nums">{row.index + 1}</td>
-              <td className={cn("px-3 py-1.5 font-semibold", row.index === 0 && "text-note-root")}>{row.note}</td>
+              <td className={cn("px-3 py-1.5 font-semibold", row.index === 0 && "text-note-root-text")}>{row.note}</td>
               <td className="px-3 py-1.5 font-mono">{row.formulaLabel}</td>
               <td className="px-3 py-1.5">{row.intervalName}</td>
               <td className="hidden px-3 py-1.5 text-right text-muted-foreground tabular-nums sm:table-cell">{row.semitones}</td>

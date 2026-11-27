@@ -32,6 +32,9 @@
   --color-note-root-foreground: var(--note-root-foreground);
   --color-note-scale: var(--note-scale);
   --color-note-scale-foreground: var(--note-scale-foreground);
+  /* amber and teal as text on the page (darker in light mode, so they're readable) */
+  --color-note-root-text: var(--note-root-text);
+  --color-note-scale-text: var(--note-scale-text);
   --color-note-outside: var(--note-outside);
   --color-surface: var(--surface);
 
@@ -64,13 +67,17 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.9 0.005 265);
   --input: oklch(0.88 0.006 265);
-  --ring: oklch(0.66 0.16 58 / 55%);
+  /* solid and darker than the button colour, so the keyboard focus ring shows on light grey too */
+  --ring: oklch(0.5 0.15 55);
   --radius: 0.75rem;
 
   --note-root: oklch(0.8 0.16 68);
   --note-root-foreground: oklch(0.22 0.05 55);
   --note-scale: oklch(0.74 0.12 188);
   --note-scale-foreground: oklch(0.2 0.04 200);
+  /* text on white: at least 4.5:1 (the bright amber and teal are only about 2:1) */
+  --note-root-text: oklch(0.5 0.13 55);
+  --note-scale-text: oklch(0.46 0.09 195);
   --note-outside: oklch(0.62 0.01 265);
 }
 
@@ -100,6 +107,8 @@
   --note-root-foreground: oklch(0.22 0.05 55);
   --note-scale: oklch(0.76 0.12 188);
   --note-scale-foreground: oklch(0.19 0.04 200);
+  --note-root-text: oklch(0.82 0.16 70);
+  --note-scale-text: oklch(0.76 0.12 188);
   --note-outside: oklch(0.7 0.01 265);
 }
 

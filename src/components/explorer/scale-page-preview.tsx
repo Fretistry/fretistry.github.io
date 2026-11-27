@@ -61,7 +61,7 @@ export function ScalePagePreview({ page }: { page: ScalePage }) {
                     row.index === 0 ? "bg-note-root/15 ring-note-root/50" : "bg-note-scale/10 ring-note-scale/30",
                   )}
                 >
-                  <span className={cn("text-base leading-tight font-semibold", row.index === 0 ? "text-note-root" : "text-foreground")}>
+                  <span className={cn("text-base leading-tight font-semibold", row.index === 0 ? "text-note-root-text" : "text-foreground")}>
                     {row.note}
                   </span>
                   <span className="font-mono text-[11px] text-muted-foreground">{row.formulaLabel}</span>

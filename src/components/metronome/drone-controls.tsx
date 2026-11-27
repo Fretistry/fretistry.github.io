@@ -2,7 +2,7 @@
 
 import { Play, Square, Volume1, Volume2 } from "lucide-react";
 import { InfoTip } from "@/components/explorer/info-tip";
-import { SegmentedControl } from "@/components/explorer/segmented-control";
+import { SELECTED, SegmentedControl } from "@/components/explorer/segmented-control";
 import { useI18n } from "@/components/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -73,7 +73,7 @@ export function DroneSoundOptions({ drone, rootName, listen, className }: DroneP
         onClick={() => update({ fifth: !settings.fifth })}
         className={cn(
           "h-7 rounded-lg px-2 text-[0.8rem] font-medium whitespace-nowrap ring-1 transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 pointer-coarse:h-9",
-          settings.fifth ? "bg-foreground text-background ring-foreground" : "bg-card text-muted-foreground ring-border hover:text-foreground",
+          settings.fifth ? SELECTED : "bg-card text-muted-foreground ring-border hover:text-foreground",
         )}
       >
         {t.fifth}

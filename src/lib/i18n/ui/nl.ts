@@ -22,6 +22,8 @@ export const nl: UiMessages = {
     theme: "Thema",
     dark: "Donker",
     light: "Licht",
+    auto: "Auto",
+    autoTitle: "Volg de lichte of donkere stand van je toestel",
     note: "Voorkeuren worden op dit toestel onthouden.",
     offline: "Werkt ook offline. Kies op je telefoon ‘Zet op beginscherm’ in het browsermenu om Fretistry als app te gebruiken.",
   },
@@ -227,6 +229,7 @@ export const nl: UiMessages = {
   },
   fretboard: {
     section: "Gitaarhals",
+    skipTo: "Ga naar de hals",
     aria: (tuning, first, last, leftHanded, vertical) =>
       `Gitaarhals in ${tuning}-stemming, frets ${first} tot ${last}${leftHanded ? ", linkshandig" : ""}${vertical ? ", staand" : ""}`,
     where: (string, fret) => `snaar ${string}, ${fret === 0 ? "open" : `fret ${fret}`}`,
@@ -321,7 +324,7 @@ export const nl: UiMessages = {
     showBar: "Metronoom en drone boven de hals tonen",
     hideBar: "Balk met metronoom en drone verbergen",
     more: "Instellingen voor metronoom en drone",
-    settings: "Instellingen",
+    settings: "Opties",
     barTitle: "Metronoom en drone",
   },
   shortcuts: {

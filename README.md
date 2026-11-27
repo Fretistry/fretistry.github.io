@@ -64,7 +64,7 @@ Then open <http://localhost:3000>.
 
 **Settings** (gear button, top right)
 
-- Everything personal in one place: language (a compact dropdown), note names, left-handed, neck direction (Auto, Across, Down), fret numbers, even fret spacing, and light/dark theme.
+- Everything personal in one place: language (a compact dropdown), note names, left-handed, neck direction (Auto, Across, Down), fret numbers, even fret spacing, and the theme: Dark, Light or **Auto** (follows the device's light or dark setting, also when it switches at sunset).
 - Settings are remembered on this device and never included in shared links.
 
 **CAGED shapes and scale positions**
@@ -116,7 +116,7 @@ Then open <http://localhost:3000>.
 - Each page has its own title and description in its language, with the word people search for ("scale", "toonladder", "Tonleiter", "gamme", "escala") and sharps and flats also written out the way they're typed: "E♭ Major scale (E flat Major) on guitar", "E♭-Dur (Es-Dur) – Tonleiter auf der Gitarre", "Mi♭ majeur (Mi bémol majeur) — gamme à la guitare". When a key is written as its simpler twin (C♯ Lydian → D♭ Lydian), the title names both.
 - Each page links to its versions in the other languages, and opens the app on that scale.
 - While the app starts (a moment), the page already shows, as real text: the scale's name, mood, notes and formula, how it's built, its intervals, character and typical use, the chords in the key and related scales. It links to the related scales, the other scales in the same key, the same scale in the other keys and the overview. That's also what search engines read.
-- **Overview pages** per language (`/en/`, `/nl/`, `/de/`, `/fr/`, `/es/`) list every scale in every key, grouped like the scale picker. The home page links to them, and so does the app's footer ("All scales").
+- **Overview pages** per language (`/en/`, `/nl/`, `/de/`, `/fr/`, `/es/`) list every scale in every key, grouped like the scale picker. The home page links to them, and so does the app's footer ("All scales"). Jump links at the top lead to each group (Major, Minor, Blues, Jazz…), handy on a phone.
 - **For search engines:** a canonical address for each page (the home page included), structured data (what Fretistry is, and breadcrumbs such as Fretistry › Guitar scales › A Minor Pentatonic), and each page's language marked for search engines. A `sitemap.xml` lists every page and `robots.txt` points to it. Nothing is written by hand: the pages are generated from the same data when the site is built.
 - **Language:** a language you chose yourself in Settings wins; otherwise the page's language is used (on the home page: the browser's language).
 
@@ -139,7 +139,7 @@ Then open <http://localhost:3000>.
 
 **Metronome**
 
-- **Docked at the neck:** a slim bar sits right above the fretboard with the metronome (**▶ Metronome**, the tempo with ± buttons, tap tempo and big **beat lights**, so the beat stays in view while you play) and the drone (**▶ Drone · A**; on phones just **▶ Drone**). Each start button names what it starts. The **Settings** button holds the rest.
+- **Docked at the neck:** a slim bar sits right above the fretboard with the metronome (**▶ Metronome**, the tempo with ± buttons, tap tempo and big **beat lights**, so the beat stays in view while you play) and the drone (**▶ Drone · A**; on phones just **▶ Drone**). Each start button names what it starts. The **Options** button holds the rest (named differently from the app's Settings in the header).
 - It's shown on every screen; its × or the metronome icon in the header hides it (and the icon brings it back). With a vertical neck it stays pinned under the header as you scroll down the neck (string names pinned just below it).
 - **On phones it's one row:** ▶ Metronome, − tempo +, ▶ Drone and the Settings button. While the metronome runs, small beat lights take the place of "BPM" under the tempo. The drone's sound (Pad / Harmonium), +5th and its ⓘ, Tap tempo and the × are in Settings. Below laptop width (1280 px) Tap tempo is in Settings too, so the bar stays on one line on tablets.
 - Tempo from 30 to 260 BPM, set with a slider, ± buttons, quick presets or **tap tempo**. The Italian tempo name is shown too (Andante, Allegro…).
@@ -220,10 +220,16 @@ Then open <http://localhost:3000>.
 **Phones and tablets (iOS and Android)**
 
 - Responsive layout with larger buttons on touch screens, no accidental zooming, and support for notches and rounded screen corners.
+- **Accessibility:**
+  - The first Tab press offers **"Skip to the fretboard"**, and the 12 root notes are one Tab stop (the arrow keys move between them, like any radio group).
+  - Light mode uses darker amber and teal for text (at least 4.5:1 contrast); the fretboard keeps its colours. The keyboard focus ring is solid.
+  - Headings in order: the scale's name (h1), Music theory (h2), its sections (h3). Icon-only buttons have labels.
+  - One calm "pressed" look for every selected option (a chord, +5th, a pattern); amber is for root notes only. The custom-tuning button shows a pencil, so it isn't confused with the metronome's Options.
 - **Quick to start:** the page shows the scale as real text at once; the app's code is listed in the page itself, so it downloads together with the rest, and the text doesn't jump when the app takes over.
 - **Large monitors:** from about 1760 pixels wide, the whole interface grows a little and uses more of the screen (up to 2240 px wide on a 2560 monitor). The neck grows with it: taller strings, bigger notes and labels.
 - **Installable as an app:** use Android "Install app" or iPhone "Share → Add to Home Screen". It opens full-screen with its own icon.
-- After the first visit, the published site keeps working offline. An offline helper (a "service worker") is installed in production builds only, never during local development.
+- After the first visit, the published site keeps working offline. An offline helper (a "service worker") is installed in production builds only, never during local development. Each release registers it under its own name (`sw.js?v=<commit>`), so it clears the previous release's files instead of letting them pile up.
+- The neck is drawn once, after its space is measured, instead of first at a guessed width.
 
 **Branding**
 

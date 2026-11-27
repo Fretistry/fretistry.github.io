@@ -743,6 +743,13 @@ function ExplorerApp() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
+      {/* keyboard and screen-reader users: one Tab, then Enter, instead of tabbing past 30+ buttons */}
+      <a
+        href="#fretboard"
+        className="sr-only rounded-md bg-background px-3 py-2 text-sm font-medium ring-2 ring-ring focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50"
+      >
+        {ui.fretboard.skipTo}
+      </a>
       <AppHeader
         soundEnabled={soundEnabled}
         onSoundChange={setSoundEnabled}
@@ -801,6 +808,8 @@ function ExplorerApp() {
 
         {/* Fretboard */}
         <section
+          id="fretboard"
+          tabIndex={-1}
           aria-label={ui.fretboard.section}
           // slightly tighter on tablets and laptops, so the whole neck fits on a 768–800 px tall screen
           className="space-y-4 rounded-2xl border border-border/70 bg-card/60 p-3 sm:p-5 lg:space-y-3 lg:p-4"

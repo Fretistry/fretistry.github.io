@@ -20,6 +20,8 @@ export const es: UiMessages = {
     theme: "Tema",
     dark: "Oscuro",
     light: "Claro",
+    auto: "Auto",
+    autoTitle: "Seguir el modo claro u oscuro del dispositivo",
     note: "Las preferencias se guardan en este dispositivo.",
     offline: "También funciona sin conexión. En el móvil, elige «Añadir a pantalla de inicio» en el menú del navegador para usar Fretistry como una app.",
   },
@@ -225,6 +227,7 @@ export const es: UiMessages = {
   },
   fretboard: {
     section: "Mástil",
+    skipTo: "Ir al mástil",
     aria: (tuning, first, last, leftHanded, vertical) =>
       `Mástil de guitarra en afinación ${tuning}, trastes ${first} a ${last}${leftHanded ? ", zurdo" : ""}${vertical ? ", vertical" : ""}`,
     where: (string, fret) => `cuerda ${string}, ${fret === 0 ? "al aire" : `traste ${fret}`}`,
@@ -319,7 +322,7 @@ export const es: UiMessages = {
     showBar: "Mostrar el metrónomo y el bordón sobre el mástil",
     hideBar: "Ocultar la barra del metrónomo y el bordón",
     more: "Ajustes del metrónomo y el bordón",
-    settings: "Ajustes",
+    settings: "Opciones",
     barTitle: "Metrónomo y bordón",
   },
   shortcuts: {

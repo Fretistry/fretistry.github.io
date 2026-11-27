@@ -83,7 +83,10 @@ export function Fretboard({
   const { ui, tuningName } = useI18n();
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [containerWidth, setContainerWidth] = useState(1200);
+  // The neck is drawn once its space has been measured (right after the first render, before
+  // anything is shown), instead of first at a guessed width and then again at the real one.
+  const [measuredWidth, setContainerWidth] = useState<number | null>(null);
+  const containerWidth = measuredWidth ?? 1200;
   /** Whether there is more neck to scroll to on the left / right. */
   const [more, setMore] = useState({ left: false, right: false });
 
@@ -172,7 +175,10 @@ export function Fretboard({
 
   const ariaLabel = ui.fretboard.aria(tuningName(tuning), firstFret, lastFret, leftHanded, vertical);
 
-  const board = (
+  const board = measuredWidth === null ? (
+    // not measured yet: an empty space of the right height (never painted: the measurement comes first)
+    <div style={{ height: geometry.height }} />
+  ) : (
     <svg width={geometry.width} height={geometry.height} role="group" aria-label={ariaLabel} className="block shrink-0 touch-manipulation select-none">
       <FretboardArt g={geometry} tuning={tuning} showFretNumbers={showFretNumbers} positionAreas={positionAreas} />
       {notes.map((row) =>

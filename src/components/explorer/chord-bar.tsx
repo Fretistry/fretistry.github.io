@@ -9,7 +9,7 @@ import { describeChordStack, type ChordSet, type ChordSize, type ScaleChord } fr
 import { cn } from "@/lib/utils";
 import { ToolbarGroup } from "./display-toolbar";
 import { InfoTip } from "./info-tip";
-import { SegmentedControl } from "./segmented-control";
+import { SELECTED, SegmentedControl } from "./segmented-control";
 
 interface ChordBarProps {
   chordSet: ChordSet;
@@ -71,10 +71,10 @@ export function ChordBar({
               className={cn(
                 "flex min-w-14 flex-col items-center rounded-lg px-2.5 py-1 ring-1 transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
                 // Selected = neutral "pressed" look; amber stays reserved for root notes.
-                active ? "bg-foreground text-background ring-foreground" : "bg-card ring-border hover:bg-accent",
+                active ? SELECTED : "bg-card ring-border hover:bg-accent",
               )}
             >
-              <span className={cn("font-mono text-[10px] leading-tight", active ? "text-background/70" : "text-muted-foreground")}>
+              <span className="font-mono text-[10px] leading-tight text-muted-foreground">
                 {chord.numeral}
               </span>
               <span className="text-sm leading-tight font-semibold whitespace-nowrap">{chord.symbol}</span>

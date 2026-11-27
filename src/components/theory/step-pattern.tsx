@@ -8,10 +8,11 @@ interface StepPatternProps {
 }
 
 const STEP_STYLE: Record<number, string> = {
-  1: "border-primary text-primary",
-  2: "border-note-scale/70 text-note-scale",
-  3: "border-violet-400/80 text-violet-300 dark:text-violet-300",
-  4: "border-rose-400/80 text-rose-300",
+  // light mode: darker text, so "H", "W" and "W+H" are readable on white (4.5:1)
+  1: "border-primary text-note-root-text",
+  2: "border-note-scale/70 text-note-scale-text",
+  3: "border-violet-400/80 text-violet-700 dark:text-violet-300",
+  4: "border-rose-400/80 text-rose-700 dark:text-rose-300",
 };
 
 /**

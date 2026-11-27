@@ -25,6 +25,8 @@ export const en = {
     theme: "Theme",
     dark: "Dark",
     light: "Light",
+    auto: "Auto",
+    autoTitle: "Follow the device's light or dark setting",
     note: "Preferences are remembered on this device.",
     offline: "Works offline too. On a phone, choose “Add to Home Screen” in the browser menu to use Fretistry like an app.",
   },
@@ -232,6 +234,7 @@ export const en = {
   },
   fretboard: {
     section: "Fretboard",
+    skipTo: "Skip to the fretboard",
     aria: (tuning: string, first: number, last: number, leftHanded: boolean, vertical: boolean) =>
       `Guitar fretboard in ${tuning} tuning, frets ${first} to ${last}${leftHanded ? ", left-handed" : ""}${vertical ? ", vertical" : ""}`,
     where: (string: number, fret: number) => `string ${string}, ${fret === 0 ? "open" : `fret ${fret}`}`,
@@ -326,7 +329,7 @@ export const en = {
     showBar: "Show the metronome and drone above the neck",
     hideBar: "Hide the metronome and drone bar",
     more: "Metronome and drone settings",
-    settings: "Settings",
+    settings: "Options",
     barTitle: "Metronome and drone",
   },
   shortcuts: {

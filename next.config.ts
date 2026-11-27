@@ -10,9 +10,13 @@ import type { NextConfig } from "next";
 const staticExport = process.env.STATIC_EXPORT === "1";
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || undefined;
 
+/** A name for this release (the commit on GitHub, else the build time): the offline copy starts fresh with each one. */
+const buildId = (process.env.GITHUB_SHA ?? "").slice(0, 8) || Date.now().toString(36);
+
 const nextConfig: NextConfig = {
   ...(staticExport ? { output: "export" as const } : {}),
   basePath,
+  env: { NEXT_PUBLIC_BUILD_ID: buildId },
   // Every page in a folder of its own (/nl/a-minor-pentatonic/index.html): the scale pages'
   // extra data lives in that same folder, and GitHub Pages serves folder addresses reliably.
   trailingSlash: true,

@@ -20,6 +20,8 @@ export const de: UiMessages = {
     theme: "Design",
     dark: "Dunkel",
     light: "Hell",
+    auto: "Auto",
+    autoTitle: "Der Hell-/Dunkel-Einstellung des Geräts folgen",
     note: "Einstellungen werden auf diesem Gerät gespeichert.",
     offline: "Funktioniert auch offline. Wähle auf dem Handy im Browsermenü „Zum Startbildschirm hinzufügen“, um Fretistry wie eine App zu nutzen.",
   },
@@ -225,6 +227,7 @@ export const de: UiMessages = {
   },
   fretboard: {
     section: "Griffbrett",
+    skipTo: "Zum Griffbrett springen",
     aria: (tuning, first, last, leftHanded, vertical) =>
       `Gitarrengriffbrett in ${tuning}-Stimmung, Bund ${first} bis ${last}${leftHanded ? ", Linkshänder" : ""}${vertical ? ", hochkant" : ""}`,
     where: (string, fret) => `Saite ${string}, ${fret === 0 ? "leer" : `Bund ${fret}`}`,
@@ -319,7 +322,7 @@ export const de: UiMessages = {
     showBar: "Metronom und Bordun über dem Griffbrett zeigen",
     hideBar: "Leiste mit Metronom und Bordun ausblenden",
     more: "Einstellungen für Metronom und Bordun",
-    settings: "Einstellungen",
+    settings: "Optionen",
     barTitle: "Metronom und Bordun",
   },
   shortcuts: {

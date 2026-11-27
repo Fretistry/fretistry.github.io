@@ -19,6 +19,12 @@ interface SegmentedControlProps<T extends string> {
   size?: "sm" | "default";
 }
 
+/**
+ * The one "selected" look for stand-alone toggle buttons (a chosen chord, +5th, a 3-per-string
+ * pattern): a calm grey "pressed" state like the segmented controls. Amber stays reserved for roots.
+ */
+export const SELECTED = "bg-foreground/12 text-foreground ring-2 ring-foreground/45";
+
 /** A compact pill-style single-choice control (like the mode switches in audio software). */
 export function SegmentedControl<T extends string>({
   value,

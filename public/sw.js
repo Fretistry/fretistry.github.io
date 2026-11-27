@@ -4,7 +4,9 @@
  * away) and fall back to the cached copy when offline. Build assets, whose
  * file names change with every release, are served from the cache.
  */
-const CACHE = "fretistry-v1";
+// One cache per release (the page registers "sw.js?v=<release>"); activating a new release
+// deletes the older caches, so old build files don't pile up in visitors' browsers.
+const CACHE = `fretistry-${new URL(self.location.href).searchParams.get("v") || "v1"}`;
 const SHELL = self.registration.scope; // e.g. https://example.com/ or https://example.github.io/fretistry/
 
 self.addEventListener("install", (event) => {

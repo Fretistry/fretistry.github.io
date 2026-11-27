@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useState } from "react";
-import { ChevronDown, ChevronUp, SlidersHorizontal } from "lucide-react";
+import { ChevronDown, ChevronUp, Pencil } from "lucide-react";
 import { useI18n } from "@/components/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -148,7 +148,8 @@ function CustomTuningDialog({
           // phones: reached through "Custom…" in the tuning menu instead
           className="bg-card max-sm:hidden dark:bg-card"
         >
-          <SlidersHorizontal />
+          {/* a pencil ("edit this tuning"), so it isn't mistaken for the metronome's options (sliders) */}
+          <Pencil />
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-md">

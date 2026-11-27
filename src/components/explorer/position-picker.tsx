@@ -8,7 +8,7 @@ import { positionStartFret, type PositionSystem, type ScalePosition } from "@/li
 import { cn } from "@/lib/utils";
 import { ToolbarGroup, ToolbarSwitch } from "./display-toolbar";
 import { InfoTip } from "./info-tip";
-import { SegmentedControl } from "./segmented-control";
+import { SELECTED, SegmentedControl } from "./segmented-control";
 
 interface PositionPickerProps {
   system: PositionChoice;
@@ -120,7 +120,7 @@ export function PositionPicker({
                         ? "text-[#1a1310] ring-transparent"
                         : "bg-card text-foreground/80 ring-border hover:bg-accent"
                       : active
-                        ? "bg-foreground text-background ring-foreground"
+                        ? SELECTED
                         : "bg-card text-foreground/80 ring-border hover:bg-accent",
                   )}
                   // CAGED shapes / boxes: the button wears the shape's colour — filled when shown on the

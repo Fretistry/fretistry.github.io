@@ -96,7 +96,7 @@ export function ScaleHeader({
                 <span
                   className={cn(
                     "text-base leading-tight font-semibold",
-                    row.index === 0 ? "text-note-root" : "text-foreground",
+                    row.index === 0 ? "text-note-root-text" : "text-foreground",
                   )}
                 >
                   {row.note}

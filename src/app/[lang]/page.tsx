@@ -78,8 +78,20 @@ export default async function ScaleIndexPage({ params }: Params) {
           <p className="text-muted-foreground">{ui.hub.intro}</p>
         </div>
 
+        {/* jump links: on a phone the list is several screens long */}
+        <nav aria-label={ui.hub.title} className="flex flex-wrap gap-1.5">
+          {SCALE_CATEGORIES.map((category) => (
+            <a
+              key={category.id}
+              href={`#${category.id}`}
+              className="rounded-full bg-card px-3 py-1.5 text-sm font-medium ring-1 ring-border/70 hover:bg-accent"
+            >
+              {bundle.categoryLabel(category.id)}
+            </a>
+          ))}
+        </nav>
         {SCALE_CATEGORIES.map((category) => (
-          <section key={category.id} className="space-y-3 rounded-2xl border border-border/70 bg-card/60 p-4 sm:p-5">
+          <section key={category.id} id={category.id} className="scroll-mt-4 space-y-3 rounded-2xl border border-border/70 bg-card/60 p-4 sm:p-5">
             <h2 className="text-[11px] font-medium tracking-wider text-muted-foreground uppercase">{bundle.categoryLabel(category.id)}</h2>
             <ul className="space-y-3">
               {SCALES.filter((s) => s.category === category.id).map((scale) => (

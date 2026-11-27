@@ -65,7 +65,20 @@ export function RootNotePicker({ value, onChange, extra }: RootNotePickerProps) 
 function RootGrid({ value, onChange, className }: RootNotePickerProps & { className: string }) {
   const { ui, note } = useI18n();
   return (
-    <div role="radiogroup" aria-label={ui.controls.rootNote} className={cn("grid gap-1", className)}>
+    <div
+      role="radiogroup"
+      aria-label={ui.controls.rootNote}
+      className={cn("grid gap-1", className)}
+      // one Tab stop for all 12 notes; the arrow keys move between them (like any radio group)
+      onKeyDown={(e) => {
+        const step = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 0;
+        if (!step) return;
+        e.preventDefault();
+        const next = (ROOT_NAMES.indexOf(value) + step + ROOT_NAMES.length) % ROOT_NAMES.length;
+        onChange(ROOT_NAMES[next]);
+        e.currentTarget.querySelectorAll<HTMLButtonElement>("button")[next]?.focus();
+      }}
+    >
       {ROOT_NAMES.map((name) => {
         const active = name === value;
         const isAccidental = name.length > 1;
@@ -76,6 +89,7 @@ function RootGrid({ value, onChange, className }: RootNotePickerProps & { classN
             type="button"
             role="radio"
             aria-checked={active}
+            tabIndex={active ? 0 : -1}
             onClick={() => onChange(name)}
             className={cn(
               // flex-centred with leading-none, so C♯ and E♭ sit level with the natural notes
