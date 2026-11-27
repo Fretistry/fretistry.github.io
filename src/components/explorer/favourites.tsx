@@ -89,7 +89,18 @@ export function StartHereBar({
  * search), so instead of four other scales this offers one good first shape for *this* scale —
  * a single slim row, so the neck stays close to the top of the screen.
  */
-export function StarterShapeBar({ label, active, onSelect }: { label: string; active: boolean; onSelect: () => void }) {
+export function StarterShapeBar({
+  label,
+  active,
+  onSelect,
+  easier,
+}: {
+  label: string;
+  active: boolean;
+  onSelect: () => void;
+  /** Major / natural minor: "Easier start: G Major Pentatonic" (five notes instead of seven). */
+  easier?: { label: string; onSelect: () => void } | null;
+}) {
   const { ui } = useI18n();
   return (
     <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
@@ -109,6 +120,15 @@ export function StarterShapeBar({ label, active, onSelect }: { label: string; ac
         {label}
       </button>
       <InfoTip label={ui.startHere.title} paragraphs={ui.startHere.shapeInfo} />
+      {easier && (
+        <button
+          type="button"
+          onClick={easier.onSelect}
+          className="flex h-8 items-center rounded-full bg-card px-3 text-sm text-foreground/85 ring-1 ring-border/70 transition-colors outline-none hover:bg-accent focus-visible:ring-3 focus-visible:ring-ring/50 pointer-coarse:h-9"
+        >
+          {easier.label}
+        </button>
+      )}
     </div>
   );
 }

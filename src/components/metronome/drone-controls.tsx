@@ -16,7 +16,15 @@ type DroneApi = ReturnType<typeof useDrone>;
  * Drone on/off (in the current key), its sound and the optional fifth — right
  * in the bar above the neck, next to the metronome.
  */
-export function DroneControls({ drone, rootName, className }: { drone: DroneApi; rootName: string; className?: string }) {
+interface DroneProps {
+  drone: DroneApi;
+  rootName: string;
+  /** The ⓘ's "listen" paragraph with this scale's own notes (falls back to the general one). */
+  listen?: string | null;
+  className?: string;
+}
+
+export function DroneControls({ drone, rootName, listen, className }: DroneProps) {
   const t = useI18n().ui.drone;
   const { running, toggle } = drone;
   return (
@@ -36,15 +44,16 @@ export function DroneControls({ drone, rootName, className }: { drone: DroneApi;
         <span className="hidden font-normal opacity-80 sm:inline">· {rootName}</span>
       </Button>
       {/* phones: sound, fifth and ⓘ are in the bar's Settings, so the whole bar is one row */}
-      <DroneSoundOptions drone={drone} rootName={rootName} className="max-sm:hidden" />
+      <DroneSoundOptions drone={drone} rootName={rootName} listen={listen} className="max-sm:hidden" />
     </div>
   );
 }
 
 /** Pad or harmonium, the optional fifth, and what a drone is (ⓘ). */
-export function DroneSoundOptions({ drone, rootName, className }: { drone: DroneApi; rootName: string; className?: string }) {
+export function DroneSoundOptions({ drone, rootName, listen, className }: DroneProps) {
   const t = useI18n().ui.drone;
   const { settings, update } = drone;
+  const info = t.info(rootName);
   return (
     <div className={cn("flex flex-wrap items-center gap-1 sm:gap-1.5", className)}>
       <SegmentedControl<DroneSound>
@@ -69,7 +78,7 @@ export function DroneSoundOptions({ drone, rootName, className }: { drone: Drone
       >
         {t.fifth}
       </button>
-      <InfoTip label={t.infoTitle} paragraphs={t.info(rootName)} />
+      <InfoTip label={t.infoTitle} paragraphs={listen ? [info[0], listen, ...info.slice(2)] : info} />
     </div>
   );
 }

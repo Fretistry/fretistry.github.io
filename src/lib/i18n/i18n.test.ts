@@ -130,6 +130,17 @@ describe("music terminology", () => {
     expect(par.title).toBe("Variante (Moll): C-Moll (natürlich)");
   });
 
+  it("names the scale's own 3rd and 7th in the drone tip", () => {
+    const en = bundle("en").ui.drone.listen({ third: { note: "C", minor: true }, seventh: { note: "G", major: false } });
+    expect(en).toContain("**C** (the ♭3) sounds sad");
+    expect(en).toContain("**G** (the ♭7) sounds relaxed and bluesy");
+    expect(bundle("de").ui.drone.listen({ third: { note: "E", minor: false }, seventh: { note: "H", major: true } })).toContain(
+      "**H** (die 7) will hinauf zum Grundton",
+    );
+    // without a 3rd or 7th (e.g. a scale that has neither) the general text is used instead
+    for (const { code } of LOCALES) expect(bundle(code).ui.drone.listen({ third: null, seventh: null })).toBeNull();
+  });
+
   it("writes step patterns with local symbols", () => {
     const steps = (locale: Locale) => explainScale(spell("C", "major"), SCALES, bundle(locale).theory).stepSummary;
     expect(steps("nl")).toBe("1 – 1 – ½ – 1 – 1 – 1 – ½");

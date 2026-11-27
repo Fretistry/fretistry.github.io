@@ -37,7 +37,7 @@ import { imageFileName } from "@/lib/file-name";
 import { alternativeScaleTitle } from "@/lib/i18n/spoken";
 import { parseScalePagePath } from "@/lib/pages";
 import { BASE_PATH, CREATOR, SITE_NAME, SITE_URL } from "@/lib/site";
-import { cagedIndex, type StartingPoint } from "@/lib/start-here";
+import { cagedIndex, pentatonicBox, type StartingPoint } from "@/lib/start-here";
 import { inTrainerArea, pickTarget, trainerTargets } from "@/lib/trainer";
 import { cn } from "@/lib/utils";
 import {
@@ -96,9 +96,8 @@ function publicSiteLabel(): string | null {
   }
 }
 
-/** Scales whose CAGED shapes most lessons number as "boxes" 1–5 (box 1 = the E shape). */
-const PENTATONIC_SCALES = new Set(["minor-pentatonic", "blues"]);
-const PENTATONIC_BOX: Record<string, number> = { E: 1, D: 2, C: 3, A: 4, G: 5 };
+/** The five-note scale that is easier to start with than a seven-note one (same root). */
+const EASIER_SCALE: Record<string, string> = { major: "major-pentatonic", "natural-minor": "minor-pentatonic" };
 
 /** Every spot within the fret span each shape covers on each string (also spots between its notes). */
 function shapeSpanKeys(positions: readonly ScalePosition[]): Set<string> {
@@ -493,18 +492,18 @@ function ExplorerApp() {
     const playable = (letter: string) => boxes.find((p) => p.cagedShape === letter && start(p) <= 8);
     return playable("E") ?? playable("A") ?? [...boxes].sort((a, b) => start(a) - start(b))[0] ?? null;
   }, [caged, spelled, tuning]);
-  const starterLabel = useMemo(() => {
+  // "E shape · box 1" (the trainer's tip names it too) and, for the chip, "… · from the 5th fret"
+  const starterName = useMemo(() => {
     if (!starterShape?.cagedShape) return null;
-    const startFret = positionStartFret(starterShape);
-    const box = PENTATONIC_SCALES.has(settings.scaleId) ? PENTATONIC_BOX[starterShape.cagedShape] : undefined;
-    return [
-      ui.positions.shape(starterShape.cagedShape),
-      box ? ui.startHere.box(box) : null,
-      startFret === 0 ? ui.positions.openPosition : startFret !== null ? ui.positions.fromFret(startFret) : null,
-    ]
-      .filter(Boolean)
-      .join(" · ");
+    const box = pentatonicBox(settings.scaleId, starterShape.cagedShape);
+    return [ui.positions.shape(starterShape.cagedShape), box ? ui.startHere.box(box) : null].filter(Boolean).join(" · ");
   }, [starterShape, settings.scaleId, ui]);
+  const starterLabel = useMemo(() => {
+    if (!starterShape || !starterName) return null;
+    const startFret = positionStartFret(starterShape);
+    const where = startFret === 0 ? ui.positions.openPosition : startFret !== null ? ui.positions.fromFret(startFret) : null;
+    return where ? `${starterName} · ${where}` : starterName;
+  }, [starterShape, starterName, ui]);
   const starterActive =
     starterShape !== null && positionSystem === "boxes" && positionIndices.length === 1 && positionIndices[0] === starterShape.index;
   const goToStarterShape = useCallback(() => {
@@ -514,6 +513,26 @@ function ExplorerApp() {
   }, [starterShape, update, revealNeck]);
   // Like the home page's suggestions: until there are favourites, and not while training.
   const showStarter = !landedOnHome && favourites.favourites.length === 0 && !training;
+  // On a major or natural minor page, "Start here" also offers the pentatonic: five notes, easier to begin with.
+  const easierScaleId = EASIER_SCALE[settings.scaleId];
+  const easierStart = useMemo(() => {
+    if (!easierScaleId) return null;
+    const scale = getScale(easierScaleId);
+    const title = theory.title(i18n.note(spellScale(rootNote(settings.rootName), scale).root), theory.scaleName(scale));
+    return { label: ui.startHere.easier(title), onSelect: () => update({ scaleId: easierScaleId, chordDegree: null }) };
+  }, [easierScaleId, settings.rootName, theory, i18n, ui, update]);
+
+  // The drone's ⓘ names this scale's own 3rd and 7th: "C (the ♭3) sounds sad, and G (the ♭7) …".
+  const droneListen = useMemo(() => {
+    const find = (degree: number, semitones: number) =>
+      spelled.notes.find((n) => n.interval.degree === degree && n.semitones === semitones);
+    const third = find(3, 4) ?? find(3, 3);
+    const seventh = find(7, 11) ?? find(7, 10);
+    return ui.drone.listen({
+      third: third ? { note: i18n.note(third.note), minor: third.semitones === 3 } : null,
+      seventh: seventh ? { note: i18n.note(seventh.note), major: seventh.semitones === 11 } : null,
+    });
+  }, [spelled, ui, i18n]);
 
   const chordBarProps = {
     chordSet,
@@ -698,6 +717,7 @@ function ExplorerApp() {
             soundEnabled={soundEnabled}
             playTitle={ui.scaleHeader.playTitle(metronomeSettings.bpm)}
             playDisabled={training}
+            tempo={metronomeSettings.bpm}
             isPlaying={scalePlayer.isPlaying}
             playingIndex={scalePlayer.playingIndex}
             onPlay={() => {
@@ -725,13 +745,14 @@ function ExplorerApp() {
                 positions={positions}
                 selected={positionIndices}
                 caged={caged}
+                scaleId={settings.scaleId}
                 onChange={(patch) => {
                   update(patch);
                   if (patch.positionSystem !== "all" && (patch.positionIndices?.length ?? 0) > 0) revealNeck();
                 }}
               />
               {showStarter && starterLabel && (
-                <StarterShapeBar label={starterLabel} active={starterActive} onSelect={goToStarterShape} />
+                <StarterShapeBar label={starterLabel} active={starterActive} onSelect={goToStarterShape} easier={easierStart} />
               )}
               {!training && (
                 <div className="max-sm:hidden">
@@ -756,6 +777,7 @@ function ExplorerApp() {
                 <MetronomeBar
                   rootPitchClass={pitchClassOf(spelled.root)}
                   rootName={i18n.note(spelled.root)}
+                  droneListen={droneListen}
                   onClose={() => update({ metronomeBar: "hidden" })}
                 />
               )}
@@ -766,6 +788,12 @@ function ExplorerApp() {
                   total={trainerSetup.targets.size}
                   onNext={() => trainerNext(trainerSetup.target.pitchClass)}
                   onStop={stopTrainer}
+                  // whole neck, first round: "Tip: learn one shape at a time. [Only E shape · box 1]"
+                  shapeTip={
+                    trainerSetup.area === null && trainer.state.round === 0 && trainer.state.completed === 0 && starterName
+                      ? { shape: starterName, onPick: goToStarterShape }
+                      : null
+                  }
                 />
               )}
             </div>

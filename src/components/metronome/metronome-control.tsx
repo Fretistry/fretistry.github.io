@@ -232,6 +232,7 @@ function MetronomeSettingsPanel() {
 export function MetronomeBar({
   rootPitchClass,
   rootName,
+  droneListen,
   onClose,
   className,
 }: {
@@ -239,6 +240,8 @@ export function MetronomeBar({
   rootPitchClass: number;
   /** The root's name in the chosen note names (on the drone button). */
   rootName: string;
+  /** The drone ⓘ's "listen" paragraph with the scale's own notes. */
+  droneListen?: string | null;
   onClose: () => void;
   className?: string;
 }) {
@@ -316,7 +319,7 @@ export function MetronomeBar({
             <div className="mt-4 border-t border-border/60 pt-3">
               <p className="mb-3 text-sm font-semibold">{ui.drone.title}</p>
               {/* phones: the drone's sound and fifth live here (the bar itself is one row) */}
-              <DroneSoundOptions drone={drone} rootName={rootName} className="mb-3 sm:hidden" />
+              <DroneSoundOptions drone={drone} rootName={rootName} listen={droneListen} className="mb-3 sm:hidden" />
               <DroneSettingsPanel drone={drone} />
             </div>
             {/* phones: the × lives here, so the metronome row stays one line */}
@@ -331,7 +334,7 @@ export function MetronomeBar({
       </div>
 
       {/* Drone (on phones just its start button, in the same row) */}
-      <DroneControls drone={drone} rootName={rootName} className="sm:border-l sm:border-border/60 sm:pl-3" />
+      <DroneControls drone={drone} rootName={rootName} listen={droneListen} className="sm:border-l sm:border-border/60 sm:pl-3" />
     </div>
   );
 }

@@ -15,6 +15,8 @@ interface TrainerBarProps {
   total: number;
   onNext: () => void;
   onStop: () => void;
+  /** Whole neck, first round: suggest practising one shape, with a button that shows it. */
+  shapeTip?: { shape: string; onPick: () => void } | null;
   className?: string;
 }
 
@@ -39,7 +41,7 @@ function useClock(startedAt: number | null, finishedAt: number | null): number {
  * (within the visible frets and the chosen shapes); found spots light up, a
  * wrong tap flashes red. Shows progress, mistakes and time.
  */
-export function TrainerBar({ state, noteName, total, onNext, onStop, className }: TrainerBarProps) {
+export function TrainerBar({ state, noteName, total, onNext, onStop, shapeTip, className }: TrainerBarProps) {
   const { ui, locale } = useI18n();
   const t = ui.trainer;
   const seconds = (ms: number) => formatSeconds(locale, ms);
@@ -53,7 +55,8 @@ export function TrainerBar({ state, noteName, total, onNext, onStop, className }
       aria-label={t.button}
       className={cn("rounded-xl border border-primary/30 bg-card/95 px-3 py-2 backdrop-blur-sm", className)}
     >
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+      {/* phones: one row ("Find every G · 0/7 · 0.0 s · ⏭ · ×"), so the pinned bar stays small */}
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-2 sm:gap-x-4">
         <p className="flex items-center gap-2 text-base sm:text-lg" aria-live="polite">
           {done ? <Check className="size-5 text-note-scale" /> : <Target className="size-5 text-primary" />}
           {done ? (
@@ -69,22 +72,45 @@ export function TrainerBar({ state, noteName, total, onNext, onStop, className }
           ))}
         </div>
         <p className="text-sm text-muted-foreground tabular-nums">
-          {t.progress(found, total)} · {t.mistakes(state.mistakes)} · {seconds(elapsed)} s
+          <span className="sm:hidden">
+            {found}/{total}
+          </span>
+          <span className="max-sm:hidden">
+            {t.progress(found, total)} · {t.mistakes(state.mistakes)}
+          </span>{" "}
+          · {seconds(elapsed)} s
         </p>
         <div className="ml-auto flex items-center gap-1">
-          <Button size="sm" variant={done ? "default" : "outline"} onClick={onNext} className="rounded-full">
-            <SkipForward /> {done ? t.next : t.skip}
+          <Button
+            size="sm"
+            variant={done ? "default" : "outline"}
+            onClick={onNext}
+            aria-label={done ? t.next : t.skip}
+            className={cn("rounded-full", !done && "max-sm:aspect-square max-sm:px-0")}
+          >
+            <SkipForward />
+            {/* phones: Skip is just ⏭ (Next keeps its word: it's the main action once you're done) */}
+            <span className={cn(!done && "max-sm:hidden")}>{done ? t.next : t.skip}</span>
           </Button>
           <Button variant="ghost" size="icon-sm" aria-label={t.stop} title={t.stop} onClick={onStop}>
             <X />
           </Button>
         </div>
       </div>
-      <p className="mt-1 hidden text-xs text-muted-foreground sm:block">
-        {state.completed > 0
-          ? t.session(state.completed, seconds(state.totalMs / state.completed), state.totalMistakes)
-          : t.hint}
-      </p>
+      {shapeTip ? (
+        <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+          {t.shapeTip}
+          <Button size="xs" variant="outline" onClick={shapeTip.onPick} className="rounded-full">
+            {t.shapeTipButton(shapeTip.shape)}
+          </Button>
+        </p>
+      ) : (
+        <p className="mt-1 hidden text-xs text-muted-foreground sm:block">
+          {state.completed > 0
+            ? t.session(state.completed, seconds(state.totalMs / state.completed), state.totalMistakes)
+            : t.hint}
+        </p>
+      )}
     </div>
   );
 }

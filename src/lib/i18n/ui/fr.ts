@@ -23,6 +23,7 @@ export const fr: UiMessages = {
     dark: "Sombre",
     light: "Clair",
     note: "Les préférences sont enregistrées sur cet appareil.",
+    offline: "Fonctionne aussi hors ligne. Sur un téléphone, choisissez « Ajouter à l’écran d’accueil » dans le menu du navigateur pour utiliser Fretistry comme une appli.",
   },
   controls: {
     rootNote: "Tonique",
@@ -90,6 +91,8 @@ export const fr: UiMessages = {
     shareShort: "Partager",
     copied: "Lien copié",
     copyLink: "Copier le lien",
+    linkHint: "Ouvre exactement cette vue",
+    imageHint: "Une image du manche · sombre, ou blanche pour imprimer",
     shareLink: "Partager le lien…",
     prompt: "Copiez ce lien pour le partager :",
     text: (title) => `${title} sur Fretistry`,
@@ -179,6 +182,7 @@ export const fr: UiMessages = {
     openPosition: "position ouverte",
     fromFret: (fret) => `à partir de la ${rang(fret)} case`,
     repeats: "(se répète 12 cases plus haut)",
+    connectHint: "touchez une autre lettre pour voir comment les formes se rejoignent",
   },
   chords: {
     chords: "Accords",
@@ -312,6 +316,7 @@ export const fr: UiMessages = {
   startHere: {
     title: "Pour commencer",
     hint: "Des premières gammes populaires, chacune dans une forme. Touchez le ☆ à côté du nom d’une gamme pour la garder ici à la place.",
+    easier: (title) => `Pour débuter plus simplement : ${title}`,
     box: (n) => `box ${n}`,
     shapeInfo: [
       "Une seule forme est bien plus facile à apprendre que tout le manche. Voici une bonne première forme pour cette gamme : touchez-la pour n’afficher qu’elle, puis jouez-la lentement de la note la plus grave vers l’aigu, et retour.",
@@ -345,6 +350,8 @@ export const fr: UiMessages = {
     session: (completed, avgSeconds, mistakes) =>
       `Cette session : ${completed} ${completed <= 1 ? "note" : "notes"} · ${avgSeconds} s en moyenne · ${mistakes} ${mistakes <= 1 ? "erreur" : "erreurs"}`,
     hint: "Touchez les emplacements sur le manche. Seules les notes dans les cases visibles sont demandées — et dans les formes choisies, s’il y en a.",
+    shapeTip: "Astuce : apprenez une forme à la fois.",
+    shapeTipButton: (shape) => `Seulement ${shape}`,
   },
   drone: {
     title: "Bourdon",
@@ -359,6 +366,13 @@ export const fr: UiMessages = {
     fifthTitle: "Ajouter la quinte au-dessus de la tonique, pour un son plus plein",
     volume: "Volume du bourdon",
     note: "Le bourdon joue la tonique de la tonalité actuelle et suit quand vous changez de tonalité. Jouez par-dessus et écoutez l’effet de chaque note : la ♭3 sonne triste, la 3 joyeuse, et la 7 veut monter vers la tonique.",
+    listen: ({ third, seventh }) => {
+      const parts = [
+        third && `**${third.note}** (la ${third.minor ? "♭3" : "3"}) sonne ${third.minor ? "triste" : "lumineuse et joyeuse"}`,
+        seventh && `**${seventh.note}** (la ${seventh.major ? "7" : "♭7"}) ${seventh.major ? "veut monter vers la tonique" : "sonne détendue et bluesy"}`,
+      ].filter(Boolean);
+      return parts.length ? `Appuyez sur ▶, jouez la gamme par-dessus et écoutez : ${parts.join(", et ")}. Cela entraîne votre oreille à ce que fait chaque note.` : null;
+    },
     infoTitle: "Qu’est-ce qu’un bourdon ?",
     info: (note) => [
       `Un **bourdon** est une note qui continue de sonner pendant que vous jouez : ici **${note}**, la tonique de la tonalité choisie. Il suit quand vous changez de tonalité.`,

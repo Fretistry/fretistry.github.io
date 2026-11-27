@@ -21,6 +21,7 @@ export const es: UiMessages = {
     dark: "Oscuro",
     light: "Claro",
     note: "Las preferencias se guardan en este dispositivo.",
+    offline: "También funciona sin conexión. En el móvil, elige «Añadir a pantalla de inicio» en el menú del navegador para usar Fretistry como una app.",
   },
   controls: {
     rootNote: "Tónica",
@@ -88,6 +89,8 @@ export const es: UiMessages = {
     shareShort: "Compartir",
     copied: "Enlace copiado",
     copyLink: "Copiar enlace",
+    linkHint: "Abre exactamente esta vista",
+    imageHint: "Una imagen del mástil · oscura, o blanca para imprimir",
     shareLink: "Compartir enlace…",
     prompt: "Copia este enlace para compartirlo:",
     text: (title) => `${title} en Fretistry`,
@@ -177,6 +180,7 @@ export const es: UiMessages = {
     openPosition: "posición abierta",
     fromFret: (fret) => `desde el traste ${fret}`,
     repeats: "(se repite 12 trastes más arriba)",
+    connectHint: "toca otra letra para ver cómo se unen las formas",
   },
   chords: {
     chords: "Acordes",
@@ -310,6 +314,7 @@ export const es: UiMessages = {
   startHere: {
     title: "Empieza aquí",
     hint: "Escalas populares para empezar, cada una en una forma. Toca la ☆ junto al nombre de una escala para guardarla aquí.",
+    easier: (title) => `Para empezar más fácil: ${title}`,
     box: (n) => `caja ${n}`,
     shapeInfo: [
       "Una sola forma es mucho más fácil de aprender que todo el mástil. Esta es una buena primera forma para esta escala: tócala para ver solo esa forma y luego tócala despacio desde la nota más grave hacia arriba y de vuelta.",
@@ -343,6 +348,8 @@ export const es: UiMessages = {
     session: (completed, avgSeconds, mistakes) =>
       `Esta sesión: ${completed} ${completed === 1 ? "nota" : "notas"} · ${avgSeconds} s de media · ${mistakes} ${mistakes === 1 ? "error" : "errores"}`,
     hint: "Toca los lugares en el mástil. Solo pregunta notas dentro de los trastes visibles — y dentro de las formas elegidas, si hay alguna.",
+    shapeTip: "Consejo: aprende una forma cada vez.",
+    shapeTipButton: (shape) => `Solo ${shape}`,
   },
   drone: {
     title: "Bordón",
@@ -357,6 +364,13 @@ export const es: UiMessages = {
     fifthTitle: "Añade la quinta sobre la tónica, para un sonido más lleno",
     volume: "Volumen del bordón",
     note: "El bordón toca la tónica de la tonalidad actual y la sigue cuando cambias de tonalidad. Toca encima y escucha cómo suena cada nota: la ♭3 suena triste, la 3 alegre, y la 7 quiere subir a la tónica.",
+    listen: ({ third, seventh }) => {
+      const parts = [
+        third && `**${third.note}** (la ${third.minor ? "♭3" : "3"}) suena ${third.minor ? "triste" : "luminosa y alegre"}`,
+        seventh && `**${seventh.note}** (la ${seventh.major ? "7" : "♭7"}) ${seventh.major ? "quiere subir a la tónica" : "suena relajada y bluesera"}`,
+      ].filter(Boolean);
+      return parts.length ? `Pulsa ▶, toca la escala encima y escucha: ${parts.join(", y ")}. Así entrenas el oído para lo que hace cada nota.` : null;
+    },
     infoTitle: "¿Qué es un bordón?",
     info: (note) => [
       `Un **bordón** es una nota que sigue sonando mientras tocas: aquí **${note}**, la tónica de la tonalidad que elegiste. Te sigue cuando cambias de tonalidad.`,

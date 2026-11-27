@@ -26,6 +26,7 @@ export const en = {
     dark: "Dark",
     light: "Light",
     note: "Preferences are remembered on this device.",
+    offline: "Works offline too. On a phone, choose “Add to Home Screen” in the browser menu to use Fretistry like an app.",
   },
   controls: {
     rootNote: "Root note",
@@ -95,6 +96,8 @@ export const en = {
     shareShort: "Share & save",
     copied: "Link copied",
     copyLink: "Copy link",
+    linkHint: "Opens exactly this view",
+    imageHint: "A picture of the neck · dark, or white for printing",
     shareLink: "Share link…",
     prompt: "Copy this link to share it:",
     text: (title: string) => `${title} on Fretistry`,
@@ -184,6 +187,7 @@ export const en = {
     openPosition: "open position",
     fromFret: (fret: number) => `from the ${ordinal(fret)} fret`,
     repeats: "(repeats 12 frets higher)",
+    connectHint: "tap another letter to see how the shapes connect",
   },
   chords: {
     chords: "Chords",
@@ -317,6 +321,7 @@ export const en = {
   startHere: {
     title: "Start here",
     hint: "Popular first scales, each in one shape. Tap the ☆ next to a scale’s name to keep it here instead.",
+    easier: (title: string) => `Easier start: ${title}`,
     /** Pentatonic "boxes" are numbered in most lessons: box 1 is the E shape. */
     box: (n: number) => `box ${n}`,
     shapeInfo: [
@@ -351,6 +356,8 @@ export const en = {
     session: (completed: number, avgSeconds: string, mistakes: number) =>
       `This session: ${completed} ${completed === 1 ? "note" : "notes"} · ${avgSeconds} s on average · ${mistakes} ${mistakes === 1 ? "mistake" : "mistakes"}`,
     hint: "Tap the spots on the neck. It only asks for notes within the visible frets — and within the chosen shapes, if any are shown.",
+    shapeTip: "Tip: learn one shape at a time.",
+    shapeTipButton: (shape: string) => `Only ${shape}`,
   },
   drone: {
     title: "Drone",
@@ -365,6 +372,14 @@ export const en = {
     fifthTitle: "Add the fifth above the root, for a fuller sound",
     volume: "Drone volume",
     note: "The drone plays the root of the current key and follows along when you change key. Play over it and listen to how each note feels: the ♭3 sounds sad, the 3 happy, and the 7 wants to move up to the root.",
+    /** The drone's ⓘ, with the scale's own notes: "C (the ♭3) sounds sad, and G (the ♭7) …". */
+    listen: ({ third, seventh }: { third: { note: string; minor: boolean } | null; seventh: { note: string; major: boolean } | null }) => {
+      const parts = [
+        third && `**${third.note}** (the ${third.minor ? "♭3" : "3"}) sounds ${third.minor ? "sad" : "bright and happy"}`,
+        seventh && `**${seventh.note}** (the ${seventh.major ? "7" : "♭7"}) ${seventh.major ? "wants to move up to the root" : "sounds relaxed and bluesy"}`,
+      ].filter(Boolean);
+      return parts.length ? `Press ▶, then play the scale over it and listen: ${parts.join(", and ")}. It trains your ear for what each note does.` : null;
+    },
     infoTitle: "What is a drone?",
     info: (note: string) => [
       `A **drone** is a note that keeps sounding while you play: here **${note}**, the root of the key you picked. It follows along when you change key.`,

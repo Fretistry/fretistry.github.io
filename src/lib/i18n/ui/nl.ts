@@ -23,6 +23,7 @@ export const nl: UiMessages = {
     dark: "Donker",
     light: "Licht",
     note: "Voorkeuren worden op dit toestel onthouden.",
+    offline: "Werkt ook offline. Kies op je telefoon ‘Zet op beginscherm’ in het browsermenu om Fretistry als app te gebruiken.",
   },
   controls: {
     rootNote: "Grondtoon",
@@ -90,6 +91,8 @@ export const nl: UiMessages = {
     shareShort: "Delen & bewaren",
     copied: "Link gekopieerd",
     copyLink: "Link kopiëren",
+    linkHint: "Opent precies deze weergave",
+    imageHint: "Een afbeelding van de hals · donker, of wit om te printen",
     shareLink: "Link delen…",
     prompt: "Kopieer deze link om te delen:",
     text: (title) => `${title} op Fretistry`,
@@ -179,6 +182,7 @@ export const nl: UiMessages = {
     openPosition: "open positie",
     fromFret: (fret) => `vanaf de ${rang(fret)} fret`,
     repeats: "(herhaalt zich 12 frets hoger)",
+    connectHint: "tik nog een letter aan om te zien hoe de vormen aansluiten",
   },
   chords: {
     chords: "Akkoorden",
@@ -312,6 +316,7 @@ export const nl: UiMessages = {
   startHere: {
     title: "Begin hier",
     hint: "Populaire eerste toonladders, elk in één vorm. Tik op de ☆ naast de naam van een toonladder om die hier te bewaren.",
+    easier: (title) => `Makkelijker begin: ${title}`,
     box: (n) => `box ${n}`,
     shapeInfo: [
       "Eén vorm is veel makkelijker te leren dan de hele hals. Dit is een goede eerste vorm voor deze toonladder: tik erop om alleen die vorm te tonen, en speel hem rustig van de laagste noot omhoog en weer terug.",
@@ -345,6 +350,8 @@ export const nl: UiMessages = {
     session: (completed, avgSeconds, mistakes) =>
       `Deze sessie: ${completed} ${completed === 1 ? "noot" : "noten"} · gemiddeld ${avgSeconds} s · ${mistakes} ${mistakes === 1 ? "fout" : "fouten"}`,
     hint: "Tik de plekken aan op de hals. Er worden alleen noten gevraagd binnen de zichtbare frets — en binnen de gekozen vormen, als die getoond worden.",
+    shapeTip: "Tip: leer één vorm tegelijk.",
+    shapeTipButton: (shape) => `Alleen ${shape}`,
   },
   drone: {
     title: "Drone",
@@ -359,6 +366,13 @@ export const nl: UiMessages = {
     fifthTitle: "Voeg de kwint boven de grondtoon toe, voor een vollere klank",
     volume: "Volume van de drone",
     note: "De drone speelt de grondtoon van de huidige toonsoort en volgt mee als je van toonsoort wisselt. Speel erover en luister hoe elke noot klinkt: de ♭3 klinkt droevig, de 3 vrolijk, en de 7 wil omhoog naar de grondtoon.",
+    listen: ({ third, seventh }) => {
+      const parts = [
+        third && `**${third.note}** (de ${third.minor ? "♭3" : "3"}) klinkt ${third.minor ? "droevig" : "helder en vrolijk"}`,
+        seventh && `**${seventh.note}** (de ${seventh.major ? "7" : "♭7"}) ${seventh.major ? "wil omhoog naar de grondtoon" : "klinkt ontspannen en bluesy"}`,
+      ].filter(Boolean);
+      return parts.length ? `Druk op ▶, speel de toonladder erover en luister: ${parts.join(", en ")}. Zo train je je oor voor wat elke noot doet.` : null;
+    },
     infoTitle: "Wat is een drone?",
     info: (note) => [
       `Een **drone** is een noot die blijft klinken terwijl je speelt: hier **${note}**, de grondtoon van de toonsoort die je koos. Hij volgt mee als je van toonsoort wisselt.`,

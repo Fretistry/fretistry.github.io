@@ -21,6 +21,7 @@ export const de: UiMessages = {
     dark: "Dunkel",
     light: "Hell",
     note: "Einstellungen werden auf diesem Gerät gespeichert.",
+    offline: "Funktioniert auch offline. Wähle auf dem Handy im Browsermenü „Zum Startbildschirm hinzufügen“, um Fretistry wie eine App zu nutzen.",
   },
   controls: {
     rootNote: "Grundton",
@@ -88,6 +89,8 @@ export const de: UiMessages = {
     shareShort: "Teilen",
     copied: "Link kopiert",
     copyLink: "Link kopieren",
+    linkHint: "Öffnet genau diese Ansicht",
+    imageHint: "Ein Bild des Griffbretts · dunkel oder weiß zum Drucken",
     shareLink: "Link teilen…",
     prompt: "Kopiere diesen Link zum Teilen:",
     text: (title) => `${title} auf Fretistry`,
@@ -177,6 +180,7 @@ export const de: UiMessages = {
     openPosition: "offene Lage",
     fromFret: (fret) => `ab dem ${fret}. Bund`,
     repeats: "(wiederholt sich 12 Bünde höher)",
+    connectHint: "tippe einen weiteren Buchstaben an, um zu sehen, wie die Formen zusammenhängen",
   },
   chords: {
     chords: "Akkorde",
@@ -310,6 +314,7 @@ export const de: UiMessages = {
   startHere: {
     title: "Hier anfangen",
     hint: "Beliebte erste Tonleitern, jeweils in einer Form. Tippe auf den ☆ neben dem Namen einer Tonleiter, um sie stattdessen hier zu behalten.",
+    easier: (title) => `Einfacher Einstieg: ${title}`,
     box: (n) => `Box ${n}`,
     shapeInfo: [
       "Eine Form ist viel leichter zu lernen als das ganze Griffbrett. Das ist eine gute erste Form für diese Tonleiter: Tippe darauf, um nur diese Form zu zeigen, und spiele sie langsam vom tiefsten Ton hinauf und wieder zurück.",
@@ -343,6 +348,8 @@ export const de: UiMessages = {
     session: (completed, avgSeconds, mistakes) =>
       `Diese Sitzung: ${completed} ${completed === 1 ? "Ton" : "Töne"} · im Schnitt ${avgSeconds} s · ${mistakes} Fehler`,
     hint: "Tippe die Stellen auf dem Griffbrett an. Gefragt werden nur Töne innerhalb der sichtbaren Bünde — und innerhalb der gewählten Formen, falls welche angezeigt werden.",
+    shapeTip: "Tipp: Lerne eine Form nach der anderen.",
+    shapeTipButton: (shape) => `Nur ${shape}`,
   },
   drone: {
     title: "Bordun",
@@ -357,6 +364,13 @@ export const de: UiMessages = {
     fifthTitle: "Die Quinte über dem Grundton hinzufügen, für einen volleren Klang",
     volume: "Lautstärke des Borduns",
     note: "Der Bordun spielt den Grundton der aktuellen Tonart und folgt, wenn du die Tonart wechselst. Spiel darüber und hör, wie jeder Ton wirkt: die ♭3 klingt traurig, die 3 fröhlich, und die 7 will hinauf zum Grundton.",
+    listen: ({ third, seventh }) => {
+      const parts = [
+        third && `**${third.note}** (die ${third.minor ? "♭3" : "3"}) klingt ${third.minor ? "traurig" : "hell und fröhlich"}`,
+        seventh && `**${seventh.note}** (die ${seventh.major ? "7" : "♭7"}) ${seventh.major ? "will hinauf zum Grundton" : "klingt entspannt und bluesig"}`,
+      ].filter(Boolean);
+      return parts.length ? `Drück ▶, spiel die Tonleiter darüber und hör hin: ${parts.join(", und ")}. So trainierst du dein Gehör für die Wirkung jedes Tons.` : null;
+    },
     infoTitle: "Was ist ein Bordun?",
     info: (note) => [
       `Ein **Bordun** ist ein Ton, der weiterklingt, während du spielst: hier **${note}**, der Grundton der gewählten Tonart. Er folgt, wenn du die Tonart wechselst.`,

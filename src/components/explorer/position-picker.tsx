@@ -3,6 +3,7 @@
 import { shapeColor } from "@/components/fretboard/shape-colors";
 import { useI18n } from "@/components/i18n/i18n-provider";
 import type { PositionChoice } from "@/lib/share";
+import { pentatonicBox } from "@/lib/start-here";
 import { positionStartFret, type PositionSystem, type ScalePosition } from "@/lib/theory";
 import { cn } from "@/lib/utils";
 import { ToolbarGroup } from "./display-toolbar";
@@ -17,6 +18,8 @@ interface PositionPickerProps {
   selected: number[];
   /** The tuning gives the 5 boxes CAGED names (standard-type tunings): label them "CAGED", C-A-G-E-D. */
   caged: boolean;
+  /** Minor pentatonic and blues shapes also get their usual box number ("E shape · box 1"). */
+  scaleId: string;
   onChange: (patch: { positionSystem?: PositionChoice; positionIndices?: number[] }) => void;
 }
 
@@ -29,9 +32,15 @@ const pill =
  * 3-notes-per-string patterns (one at a time). The buttons always stay in
  * the same place; only their colour changes.
  */
-export function PositionPicker({ system, available, positions, selected, caged, onChange }: PositionPickerProps) {
+export function PositionPicker({ system, available, positions, selected, caged, scaleId, onChange }: PositionPickerProps) {
   const { ui } = useI18n();
   const t = ui.positions;
+  /** "E shape", or "E shape · box 1" for the minor pentatonic and blues. */
+  const shapeName = (p: ScalePosition) => {
+    if (!p.cagedShape) return t.positionAria(p.index + 1, null);
+    const box = pentatonicBox(scaleId, p.cagedShape);
+    return box ? `${t.shape(p.cagedShape)} · ${ui.startHere.box(box)}` : t.shape(p.cagedShape);
+  };
   const shapesInfo = [caged ? ui.info.caged : ui.info.positions, ...(available.includes("3nps") ? [ui.info.threePerString] : [])];
   const count = positions.length;
   const multi = system === "boxes";
@@ -49,12 +58,14 @@ export function PositionPicker({ system, available, positions, selected, caged, 
   };
 
   const detail = single
-    ? `${single.cagedShape ? `${t.shape(single.cagedShape)} · ` : ""}${
+    ? `${single.cagedShape ? `${shapeName(single)} · ` : ""}${
         startFret === 0 ? t.openPosition : startFret !== null ? t.fromFret(startFret) : ""
       }${single.occurrences.length > 1 ? ` ${t.repeats}` : ""}`
     : selected.length === 0
       ? t.noneShown
       : null; // several shapes: the coloured buttons already say it all
+  // With one CAGED shape shown, say that more can be added (the buttons look like a single choice).
+  const connectHint = multi && single && count > 1 ? t.connectHint : null;
 
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5">
@@ -79,7 +90,7 @@ export function PositionPicker({ system, available, positions, selected, caged, 
           <div role={multi ? "group" : "radiogroup"} aria-label={t.position} className="flex flex-wrap gap-1">
             {positions.map((p) => {
               const active = selected.includes(p.index);
-              const name = p.cagedShape ? t.shape(p.cagedShape) : t.positionAria(p.index + 1, null);
+              const name = shapeName(p);
               const color = shapeColor(p.index);
               return (
                 <button
@@ -121,7 +132,12 @@ export function PositionPicker({ system, available, positions, selected, caged, 
               </button>
             )}
           </div>
-          {detail && <span className="text-xs text-muted-foreground">{detail}</span>}
+          {detail && (
+            <span className="text-xs text-muted-foreground">
+              {detail}
+              {connectHint && <span className="text-muted-foreground/80"> · {connectHint}</span>}
+            </span>
+          )}
         </div>
       )}
     </div>

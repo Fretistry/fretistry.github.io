@@ -70,6 +70,7 @@ Then open <http://localhost:3000>.
 **CAGED shapes and scale positions**
 
 - **CAGED:** the 5 shapes of each scale, in the order guitarists learn them: **C – A – G – E – D**. They're available in standard tuning (and E♭, D or C standard).
+- **Box numbers:** for the minor pentatonic and blues, shapes also carry the box number most lessons use: box 1 is the E shape (at the 5th fret in A), then D, C, A and G are boxes 2–5. The line under the buttons reads e.g. "E shape · box 1 · from the 5th fret", and with one shape shown it adds "tap another letter to see how the shapes connect".
   - 7-note scales give the standard CAGED scale patterns, and an automated test checks all five C major shapes against the usual diagrams.
   - Pentatonic scales give the 5 pentatonic boxes, named by the same shapes (the familiar "box 1" at the 5th fret of A minor pentatonic is the E shape).
 - **Shaded like a CAGED diagram:** each shown shape is shaded on the fret grid. On every string the area covers exactly the frets that string uses, with edges on the fret wires and a step where the shape shifts (e.g. at the B string). It repeats 12 frets higher where it fits, and the rest of the scale is dimmed.
@@ -101,6 +102,7 @@ Then open <http://localhost:3000>.
   - On the **home page** a row under the controls offers popular first scales: A minor pentatonic (box 1, E shape), E minor pentatonic in open position, C major (C shape) and A blues.
   - On a **scale's own page** (often reached from a search) the scale is already chosen, so next to the Shapes picker there's one slim chip with a good first shape for that scale, e.g. "E shape · box 1 · from the 5th fret": the shape with its root on the low E string, or on the A string when that sits too high. Pentatonic and blues shapes also get their usual box number. The ⓘ explains it.
   - One tap shows the scale in that one shape instead of the whole neck.
+  - On a major or natural minor page it also offers an **easier start**: "Easier start: G Major Pentatonic" (five notes instead of seven).
 - **The neck comes into view:** after Start here, picking a shape, Play scale, Train or a chord's "Show", the page scrolls just far enough to show the result (on a vertical neck: the chosen shape). Nothing moves when it's already in view, and with "reduce motion" turned on it jumps instead of gliding.
 - Your preferences are remembered: tuning, labels, view options, sound, metronome and drone settings (and whether their bar is shown), and whether the theory panel is folded.
 - A highlighted chord belongs to one key, so it is cleared when you change the root or scale.
@@ -122,13 +124,14 @@ Then open <http://localhost:3000>.
 - The address bar always describes what you're looking at: the page is the key and scale (in the current language), and anything else follows after the "?", e.g. `/en/a-dorian/?tuning=drop-d&pos=boxes2&chord=4`. Standard tuning and the plain view need nothing after the "?". Reloading or sharing opens exactly that view.
 - A plain visit to the home page keeps its address until you change something.
 - Older links (`?root=A&scale=dorian&…`, or with `mode=practice`) still open normally.
-- The **Share & save** menu has two choices: **Copy link** (on phones: **Share link…**, which opens the share sheet) and **Save as image…**.
+- The **Share & save** menu has two choices, each with a line saying what you get: **Copy link** ("Opens exactly this view"; on phones: **Share link…**, which opens the share sheet) and **Save as image…** ("A picture of the neck · dark, or white for printing").
+- **Settings** also says that Fretistry works offline and can be added to a phone's home screen, and links to the overview of all scales.
 - Personal preferences (theme, labels, left-handed, sound) stay on your own device.
 
 **Sound**
 
 - Notes play as a plucked guitar string at the exact pitch. A new note on the same string cuts off the previous one; notes on different strings ring together.
-- **Play scale** plays one shape on the neck, from its lowest note to its highest and back, and lights up each spot as it sounds, so you can follow along with your fingers. It uses the shape you chose (or, with several shapes or the whole neck shown, the one nearest the nut that fits in the visible frets). It plays one note per metronome click at the metronome's tempo, and when the metronome is running it starts exactly on the next beat.
+- **Play scale** plays one shape on the neck, from its lowest note to its highest and back, and lights up each spot as it sounds, so you can follow along with your fingers. It uses the shape you chose (or, with several shapes or the whole neck shown, the one nearest the nut that fits in the visible frets). It plays one note per metronome click at the metronome's tempo (on laptops the button shows it: "Play scale 80 BPM"), and when the metronome is running it starts exactly on the next beat.
 - **Play chord** strums the highlighted chord.
 - The speaker icon turns note sounds on or off. The metronome has its own volume. On iPhone the sound plays even when the silent switch is on (iOS 16.4+).
 
@@ -147,12 +150,14 @@ Then open <http://localhost:3000>.
 
 - A note that keeps sounding under your playing: the root of the current key, so you hear what every note does against it (the ♭3 sad, the 3 happy, the 7 pulling up to the root). Change key and it glides to the new root.
 - Two sounds: **Pad** (a warm, slowly moving synth sound) and **Harmonium** (a steady, singing reed organ), both with a soft room around them. **+5th** adds the fifth for a fuller sound. (On phones both are in the bar's Settings.)
-- The ⓘ next to it explains what a drone is and how to practise with it.
+- The ⓘ next to it explains what a drone is and how to practise with it, using the current scale's own notes: in A minor pentatonic, "C (the ♭3) sounds sad, and G (the ♭7) sounds relaxed and bluesy".
 - Its volume is in **Settings**, separate from the metronome and the note sounds. Closing the bar stops the drone. Sound, fifth and volume are remembered.
 
 **Fretboard trainer** (the **Train** button next to Share & save)
 
 - Asks you to **find every spot** of one note of the scale ("Find every G"). The neck turns into blank circles; tap the right spots. Found notes appear with their name, a wrong tap flashes red, and you hear every note you tap.
+- The clock starts at your first tap, not when the question appears. On phones the bar is one row ("Find every G · 0/7 · 0.0 s · ⏭ · ×").
+- On the whole neck, the first round suggests learning one shape at a time, with a button that switches to it ("Only E shape · box 1").
 - It quizzes the visible frets only, and only the chosen CAGED shapes or boxes if any are shown, so you can learn one shape at a time.
 - A bar above the neck shows progress, mistakes and a timer, plus your totals for the session. **Next note** picks another note of the scale (never the same one twice in a row); **Skip** moves on without finishing.
 - Changing the key, scale, tuning, fret range or shapes starts a fresh round. While training, the chord bar, the note summary and Play scale step aside; a saved picture still shows the normal neck.
@@ -324,7 +329,7 @@ Add one line to `src/lib/data/tunings.ts`, e.g. `tuning("open-f", "Open F", "C2 
 
 ## Tests
 
-`npm test` runs 480 automated checks, including:
+`npm test` runs 482 automated checks, including:
 
 - **Required cases:** C Major, A Natural Minor, A Minor Pentatonic, E Minor Pentatonic, Drop D, and custom tunings.
 - **Spelling:** every root × every scale for correct pitches and spelling.
@@ -349,7 +354,8 @@ Add one line to `src/lib/data/tunings.ts`, e.g. `tuning("open-f", "Open F", "C2 
 - **Fret ranges:** the five ranges in order, never past the end of the neck, 12 frets on phones by default, and older saved settings moved over correctly.
 - **Play scale on the neck:** the chosen shape where it fits in the visible frets, nearest the nut, played up and back down with the top note once.
 - **Fretboard trainer:** every spot of a note within the frets and shapes, answers hidden until found (also from screen readers), wrong taps flagged, and a varied, repeatable choice of notes that never repeats one straight away.
-- **Start here:** every suggestion is a real scale in a real CAGED shape, in the familiar place on the neck.
+- **Start here:** every suggestion is a real scale in a real CAGED shape, in the familiar place on the neck; minor pentatonic and blues boxes are numbered the usual way (E shape = box 1).
+- **Drone tip:** names the scale's own 3rd and 7th in every language, and falls back to the general text when a scale has neither.
 - **Same pitch:** exact-pitch rings, also outside the chosen shape, kept apart from the same note in other octaves.
 - **Selection rules:** C Major start, a chord cleared on key change, positions kept, and the metronome bar's default.
 - **Languages:** every interface text exists in all five languages, every scale is translated, German H/B and do-re-mi names are correct, step patterns use local symbols (German GT/HT, since G and H are note names), and a sweep over every language × note-name system × root × scale checks that no text comes out broken.

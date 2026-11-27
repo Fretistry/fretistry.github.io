@@ -14,15 +14,29 @@ interface ShareMenuProps {
   imageFileName: string;
 }
 
-function MenuItem({ icon, children, onClick }: { icon: React.ReactNode; children: React.ReactNode; onClick: () => void }) {
+function MenuItem({
+  icon,
+  children,
+  hint,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  children: React.ReactNode;
+  /** A short line under the choice saying what it gives you (so "Save" isn't missed). */
+  hint?: string;
+  onClick: () => void;
+}) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-sm transition-colors outline-none hover:bg-accent focus-visible:bg-accent [&_svg]:size-4 [&_svg]:text-muted-foreground"
+      className="flex w-full items-start gap-2.5 rounded-md px-2.5 py-2 text-left text-sm transition-colors outline-none hover:bg-accent focus-visible:bg-accent [&_svg]:mt-0.5 [&_svg]:size-4 [&_svg]:text-muted-foreground"
     >
       {icon}
-      {children}
+      <span className="min-w-0">
+        <span className="block">{children}</span>
+        {hint && <span className="block text-xs text-muted-foreground">{hint}</span>}
+      </span>
     </button>
   );
 }
@@ -80,12 +94,13 @@ export function ShareMenu({ title, imageInput, imageFileName }: ShareMenuProps) 
             <span className="max-sm:hidden">{t.share}</span>
           </Button>
         </PopoverTrigger>
-        <PopoverContent align="start" className="w-60 p-1">
-          <MenuItem icon={copied ? <Check className="text-note-scale!" /> : <Link2 />} onClick={shareLink}>
+        <PopoverContent align="start" collisionPadding={12} className="w-72 p-1">
+          <MenuItem icon={copied ? <Check className="text-note-scale!" /> : <Link2 />} hint={t.linkHint} onClick={shareLink}>
             <span aria-live="polite">{copied ? t.copied : nativeShare ? t.shareLink : t.copyLink}</span>
           </MenuItem>
           <MenuItem
             icon={<ImageDown />}
+            hint={t.imageHint}
             onClick={() => {
               setOpen(false);
               setImageOpen(true);

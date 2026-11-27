@@ -16,6 +16,8 @@ interface ScaleHeaderProps {
   playTitle?: string;
   /** "Play scale" unavailable for another reason than sound being off (e.g. during the trainer). */
   playDisabled?: boolean;
+  /** The metronome tempo "Play scale" uses (shown on the button on larger screens). */
+  tempo?: number;
   isPlaying: boolean;
   /** Scale note currently sounding during "Play scale" (highlighted). */
   playingIndex: number | null;
@@ -31,6 +33,7 @@ export function ScaleHeader({
   soundEnabled,
   playTitle,
   playDisabled = false,
+  tempo,
   isPlaying,
   playingIndex,
   onPlay,
@@ -62,6 +65,9 @@ export function ScaleHeader({
                 <span className={cn("col-start-1 row-start-1", isPlaying && "invisible")}>
                   <span className="sm:hidden">{t.playShort}</span>
                   <span className="max-sm:hidden">{t.playScale}</span>
+                  {/* the tempo it plays at: it follows the metronome */}
+                  {/* (from laptop width: on a tablet it would push the scale's notes onto a new line) */}
+                  {tempo !== undefined && <span className="ml-1 hidden font-normal tabular-nums opacity-70 xl:inline">{tempo} BPM</span>}
                 </span>
                 <span className={cn("col-start-1 row-start-1", !isPlaying && "invisible")}>{t.stop}</span>
               </span>

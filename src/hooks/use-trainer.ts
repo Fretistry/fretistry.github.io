@@ -50,8 +50,10 @@ export function useTrainer(context: string) {
     setState((s) => ({ ...s, context, found: [], mistakes: 0, startedAt: null, finishedAt: null, wrongKey: null }));
   }
 
+  // The clock starts at the first tap of a round (not when the question appears), so time spent
+  // reading the question or scrolling to the neck doesn't count.
   const start = useCallback(() => {
-    setState({ ...IDLE, active: true, context, startedAt: performance.now() });
+    setState({ ...IDLE, active: true, context });
   }, [context]);
 
   const stop = useCallback(() => {
@@ -67,7 +69,7 @@ export function useTrainer(context: string) {
       previous: askedPitchClass,
       found: [],
       mistakes: 0,
-      startedAt: performance.now(),
+      startedAt: null,
       finishedAt: null,
       wrongKey: null,
     }));

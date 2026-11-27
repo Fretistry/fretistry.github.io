@@ -11,6 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type { ExplorerSettings } from "@/hooks/use-explorer-state";
 import { LOCALES, defaultNamingFor, isLocale } from "@/lib/i18n";
+import { scaleIndexPath } from "@/lib/pages";
+import { BASE_PATH } from "@/lib/site";
 import type { NoteNaming } from "@/lib/theory";
 import { applyTheme, getCurrentTheme, type Theme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
@@ -219,7 +221,16 @@ function SettingsMenu({ settings, onChange }: { settings: ExplorerSettings; onCh
               ]}
             />
           </section>
-          <p className="text-xs text-muted-foreground">{ui.settings.note}</p>
+          <div className="space-y-1.5 text-xs text-muted-foreground">
+            <p>{ui.settings.note}</p>
+            {/* worth knowing, but easy to miss: it works offline, and every scale in every key has its own page */}
+            <p>{ui.settings.offline}</p>
+            <p>
+              <a href={`${BASE_PATH}${scaleIndexPath(locale)}`} className="font-medium text-foreground underline underline-offset-2 hover:text-primary">
+                {ui.seo.allScales}
+              </a>
+            </p>
+          </div>
         </div>
       </PopoverContent>
     </Popover>
